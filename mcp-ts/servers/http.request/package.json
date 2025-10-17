@@ -1,0 +1,20 @@
+{
+  "name": "@meta/mcp-http-request",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier -w ."
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.1",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3"
+  }
+}

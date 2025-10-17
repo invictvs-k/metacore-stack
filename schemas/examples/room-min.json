@@ -1,0 +1,12 @@
+{
+  "id": "room-123",
+  "state": "init",
+  "config": {
+    "mounts": [
+      { "path": "/data", "type": "volume" }
+    ],
+    "env": {
+      "MODE": "demo"
+    }
+  }
+}

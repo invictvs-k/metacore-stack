@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "room.schema.json",
+  "type": "object",
+  "required": ["id", "state", "config"],
+  "properties": {
+    "id": { "type": "string" },
+    "state": { "enum": ["init", "active", "paused", "ended"] },
+    "config": {
+      "type": "object",
+      "properties": {
+        "mounts": { "type": "array", "items": { "type": "object" } },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}

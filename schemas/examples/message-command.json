@@ -1,0 +1,13 @@
+{
+  "id": "msg-001",
+  "channel": "commands",
+  "from": "entity-human-1",
+  "type": "command",
+  "payload": {
+    "command": "run-task",
+    "args": {
+      "taskId": "sync"
+    }
+  },
+  "ts": "2024-01-01T12:00:00Z"
+}
