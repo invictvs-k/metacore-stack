@@ -17,7 +17,7 @@
     "PortId": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9]+)*$" },
     "MimeOrLogicalType": {
       "type": "string",
-      "pattern": "^([a-z0-9.+-]+/[a-z0-9.+-]+|[a-z][a-z0-9]*(?:\\/[a-z0-9.+-]+)*)$",
+      "pattern": "^([a-z0-9.+-]+/[a-z0-9.+-]+|[a-z][a-z0-9]*(?:/[a-z0-9.+-]+)*)$",
       "examples": ["text/markdown", "doc/markdown", "app/json"]
     },
     "Sha256": {
