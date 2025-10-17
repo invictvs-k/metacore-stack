@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "entity.schema.json",
+  "type": "object",
+  "required": ["id", "kind", "capabilities", "visibility"],
+  "properties": {
+    "id": { "type": "string" },
+    "kind": { "enum": ["human", "agent", "npc", "orchestrator"] },
+    "owner_user_id": { "type": "string" },
+    "visibility": { "enum": ["public", "team", "owner"] },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "policy": { "type": "object" }
+  }
+}

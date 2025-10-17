@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "message.schema.json",
+  "type": "object",
+  "required": ["id", "channel", "from", "type", "ts"],
+  "properties": {
+    "id": { "type": "string" },
+    "channel": { "type": "string" },
+    "from": { "type": "string" },
+    "type": { "enum": ["chat", "command", "event", "artifact"] },
+    "payload": { "type": "object" },
+    "ts": { "type": "string", "format": "date-time" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "session-log",
+  "type": "text/plain",
+  "path": "artifacts/session-log.txt",
+  "sha256": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+  "origin": {
+    "room": "room-001",
+    "entity": "entity-123",
+    "port": "log"
+  },
+  "version": 1,
+  "ts": "2024-01-01T12:05:00Z"
+}

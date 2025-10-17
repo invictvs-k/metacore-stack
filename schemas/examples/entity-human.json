@@ -1,0 +1,10 @@
+{
+  "id": "entity-123",
+  "kind": "human",
+  "owner_user_id": "user-42",
+  "visibility": "team",
+  "capabilities": ["chat", "view-artifacts"],
+  "policy": {
+    "allow": ["join-room", "send-message"]
+  }
+}

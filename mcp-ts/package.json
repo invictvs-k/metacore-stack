@@ -1,0 +1,9 @@
+{
+  "name": "@meta/mcp-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r -F '*' build",
+    "lint": "pnpm -r -F '*' lint",
+    "format": "pnpm -r -F '*' format"
+  }
+}

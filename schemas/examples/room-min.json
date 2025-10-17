@@ -1,0 +1,12 @@
+{
+  "id": "room-001",
+  "state": "init",
+  "config": {
+    "mounts": [
+      { "path": "/data", "target": "workspace" }
+    ],
+    "env": {
+      "MODE": "demo"
+    }
+  }
+}

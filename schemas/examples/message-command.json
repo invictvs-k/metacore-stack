@@ -1,0 +1,13 @@
+{
+  "id": "msg-789",
+  "channel": "commands",
+  "from": "entity-123",
+  "type": "command",
+  "payload": {
+    "command": "start-session",
+    "args": {
+      "roomId": "room-001"
+    }
+  },
+  "ts": "2024-01-01T12:00:00Z"
+}

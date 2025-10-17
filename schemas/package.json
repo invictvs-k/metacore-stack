@@ -1,0 +1,12 @@
+{
+  "name": "@meta/schemas",
+  "private": true,
+  "scripts": {
+    "validate": "ajv -s room.schema.json -d examples/room-min.json --spec=draft2020 && ajv -s entity.schema.json -d examples/entity-human.json --spec=draft2020 && ajv -s message.schema.json -d examples/message-command.json --spec=draft2020 && ajv -s artifact-manifest.schema.json -d examples/artifact-sample.json --spec=draft2020",
+    "test": "npm run validate"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-cli": "^5.0.0"
+  }
+}
