@@ -1,0 +1,8 @@
+{
+  "id": "entity-human-1",
+  "kind": "human",
+  "owner_user_id": "user-1",
+  "visibility": "public",
+  "capabilities": ["chat", "upload"],
+  "policy": {}
+}

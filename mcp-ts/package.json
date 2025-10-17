@@ -1,0 +1,10 @@
+{
+  "name": "@meta/mcp-stack",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r -F '*' dev",
+    "build": "pnpm -r -F '*' build",
+    "lint": "pnpm -r -F '*' lint",
+    "format": "pnpm -r -F '*' format"
+  }
+}
