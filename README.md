@@ -1,4 +1,4 @@
-# Metaplataforma — Sala Viva (MVP)
+# Metacore Stack — Metaplataforma (MVP)
 
 Mono-repo com:
 - `server-dotnet/` — Room Host (.NET 8 + SignalR)
