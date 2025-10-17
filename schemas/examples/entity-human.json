@@ -1,8 +1,8 @@
 {
-  "id": "entity-human-1",
+  "id": "E-AGENT-1",
   "kind": "human",
-  "owner_user_id": "user-1",
-  "visibility": "public",
-  "capabilities": ["chat", "upload"],
-  "policy": {}
+  "display_name": "Marcelo",
+  "visibility": "team",
+  "capabilities": ["text.generate", "review"],
+  "policy": { "allow_commands_from": "any", "sandbox_mode": false }
 }

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.defs.json",
+  "title": "Common Definitions for the Room Metaplatform",
+  "$metadata": { "semver": "1.0.0" },
+  "$defs": {
+    "Uuid": { "type": "string", "format": "uuid" },
+    "Ulid": { "type": "string", "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$" },
+    "IsoDateTime": { "type": "string", "format": "date-time" },
+    "RoomId": { "type": "string", "pattern": "^(room-[A-Za-z0-9_-]{6,})$" },
+    "EntityId": { "type": "string", "pattern": "^(E-[A-Za-z0-9_-]{2,64})$" },
+    "Channel": {
+      "type": "string",
+      "pattern": "^(room|@[A-Za-z0-9_.:-]+|#[A-Za-z0-9_.:-]+)$",
+      "examples": ["room", "@E-42", "#topic-ai"]
+    },
+    "PortId": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9]+)*$" },
+    "MimeOrLogicalType": {
+      "type": "string",
+      "pattern": "^([a-z0-9.+-]+/[a-z0-9.+-]+|[a-z][a-z0-9]*(?:\\/[a-z0-9.+-]+)*)$",
+      "examples": ["text/markdown", "doc/markdown", "app/json"]
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "Visibility": { "enum": ["public", "team", "owner"] },
+    "EntityKind": { "enum": ["human", "agent", "npc", "orchestrator"] },
+    "RoomState": { "enum": ["init", "active", "paused", "ended"] },
+    "Policy": {
+      "type": "object",
+      "properties": {
+        "allow_commands_from": { "enum": ["owner", "orchestrator", "any"] },
+        "sandbox_mode": { "type": "boolean" },
+        "env_whitelist": { "type": "array", "items": { "type": "string" } },
+        "scopes": { "type": "array", "items": { "type": "string" } },
+        "rateLimit": {
+          "type": "object",
+          "properties": { "perMinute": { "type": "integer", "minimum": 1 } },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": true
+    },
+    "Origin": {
+      "type": "object",
+      "required": ["room", "entity"],
+      "properties": {
+        "room": { "$ref": "#/$defs/RoomId" },
+        "entity": { "$ref": "#/$defs/EntityId" },
+        "port": { "$ref": "#/$defs/PortId" },
+        "workspace": { "enum": ["room", "entity"] },
+        "channel": { "$ref": "#/$defs/Channel" }
+      },
+      "additionalProperties": false
+    },
+    "KeyValue": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "Ext": {
+      "type": "object",
+      "description": "Vendor/Project specific extensions",
+      "additionalProperties": true
+    }
+  }
+}

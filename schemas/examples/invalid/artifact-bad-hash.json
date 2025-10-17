@@ -1,0 +1,8 @@
+{
+  "name": "file.bin",
+  "type": "app/octet-stream",
+  "path": "artifacts/file.bin",
+  "sha256": "NOTAHEX",
+  "origin": { "room": "room-abc123", "entity": "E-1" },
+  "ts": "2025-10-17T12:10:00Z"
+}

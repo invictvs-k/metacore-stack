@@ -1,0 +1,6 @@
+{
+  "id": "01J97KXK7J0ZC9D02T4X9Q4S7X",
+  "type": "command",
+  "payload": { "port": "text.generate", "inputs": {} },
+  "ts": "2025-10-17T12:01:00Z"
+}

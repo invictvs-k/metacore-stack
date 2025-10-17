@@ -1,13 +1,11 @@
 {
-  "name": "report.pdf",
-  "type": "application/pdf",
-  "path": "artifacts/report.pdf",
-  "sha256": "d2b2f74d2f0f2b3d2f4f5c6b7a8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c",
-  "origin": {
-    "room": "room-123",
-    "entity": "entity-human-1",
-    "port": "output"
-  },
+  "name": "intro_refined.md",
+  "type": "doc/markdown",
+  "path": ".ai-flow/runs/room-abc123/artifacts/intro_refined.md",
+  "size": 1280,
+  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "origin": { "room": "room-abc123", "entity": "E-AGENT-1", "port": "text.generate", "workspace": "room" },
   "version": 1,
-  "ts": "2024-01-01T12:05:00Z"
+  "ts": "2025-10-17T12:02:10Z",
+  "metadata": { "note": "refinado com guidance=clareza" }
 }

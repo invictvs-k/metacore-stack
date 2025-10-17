@@ -1,14 +1,119 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "message.schema.json",
+  "title": "Room Messaging",
+  "$metadata": { "semver": "1.0.0" },
   "type": "object",
-  "required": ["id", "channel", "from", "type", "ts"],
-  "properties": {
-    "id": { "type": "string" },
-    "channel": { "type": "string" },
-    "from": { "type": "string" },
-    "type": { "enum": ["chat", "command", "event", "artifact"] },
-    "payload": { "type": "object" },
-    "ts": { "type": "string", "format": "date-time" }
+  "oneOf": [
+    { "$ref": "#/$defs/ChatMessage" },
+    { "$ref": "#/$defs/CommandMessage" },
+    { "$ref": "#/$defs/EventMessage" },
+    { "$ref": "#/$defs/ArtifactMessage" }
+  ],
+  "$defs": {
+    "Base": {
+      "type": "object",
+      "required": ["id", "roomId", "channel", "from", "type", "ts"],
+      "properties": {
+        "id": { "$ref": "common.defs.json#/$defs/Ulid" },
+        "roomId": { "$ref": "common.defs.json#/$defs/RoomId" },
+        "channel": { "$ref": "common.defs.json#/$defs/Channel" },
+        "from": { "$ref": "common.defs.json#/$defs/EntityId" },
+        "to": { "$ref": "common.defs.json#/$defs/EntityId" },
+        "type": { "type": "string" },
+        "ts": { "$ref": "common.defs.json#/$defs/IsoDateTime" },
+        "correlationId": { "$ref": "common.defs.json#/$defs/Ulid" },
+        "payload": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+
+    "ChatMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/Base" },
+        {
+          "type": "object",
+          "required": ["type", "payload"],
+          "properties": {
+            "type": { "const": "chat" },
+            "payload": {
+              "type": "object",
+              "required": ["text"],
+              "properties": {
+                "text": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+
+    "CommandMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/Base" },
+        {
+          "type": "object",
+          "required": ["type", "payload"],
+          "properties": {
+            "type": { "const": "command" },
+            "payload": {
+              "type": "object",
+              "required": ["target", "port", "inputs"],
+              "properties": {
+                "target": { "$ref": "common.defs.json#/$defs/EntityId" },
+                "port": { "$ref": "common.defs.json#/$defs/PortId" },
+                "inputs": { "type": "object", "additionalProperties": true },
+                "policies": { "$ref": "common.defs.json#/$defs/Policy" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+
+    "EventMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/Base" },
+        {
+          "type": "object",
+          "required": ["type", "payload"],
+          "properties": {
+            "type": { "const": "event" },
+            "payload": {
+              "type": "object",
+              "required": ["kind"],
+              "properties": {
+                "kind": { "type": "string", "pattern": "^[A-Z]+(\\.[A-Z]+)*$" },
+                "data": { "type": "object", "additionalProperties": true }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    },
+
+    "ArtifactMessage": {
+      "allOf": [
+        { "$ref": "#/$defs/Base" },
+        {
+          "type": "object",
+          "required": ["type", "payload"],
+          "properties": {
+            "type": { "const": "artifact" },
+            "payload": {
+              "type": "object",
+              "required": ["manifest"],
+              "properties": {
+                "manifest": { "$ref": "artifact-manifest.schema.json" }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      ]
+    }
   }
 }

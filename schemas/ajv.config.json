@@ -1,7 +1,6 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "options": {
-    "coerceTypes": false,
-    "allErrors": true
-  }
+  "strict": true,
+  "allowUnionTypes": true,
+  "validateFormats": true,
+  "allErrors": false
 }

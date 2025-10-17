@@ -1,22 +1,25 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "artifact-manifest.schema.json",
+  "title": "Artifact Manifest",
+  "$metadata": { "semver": "1.0.0" },
   "type": "object",
   "required": ["name", "type", "path", "sha256", "origin", "ts"],
   "properties": {
-    "name": { "type": "string" },
-    "type": { "type": "string" },
-    "path": { "type": "string" },
-    "sha256": { "type": "string" },
-    "origin": {
-      "type": "object",
-      "properties": {
-        "room": { "type": "string" },
-        "entity": { "type": "string" },
-        "port": { "type": "string" }
-      }
+    "name": { "type": "string", "minLength": 1 },
+    "type": { "$ref": "common.defs.json#/$defs/MimeOrLogicalType" },
+    "path": { "type": "string", "minLength": 1 },
+    "size": { "type": "integer", "minimum": 0 },
+    "sha256": { "$ref": "common.defs.json#/$defs/Sha256" },
+    "origin": { "$ref": "common.defs.json#/$defs/Origin" },
+    "version": { "type": "integer", "minimum": 1, "default": 1 },
+    "parents": {
+      "type": "array",
+      "items": { "$ref": "common.defs.json#/$defs/Sha256" }
     },
-    "version": { "type": "integer" },
-    "ts": { "type": "string", "format": "date-time" }
-  }
+    "metadata": { "type": "object", "additionalProperties": true },
+    "ts": { "$ref": "common.defs.json#/$defs/IsoDateTime" },
+    "x-extensions": { "$ref": "common.defs.json#/$defs/Ext" }
+  },
+  "additionalProperties": false
 }

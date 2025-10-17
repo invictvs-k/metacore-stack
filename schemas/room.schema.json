@@ -1,17 +1,76 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "room.schema.json",
-  "type": "object",
-  "required": ["id", "state", "config"],
-  "properties": {
-    "id": { "type": "string" },
-    "state": { "enum": ["init", "active", "paused", "ended"] },
-    "config": {
+  "title": "Room/Workspace Runtime",
+  "$metadata": { "semver": "1.0.0" },
+  "$ref": "#/$defs/Room",
+  "$defs": {
+    "Room": {
       "type": "object",
+      "required": ["id", "state", "config", "created_at"],
       "properties": {
-        "mounts": { "type": "array", "items": { "type": "object" } },
-        "env": { "type": "object", "additionalProperties": { "type": "string" } }
-      }
+        "id": { "$ref": "common.defs.json#/$defs/RoomId" },
+        "state": { "$ref": "common.defs.json#/$defs/RoomState" },
+        "created_at": { "$ref": "common.defs.json#/$defs/IsoDateTime" },
+        "updated_at": { "$ref": "common.defs.json#/$defs/IsoDateTime" },
+        "config": {
+          "type": "object",
+          "required": ["env"],
+          "properties": {
+            "mounts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "kind"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "kind": { "enum": ["mcp", "fs", "secret", "kv"] },
+                  "config": { "type": "object" },
+                  "visibility": { "enum": ["room", "entity"] },
+                  "policies": { "$ref": "common.defs.json#/$defs/Policy" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "env": { "$ref": "common.defs.json#/$defs/KeyValue" },
+            "secrets": { "$ref": "common.defs.json#/$defs/KeyValue" }
+          },
+          "additionalProperties": false
+        },
+        "contracts": {
+          "type": "object",
+          "properties": {
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "$ref": "common.defs.json#/$defs/MimeOrLogicalType" },
+                  "required": { "type": "boolean", "default": true }
+                },
+                "additionalProperties": false
+              }
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "type": { "$ref": "common.defs.json#/$defs/MimeOrLogicalType" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "x-extensions": { "$ref": "common.defs.json#/$defs/Ext" }
+      },
+      "additionalProperties": false
     }
   }
 }
