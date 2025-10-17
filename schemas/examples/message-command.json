@@ -1,13 +1,14 @@
 {
-  "id": "msg-001",
-  "channel": "commands",
-  "from": "entity-human-1",
+  "id": "01J97KXK7J0ZC9D02T4X9Q4S7X",
+  "roomId": "room-abc123",
+  "channel": "room",
+  "from": "E-ORC",
   "type": "command",
+  "ts": "2025-10-17T12:01:00Z",
   "payload": {
-    "command": "run-task",
-    "args": {
-      "taskId": "sync"
-    }
-  },
-  "ts": "2024-01-01T12:00:00Z"
+    "target": "E-AGENT-1",
+    "port": "text.generate",
+    "inputs": { "text": "Olá mundo", "guidance": "clareza" },
+    "policies": { "sandbox_mode": true, "env_whitelist": ["AI_MODEL"] }
+  }
 }

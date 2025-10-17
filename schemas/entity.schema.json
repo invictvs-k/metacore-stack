@@ -1,14 +1,28 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "entity.schema.json",
-  "type": "object",
-  "required": ["id", "kind", "capabilities", "visibility"],
-  "properties": {
-    "id": { "type": "string" },
-    "kind": { "enum": ["human", "agent", "npc", "orchestrator"] },
-    "owner_user_id": { "type": "string" },
-    "visibility": { "enum": ["public", "team", "owner"] },
-    "capabilities": { "type": "array", "items": { "type": "string" } },
-    "policy": { "type": "object" }
+  "title": "Entity Model",
+  "$metadata": { "semver": "1.0.0" },
+  "$ref": "#/$defs/Entity",
+  "$defs": {
+    "Entity": {
+      "type": "object",
+      "required": ["id", "kind", "capabilities", "visibility"],
+      "properties": {
+        "id": { "$ref": "common.defs.json#/$defs/EntityId" },
+        "kind": { "$ref": "common.defs.json#/$defs/EntityKind" },
+        "display_name": { "type": "string" },
+        "owner_user_id": { "type": "string" },
+        "visibility": { "$ref": "common.defs.json#/$defs/Visibility" },
+        "capabilities": {
+          "type": "array",
+          "items": { "$ref": "common.defs.json#/$defs/PortId" },
+          "minItems": 0
+        },
+        "policy": { "$ref": "common.defs.json#/$defs/Policy" },
+        "x-extensions": { "$ref": "common.defs.json#/$defs/Ext" }
+      },
+      "additionalProperties": false
+    }
   }
 }

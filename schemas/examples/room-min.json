@@ -1,12 +1,16 @@
 {
-  "id": "room-123",
-  "state": "init",
+  "id": "room-abc123",
+  "state": "active",
+  "created_at": "2025-10-17T12:00:00Z",
   "config": {
+    "env": { "AI_MODEL": "gpt-4o-mini" },
+    "secrets": { "OPENAI_API_KEY": "****" },
     "mounts": [
-      { "path": "/data", "type": "volume" }
-    ],
-    "env": {
-      "MODE": "demo"
-    }
+      { "id": "mcp:web.search@local", "kind": "mcp", "config": { "url": "ws://localhost:8081" }, "visibility": "room" }
+    ]
+  },
+  "contracts": {
+    "inputs":  [{ "name": "in_doc",  "type": "doc/markdown", "required": true }],
+    "outputs": [{ "name": "out_doc", "type": "doc/markdown" }]
   }
 }
