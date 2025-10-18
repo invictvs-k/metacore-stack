@@ -109,7 +109,7 @@ public class RoomManager
 
     private void RemoveConnectionEntryFromAll(string roomId, string entityId)
     {
-        foreach (var (connectionId, _) in _connectionIndex.ToArray())
+        foreach (var connectionId in _connectionIndex.Keys)
         {
             RemoveConnectionEntry(connectionId, roomId, entityId);
         }
