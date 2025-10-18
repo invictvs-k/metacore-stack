@@ -817,6 +817,8 @@ pnpm i && pnpm -r -F "*" build
 ## 9. Recursos e Referências
 
 ### Documentação Interna
+- [QUICKREF.md](./QUICKREF.md) - Guia rápido de referência (comandos e conceitos)
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Diagramas de arquitetura
 - [CONCEPTDEFINITION.md](./CONCEPTDEFINITION.md) - Especificação funcional completa
 - [README.md](./README.md) - Quickstart
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia de contribuição

@@ -11,6 +11,7 @@ Mono-repo com:
 
 ## 📚 Documentação
 
+- **[QUICKREF.md](./QUICKREF.md)** — **Guia rápido de referência** 📌 Comandos e conceitos essenciais
 - **[ONBOARDING.md](./ONBOARDING.md)** — **Guia completo para novos desenvolvedores** ⭐ Comece aqui!
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Diagramas e arquitetura visual do sistema
 - **[CONCEPTDEFINITION.md](./CONCEPTDEFINITION.md)** — Especificação funcional detalhada
