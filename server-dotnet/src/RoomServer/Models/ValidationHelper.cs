@@ -88,7 +88,6 @@ public static partial class ValidationHelper
                     return false;
                 }
 
-                error = null;
                 return true;
             }
             else if (payload is JsonDocument document)
