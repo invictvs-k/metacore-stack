@@ -45,7 +45,8 @@ public class CommandTargetResolutionTests : IAsyncLifetime
         });
 
         // Create a JsonElement payload
-        var jsonPayload = JsonDocument.Parse("{\"target\":\"E-TARGET\",\"action\":\"execute\"}").RootElement.Clone();
+        using var doc = JsonDocument.Parse("{\"target\":\"E-TARGET\",\"action\":\"execute\"}");
+        var jsonPayload = doc.RootElement.Clone();
 
         // This should succeed without throwing
         await senderConnection.InvokeAsync("SendToRoom", RoomId, new MessageModel
