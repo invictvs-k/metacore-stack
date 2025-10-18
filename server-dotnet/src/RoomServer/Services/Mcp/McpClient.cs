@@ -150,6 +150,14 @@ public class McpClient : IMcpClient, IDisposable
 
         var response = await SendRequestAsync(request);
         
+        // Check for JSON-RPC error response
+        if (response.TryGetProperty("error", out var error))
+        {
+            var code = error.TryGetProperty("code", out var codeElement) ? codeElement.GetInt32() : -32000;
+            var message = error.TryGetProperty("message", out var msgElement) ? msgElement.GetString() : "Unknown error";
+            throw new McpServerException(code, message ?? "Unknown error");
+        }
+        
         if (response.TryGetProperty("result", out var result) && 
             result.TryGetProperty("tools", out var toolsArray))
         {
