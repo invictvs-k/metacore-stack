@@ -259,6 +259,7 @@ public static partial class ValidationHelper
                     return false;
                 }
 
+                error = null;
                 return true;
             }
 
