@@ -350,7 +350,7 @@ public sealed class FileArtifactStore : IArtifactStore
 
         if (name.Contains("..", StringComparison.Ordinal) || name.Contains('/') || name.Contains('\\'))
         {
-            throw new ArtifactStoreException(400, "InvalidArtifactName", "name contains invalid path tokens");
+            throw new ArtifactStoreException(400, "InvalidArtifactName", "Name contains invalid path tokens");
         }
     }
 
