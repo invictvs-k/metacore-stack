@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: bootstrap build test lint format run-server mcp-up mcp-dev schemas-validate compose-up
+.PHONY: bootstrap build test lint format run-server mcp-up mcp-dev schemas-validate compose-up verify-environment
 
 bootstrap:
 	@echo ">> Installing pnpm (if missing) and dotnet tools"
@@ -39,3 +39,6 @@ schemas-validate:
 
 compose-up:
 	cd infra && docker compose up -d
+
+verify-environment:
+	@./tools/scripts/verify-environment.sh
