@@ -87,24 +87,24 @@ public static partial class ValidationHelper
                     error = "Chat payload 'text' must be a non-empty string";
                     return false;
                 }
+
+                error = null;
+                return true;
             }
 
-            else if (payload is JsonDocument document)
+            if (payload is JsonDocument document)
             {
                 return ValidateChatPayload(document.RootElement, out error);
             }
-            else
-            {
-                error = "Chat payload must be a JSON object";
-                return false;
-            }
+
+            error = "Chat payload must be a JSON object";
+            return false;
         }
         catch
         {
             error = "Invalid chat payload format";
             return false;
         }
-
     }
 
     public static bool ValidateCommandPayload(object payload, out string? error)
@@ -148,25 +148,24 @@ public static partial class ValidationHelper
                 // If present, we do not validate its value
                 // Example:
                 // if (element.TryGetProperty("port", out var portValue)) { /* intentionally not validated */ }
+
+                error = null;
+                return true;
             }
-            else if (payload is JsonDocument document)
+
+            if (payload is JsonDocument document)
             {
                 return ValidateCommandPayload(document.RootElement, out error);
             }
-            else
-            {
-                error = "Command payload must be a JSON object";
-                return false;
-            }
+
+            error = "Command payload must be a JSON object";
+            return false;
         }
         catch
         {
             error = "Invalid command payload format";
             return false;
         }
-
-        error = "Command payload must be a JSON object";
-        return false;
     }
 
     public static bool ValidateEventPayload(object payload, out string? error)
@@ -208,26 +207,24 @@ public static partial class ValidationHelper
                     error = "Event payload 'kind' must be in SCREAMING_CASE format (e.g., ENTITY.JOIN, ROOM.STATE)";
                     return false;
                 }
+
+                error = null;
+                return true;
             }
 
-            else if (payload is JsonDocument document)
+            if (payload is JsonDocument document)
             {
                 return ValidateEventPayload(document.RootElement, out error);
             }
-            else
-            {
-                error = "Event payload must be a JSON object";
-                return false;
-            }
+
+            error = "Event payload must be a JSON object";
+            return false;
         }
         catch
         {
             error = "Invalid event payload format";
             return false;
         }
-
-        error = "Event payload must be a JSON object";
-        return false;
     }
 
     public static bool ValidateArtifactPayload(object payload, out string? error)
@@ -261,25 +258,23 @@ public static partial class ValidationHelper
                     error = "Artifact payload 'manifest' must be an object";
                     return false;
                 }
+
+                error = null;
+                return true;
             }
 
-            else if (payload is JsonDocument document)
+            if (payload is JsonDocument document)
             {
                 return ValidateArtifactPayload(document.RootElement, out error);
             }
-            else
-            {
-                error = "Artifact payload must be a JSON object";
-                return false;
-            }
+
+            error = "Artifact payload must be a JSON object";
+            return false;
         }
         catch
         {
             error = "Invalid artifact payload format";
             return false;
         }
-
-        error = "Artifact payload must be a JSON object";
-        return false;
     }
 }
