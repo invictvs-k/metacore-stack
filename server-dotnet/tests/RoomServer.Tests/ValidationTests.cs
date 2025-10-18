@@ -20,7 +20,8 @@ public class ValidationTests
     }
 
     [Theory]
-    [InlineData("E-A", true)]
+    [InlineData("E-A", false)] // Too short (< 2 chars after prefix)
+    [InlineData("E-AB", true)] // Minimum valid (2 chars)
     [InlineData("E-ABCD1234", true)]
     [InlineData("E-Test_Entity-123", true)]
     [InlineData("E-", false)] // No ID after prefix

@@ -13,7 +13,7 @@ namespace RoomServer.Tests;
 public class RoomHub_SmokeTests : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-test";
+    private const string RoomId = "room-test123";
 
     [Fact]
     public async Task JoinBroadcastsPresence()
@@ -27,7 +27,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         {
             if (evt.Payload.Kind == "ENTITY.JOIN" &&
                 evt.Payload.Data.TryGetProperty("entity", out var entity) &&
-                entity.GetProperty("id").GetString() == "E-B")
+                entity.GetProperty("id").GetString() == "E-Bob")
             {
                 joinReceived.TrySetResult(evt);
             }
@@ -36,7 +36,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         await connectionA.StartAsync();
         await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human",
             DisplayName = "Alice"
         });
@@ -44,7 +44,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         await connectionB.StartAsync();
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-B",
+            Id = "E-Bob",
             Kind = "agent",
             DisplayName = "Bot"
         });
@@ -64,7 +64,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
 
         connectionB.On<MessageModel>("message", message =>
         {
-            if (message.From == "E-A")
+            if (message.From == "E-Alice")
             {
                 messageReceived.TrySetResult(message);
             }
@@ -75,21 +75,21 @@ public class RoomHub_SmokeTests : IAsyncLifetime
 
         await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human",
             DisplayName = "Alice"
         });
 
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-B",
+            Id = "E-Bob",
             Kind = "agent",
             DisplayName = "Bot"
         });
 
         await connectionA.InvokeAsync("SendToRoom", RoomId, new MessageModel
         {
-            From = "E-A",
+            From = "E-Alice",
             Channel = "room",
             Type = "chat",
             Payload = new { text = "Olá!" }
@@ -113,7 +113,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         {
             if (evt.Payload.Kind == "ENTITY.LEAVE" &&
                 evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
-                entity.GetString() == "E-B")
+                entity.GetString() == "E-Bob")
             {
                 leaveReceived.TrySetResult(evt);
             }
@@ -124,19 +124,19 @@ public class RoomHub_SmokeTests : IAsyncLifetime
 
         await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human",
             DisplayName = "Alice"
         });
 
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-B",
+            Id = "E-Bob",
             Kind = "agent",
             DisplayName = "Bot"
         });
 
-        await connectionB.InvokeAsync("Leave", RoomId, "E-B");
+        await connectionB.InvokeAsync("Leave", RoomId, "E-Bob");
 
         var leaveEvent = await leaveReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
         leaveEvent.Payload.Kind.Should().Be("ENTITY.LEAVE");
@@ -155,7 +155,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         {
             if (evt.Payload.Kind == "ENTITY.LEAVE" &&
                 evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
-                entity.GetString() == "E-B")
+                entity.GetString() == "E-Bob")
             {
                 leaveReceived.TrySetResult(evt);
             }
@@ -166,14 +166,14 @@ public class RoomHub_SmokeTests : IAsyncLifetime
 
         await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human",
             DisplayName = "Alice"
         });
 
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-B",
+            Id = "E-Bob",
             Kind = "agent",
             DisplayName = "Bot"
         });

@@ -18,7 +18,7 @@ namespace RoomServer.Tests;
 public class McpBridge_SmokeTests : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-mcp-test";
+    private const string RoomId = "room-mcp-test123";
 
     [Fact]
     public async Task ListTools_WithNoMcpServers_ReturnsEmptyArray()

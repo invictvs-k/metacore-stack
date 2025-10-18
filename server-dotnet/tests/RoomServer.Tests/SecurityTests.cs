@@ -19,7 +19,7 @@ namespace RoomServer.Tests;
 public class SecurityTests : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-security";
+    private const string RoomId = "room-security123";
 
     [Fact]
     public async Task JoinOwnerWithoutAuthShouldFail()
@@ -67,22 +67,22 @@ public class SecurityTests : IAsyncLifetime
 
         await humanConnection.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-H",
+            Id = "E-Human",
             Kind = "human"
         });
 
         await targetConnection.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-T",
+            Id = "E-Target",
             Kind = "agent",
             Policy = new PolicySpec { AllowCommandsFrom = "orchestrator" }
         });
 
-        var payload = JsonDocument.Parse("{\"target\":\"E-T\"}").RootElement.Clone();
+        var payload = JsonDocument.Parse("{\"target\":\"E-Target\"}").RootElement.Clone();
 
         var exception = await Assert.ThrowsAsync<HubException>(() => humanConnection.InvokeAsync("SendToRoom", RoomId, new MessageModel
         {
-            From = "E-H",
+            From = "E-Human",
             Channel = "room",
             Type = "command",
             Payload = payload
@@ -136,7 +136,7 @@ public class SecurityTests : IAsyncLifetime
 
         await connection.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human"
         });
 
@@ -145,8 +145,8 @@ public class SecurityTests : IAsyncLifetime
         content.Add(new ByteArrayContent(Encoding.UTF8.GetBytes("hello")) { Headers = { ContentType = new MediaTypeHeaderValue("text/plain") } }, "data", "test.txt");
 
         var client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-A");
-        var response = await client.PostAsync($"/rooms/{RoomId}/entities/E-B/artifacts", content);
+        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-Alice");
+        var response = await client.PostAsync($"/rooms/{RoomId}/entities/E-Bob/artifacts", content);
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
         var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -161,7 +161,7 @@ public class SecurityTests : IAsyncLifetime
 
         await ownerConnection.InvokeAsync("Join", RoomId, new EntitySpec
         {
-            Id = "E-A",
+            Id = "E-Alice",
             Kind = "human"
         });
 
@@ -170,13 +170,13 @@ public class SecurityTests : IAsyncLifetime
         content.Add(new ByteArrayContent(Encoding.UTF8.GetBytes("hello")) { Headers = { ContentType = new MediaTypeHeaderValue("text/plain") } }, "data", "test.txt");
 
         var client = _factory.CreateClient();
-        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-A");
-        var uploadResponse = await client.PostAsync($"/rooms/{RoomId}/entities/E-A/artifacts", content);
+        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-Alice");
+        var uploadResponse = await client.PostAsync($"/rooms/{RoomId}/entities/E-Alice/artifacts", content);
         uploadResponse.EnsureSuccessStatusCode();
 
         client.DefaultRequestHeaders.Remove("X-Entity-Id");
-        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-B");
-        var promotePayload = JsonContent.Create(new { fromEntity = "E-A", name = "test.txt" });
+        client.DefaultRequestHeaders.Add("X-Entity-Id", "E-Bob");
+        var promotePayload = JsonContent.Create(new { fromEntity = "E-Alice", name = "test.txt" });
         var promoteResponse = await client.PostAsync($"/rooms/{RoomId}/artifacts/promote", promotePayload);
 
         promoteResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
