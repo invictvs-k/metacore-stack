@@ -1,6 +1,16 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace RoomServer.Models;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum EntityKind
+{
+    Human,
+    Agent,
+    Npc,
+    Orchestrator
+}
 
 public sealed class EntitySpec
 {

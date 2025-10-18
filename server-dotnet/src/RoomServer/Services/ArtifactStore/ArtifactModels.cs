@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ public record ArtifactWriteRequest(
     long? Size,
     string? Port,
     IReadOnlyList<string>? Parents,
-    Dictionary<string, string>? Metadata);
+    Dictionary<string, object>? Metadata);
 
 public record ArtifactReadRequest(string RoomId, string Workspace, string? EntityId, string Name);
 
@@ -44,7 +45,7 @@ public record ArtifactPromoteRequest(
     string FromEntity,
     string Name,
     string? AsName,
-    Dictionary<string, string>? Metadata);
+    Dictionary<string, object>? Metadata);
 
 public sealed class ArtifactManifest
 {
@@ -56,7 +57,7 @@ public sealed class ArtifactManifest
     public Origin Origin { get; set; } = new();
     public int Version { get; set; } = 1;
     public List<string>? Parents { get; set; }
-    public Dictionary<string, string>? Metadata { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
     public DateTime Ts { get; set; } = DateTime.UtcNow;
 }
 
@@ -66,4 +67,5 @@ public sealed class Origin
     public string Entity { get; set; } = default!;
     public string? Port { get; set; }
     public string Workspace { get; set; } = "room";
+    public string? Channel { get; set; }
 }

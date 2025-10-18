@@ -55,6 +55,13 @@ public partial class RoomHub : Hub
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         ArgumentNullException.ThrowIfNull(entity);
+        
+        // Validate RoomId format
+        if (!ValidationHelper.IsValidRoomId(roomId))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ROOM_ID", "roomId must match pattern: room-[A-Za-z0-9_-]{6,}");
+        }
+        
         ValidateEntity(entity);
 
         var userId = ResolveUserId();
@@ -133,6 +140,9 @@ public partial class RoomHub : Hub
         {
             throw ErrorFactory.HubForbidden("PERM_DENIED", "message sender mismatch");
         }
+
+        // Validate message payload based on type
+        ValidateMessagePayload(message);
 
         message.RoomId = roomId;
         message.Ts = DateTime.UtcNow;
@@ -274,9 +284,33 @@ public partial class RoomHub : Hub
             throw ErrorFactory.HubBadRequest("INVALID_ENTITY_SPEC", "entity.id is required");
         }
 
+        // Validate EntityId format
+        if (!ValidationHelper.IsValidEntityId(entity.Id))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_ID", "entity.id must match pattern: E-[A-Za-z0-9_-]{2,64}");
+        }
+
         if (string.IsNullOrWhiteSpace(entity.Kind))
         {
             throw ErrorFactory.HubBadRequest("INVALID_ENTITY_SPEC", "entity.kind is required");
+        }
+
+        // Validate EntityKind
+        if (!ValidationHelper.IsValidEntityKind(entity.Kind))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_KIND", "entity.kind must be one of: human, agent, npc, orchestrator");
+        }
+
+        // Validate Capabilities (PortIds)
+        if (entity.Capabilities is not null)
+        {
+            foreach (var capability in entity.Capabilities)
+            {
+                if (!ValidationHelper.IsValidPortId(capability))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_CAPABILITY", $"capability '{capability}' must match pattern: ^[a-z][a-z0-9]*(\\.[a-z0-9]+)*$");
+                }
+            }
         }
 
         if (entity.Policy is null)
@@ -287,6 +321,45 @@ public partial class RoomHub : Hub
         if (entity.Capabilities is null)
         {
             entity.Capabilities = Array.Empty<string>();
+        }
+    }
+
+    private static void ValidateMessagePayload(MessageModel message)
+    {
+        var messageType = message.Type?.ToLowerInvariant();
+        
+        switch (messageType)
+        {
+            case "chat":
+                if (!ValidationHelper.ValidateChatPayload(message.Payload, out var chatError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_CHAT_PAYLOAD", chatError ?? "Invalid chat payload");
+                }
+                break;
+                
+            case "command":
+                if (!ValidationHelper.ValidateCommandPayload(message.Payload, out var commandError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_COMMAND_PAYLOAD", commandError ?? "Invalid command payload");
+                }
+                break;
+                
+            case "event":
+                if (!ValidationHelper.ValidateEventPayload(message.Payload, out var eventError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_EVENT_PAYLOAD", eventError ?? "Invalid event payload");
+                }
+                break;
+                
+            case "artifact":
+                if (!ValidationHelper.ValidateArtifactPayload(message.Payload, out var artifactError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_ARTIFACT_PAYLOAD", artifactError ?? "Invalid artifact payload");
+                }
+                break;
+                
+            default:
+                throw ErrorFactory.HubBadRequest("INVALID_MESSAGE_TYPE", $"message.type must be one of: chat, command, event, artifact (got: {message.Type})");
         }
     }
 

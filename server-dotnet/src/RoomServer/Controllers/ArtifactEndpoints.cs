@@ -229,8 +229,7 @@ public static class ArtifactEndpoints
                 return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to promote artifact");
             }
 
-            var metadata = payload.Metadata is null ? null : new Dictionary<string, string>(payload.Metadata);
-            var manifest = await store.PromoteAsync(new ArtifactPromoteRequest(roomId, payload.FromEntity!, payload.Name!, payload.As, metadata), ct).ConfigureAwait(false);
+            var manifest = await store.PromoteAsync(new ArtifactPromoteRequest(roomId, payload.FromEntity!, payload.Name!, payload.As, payload.Metadata), ct).ConfigureAwait(false);
             await PublishArtifactEvents(publisher, roomId, manifest).ConfigureAwait(false);
             var location = $"/rooms/{roomId}/artifacts/{manifest.Name}";
             return Results.Created(location, new { manifest });
@@ -323,7 +322,7 @@ public static class ArtifactEndpoints
     {
         public string? Name { get; set; }
         public string? Type { get; set; }
-        public Dictionary<string, string>? Metadata { get; set; }
+        public Dictionary<string, object>? Metadata { get; set; }
     }
 
     private sealed class ArtifactPromotePayload
@@ -331,7 +330,7 @@ public static class ArtifactEndpoints
         public string? FromEntity { get; set; }
         public string? Name { get; set; }
         public string? As { get; set; }
-        public Dictionary<string, string>? Metadata { get; set; }
+        public Dictionary<string, object>? Metadata { get; set; }
     }
 
     private sealed class ArtifactListQuery
