@@ -90,7 +90,7 @@ public class ValidationTests
     [Fact]
     public void ChatPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateChatPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateChatPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Chat payload is required");
 
         ValidationHelper.ValidateChatPayload("text"!, out var errorPrimitive).Should().BeFalse();
