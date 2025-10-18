@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using NUlid;
 using RoomServer.Hubs;
+using RoomServer.Models;
+using RoomServer.Services.ArtifactStore;
 
 namespace RoomServer.Services;
 
@@ -28,5 +30,24 @@ public class RoomEventPublisher
             payload = new { kind = eventType, data },
             ts = DateTime.UtcNow
         });
+    }
+
+    public Task PublishArtifactMessageAsync(string roomId, ArtifactManifest manifest, string from = "E-SERVER", string channel = "room")
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
+        ArgumentNullException.ThrowIfNull(manifest);
+
+        var message = new MessageModel
+        {
+            Id = Ulid.NewUlid().ToString(),
+            RoomId = roomId,
+            Channel = channel,
+            From = from,
+            Type = "artifact",
+            Payload = new { manifest },
+            Ts = DateTime.UtcNow
+        };
+
+        return _hubContext.Clients.Group(roomId).SendAsync("message", message);
     }
 }
