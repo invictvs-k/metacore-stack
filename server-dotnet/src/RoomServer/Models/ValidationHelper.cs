@@ -61,7 +61,7 @@ public static partial class ValidationHelper
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Chat payload is required",
-                objectError: "Chat payload must be an object",
+                objectError: "Chat payload must be a JSON object",
                 invalidFormatError: "Invalid chat payload format",
                 out var element,
                 out error))
