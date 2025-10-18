@@ -16,5 +16,6 @@ pnpm-lock.yaml
 
 # artifacts
 /.ai-flow/
+**/.ai-flow/
 dist/
 coverage/
