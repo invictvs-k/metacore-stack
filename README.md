@@ -9,6 +9,9 @@ Mono-repo com:
 
 ## Quickstart
 ```bash
+# 0) verify environment (optional but recommended)
+make verify-environment
+
 # 1) preparar ferramentas
 make bootstrap
 

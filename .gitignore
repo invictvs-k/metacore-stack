@@ -19,3 +19,6 @@ pnpm-lock.yaml
 **/.ai-flow/
 dist/
 coverage/
+
+# verification reports
+environment-validation-report-*.md
