@@ -223,7 +223,8 @@ public class CommandTargetResolutionTests : IAsyncLifetime
         });
 
         // Create a payload with a non-existent target
-        var payload = JsonDocument.Parse("{\"target\":\"E-NONEXISTENT\"}").RootElement.Clone();
+        using var doc = JsonDocument.Parse("{\"target\":\"E-NONEXISTENT\"}");
+        var payload = doc.RootElement.Clone();
 
         var exception = await Assert.ThrowsAsync<HubException>(() => 
             senderConnection.InvokeAsync("SendToRoom", RoomId, new MessageModel
