@@ -129,7 +129,11 @@ public static partial class ValidationHelper
                 
                 // Port is recommended but not strictly required for backward compatibility
                 // The schema requires it, but existing code may not provide it
-                
+
+                // Explicitly skip validation of 'port' field for backward compatibility
+                // If present, we do not validate its value
+                // Example:
+                // if (element.TryGetProperty("port", out var portValue)) { /* intentionally not validated */ }
                 return true;
             }
             
