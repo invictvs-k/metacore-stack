@@ -8,5 +8,6 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="8.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="8.0.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="NUlid" Version="2.3.0" />
   </ItemGroup>
 </Project>
