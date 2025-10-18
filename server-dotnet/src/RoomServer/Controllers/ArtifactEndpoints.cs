@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using RoomServer.Models;
 using RoomServer.Services;
 using RoomServer.Services.ArtifactStore;
 
@@ -33,20 +34,30 @@ public static class ArtifactEndpoints
         return app;
     }
 
-    private static async Task<IResult> HandleWriteRoomArtifact(HttpContext context, string roomId, IArtifactStore store, RoomEventPublisher publisher, CancellationToken ct)
+    private static async Task<IResult> HandleWriteRoomArtifact(HttpContext context, string roomId, IArtifactStore store, RoomEventPublisher publisher, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleWriteArtifact(context, roomId, null, "room", store, publisher, ct);
+        return await HandleWriteArtifact(context, roomId, null, "room", store, publisher, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleWriteEntityArtifact(HttpContext context, string roomId, string entityId, IArtifactStore store, RoomEventPublisher publisher, CancellationToken ct)
+    private static async Task<IResult> HandleWriteEntityArtifact(HttpContext context, string roomId, string entityId, IArtifactStore store, RoomEventPublisher publisher, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleWriteArtifact(context, roomId, entityId, "entity", store, publisher, ct);
+        return await HandleWriteArtifact(context, roomId, entityId, "entity", store, publisher, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleWriteArtifact(HttpContext context, string roomId, string? entityId, string workspace, IArtifactStore store, RoomEventPublisher publisher, CancellationToken ct)
+    private static async Task<IResult> HandleWriteArtifact(HttpContext context, string roomId, string? entityId, string workspace, IArtifactStore store, RoomEventPublisher publisher, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
         try
         {
+            if (!TryResolveSession(context, roomId, sessions, out var session, out var errorResult))
+            {
+                return errorResult!;
+            }
+
+            if (!permissions.CanAccessWorkspace(session, workspace, entityId))
+            {
+                return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to access workspace");
+            }
+
             var form = await context.Request.ReadFormAsync(ct).ConfigureAwait(false);
             var specJson = form["spec"].FirstOrDefault();
             var file = form.Files["data"];
@@ -85,7 +96,7 @@ public static class ArtifactEndpoints
             }
 
             var originEntity = workspace == "entity" ? entityId : form["entityId"].FirstOrDefault();
-            originEntity ??= context.User?.Identity?.Name;
+            originEntity ??= session.Entity.Id;
 
             await using var dataStream = file.OpenReadStream();
             var request = new ArtifactWriteRequest(
@@ -114,20 +125,30 @@ public static class ArtifactEndpoints
         }
     }
 
-    private static async Task<IResult> HandleReadRoomArtifact(HttpContext context, string roomId, string name, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleReadRoomArtifact(HttpContext context, string roomId, string name, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleReadArtifact(context, roomId, null, name, "room", store, ct);
+        return await HandleReadArtifact(context, roomId, null, name, "room", store, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleReadEntityArtifact(HttpContext context, string roomId, string entityId, string name, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleReadEntityArtifact(HttpContext context, string roomId, string entityId, string name, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleReadArtifact(context, roomId, entityId, name, "entity", store, ct);
+        return await HandleReadArtifact(context, roomId, entityId, name, "entity", store, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleReadArtifact(HttpContext context, string roomId, string? entityId, string name, string workspace, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleReadArtifact(HttpContext context, string roomId, string? entityId, string name, string workspace, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
         try
         {
+            if (!TryResolveSession(context, roomId, sessions, out var session, out var errorResult))
+            {
+                return errorResult!;
+            }
+
+            if (!permissions.CanAccessWorkspace(session, workspace, entityId))
+            {
+                return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to access workspace");
+            }
+
             var stream = await store.ReadAsync(new ArtifactReadRequest(roomId, workspace, entityId, name), ct).ConfigureAwait(false);
             var download = string.Equals(context.Request.Query["download"], "true", StringComparison.OrdinalIgnoreCase);
             var fileName = download ? name : null;
@@ -139,20 +160,30 @@ public static class ArtifactEndpoints
         }
     }
 
-    private static async Task<IResult> HandleListRoomArtifacts(HttpContext context, string roomId, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleListRoomArtifacts(HttpContext context, string roomId, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleListArtifacts(context, roomId, null, "room", store, ct);
+        return await HandleListArtifacts(context, roomId, null, "room", store, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleListEntityArtifacts(HttpContext context, string roomId, string entityId, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleListEntityArtifacts(HttpContext context, string roomId, string entityId, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
-        return await HandleListArtifacts(context, roomId, entityId, "entity", store, ct);
+        return await HandleListArtifacts(context, roomId, entityId, "entity", store, sessions, permissions, ct);
     }
 
-    private static async Task<IResult> HandleListArtifacts(HttpContext context, string roomId, string? entityId, string workspace, IArtifactStore store, CancellationToken ct)
+    private static async Task<IResult> HandleListArtifacts(HttpContext context, string roomId, string? entityId, string workspace, IArtifactStore store, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
         try
         {
+            if (!TryResolveSession(context, roomId, sessions, out var session, out var errorResult))
+            {
+                return errorResult!;
+            }
+
+            if (!permissions.CanAccessWorkspace(session, workspace, entityId))
+            {
+                return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to access workspace");
+            }
+
             if (!TryParseListParameters(context.Request, out var listParams, out var errorResult))
             {
                 return errorResult!;
@@ -178,14 +209,24 @@ public static class ArtifactEndpoints
         }
     }
 
-    private static async Task<IResult> HandlePromoteArtifact(HttpContext context, string roomId, IArtifactStore store, RoomEventPublisher publisher, CancellationToken ct)
+    private static async Task<IResult> HandlePromoteArtifact(HttpContext context, string roomId, IArtifactStore store, RoomEventPublisher publisher, SessionStore sessions, PermissionService permissions, CancellationToken ct)
     {
         try
         {
+            if (!TryResolveSession(context, roomId, sessions, out var session, out var errorResult))
+            {
+                return errorResult!;
+            }
+
             var payload = await context.Request.ReadFromJsonAsync<ArtifactPromotePayload>(SpecSerializerOptions, ct).ConfigureAwait(false);
             if (payload is null || string.IsNullOrWhiteSpace(payload.FromEntity) || string.IsNullOrWhiteSpace(payload.Name))
             {
                 return Results.Json(new { error = "InvalidPromoteRequest", message = "fromEntity and name are required" }, statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            if (!permissions.CanPromote(session, payload.FromEntity!))
+            {
+                return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to promote artifact");
             }
 
             var metadata = payload.Metadata is null ? null : new Dictionary<string, string>(payload.Metadata);
@@ -202,6 +243,28 @@ public static class ArtifactEndpoints
         {
             return Results.Json(new { error = "InvalidPromoteRequest", message = "Body must be valid JSON" }, statusCode: StatusCodes.Status400BadRequest);
         }
+    }
+
+    private static bool TryResolveSession(HttpContext context, string roomId, SessionStore sessions, out EntitySession? session, out IResult? error)
+    {
+        session = null;
+        error = null;
+
+        var entityId = context.Request.Headers["X-Entity-Id"].FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(entityId))
+        {
+            error = ErrorFactory.HttpUnauthorized("AUTH_REQUIRED", "X-Entity-Id header is required");
+            return false;
+        }
+
+        session = sessions.GetByRoomAndEntity(roomId, entityId);
+        if (session is null)
+        {
+            error = ErrorFactory.HttpForbidden("PERM_DENIED", "active session not found for entity");
+            return false;
+        }
+
+        return true;
     }
 
     private static async Task PublishArtifactEvents(RoomEventPublisher publisher, string roomId, ArtifactManifest manifest)
