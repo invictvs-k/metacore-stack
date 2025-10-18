@@ -88,6 +88,7 @@ public static partial class ValidationHelper
                     return false;
                 }
             }
+
             else if (payload is JsonDocument document)
             {
                 return ValidateChatPayload(document.RootElement, out error);
@@ -104,7 +105,6 @@ public static partial class ValidationHelper
             return false;
         }
 
-        return true;
     }
 
     public static bool ValidateCommandPayload(object payload, out string? error)
@@ -165,7 +165,8 @@ public static partial class ValidationHelper
             return false;
         }
 
-        return true;
+        error = "Command payload must be a JSON object";
+        return false;
     }
 
     public static bool ValidateEventPayload(object payload, out string? error)
@@ -208,6 +209,7 @@ public static partial class ValidationHelper
                     return false;
                 }
             }
+
             else if (payload is JsonDocument document)
             {
                 return ValidateEventPayload(document.RootElement, out error);
@@ -224,7 +226,8 @@ public static partial class ValidationHelper
             return false;
         }
 
-        return true;
+        error = "Event payload must be a JSON object";
+        return false;
     }
 
     public static bool ValidateArtifactPayload(object payload, out string? error)
@@ -259,6 +262,7 @@ public static partial class ValidationHelper
                     return false;
                 }
             }
+
             else if (payload is JsonDocument document)
             {
                 return ValidateArtifactPayload(document.RootElement, out error);
@@ -275,6 +279,7 @@ public static partial class ValidationHelper
             return false;
         }
 
-        return true;
+        error = "Artifact payload must be a JSON object";
+        return false;
     }
 }

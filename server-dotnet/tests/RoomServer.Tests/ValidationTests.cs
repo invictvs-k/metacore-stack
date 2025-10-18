@@ -90,7 +90,7 @@ public class ValidationTests
     [Fact]
     public void ChatPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateChatPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateChatPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Chat payload is required");
 
         ValidationHelper.ValidateChatPayload("text", out var errorPrimitive).Should().BeFalse();
@@ -142,7 +142,7 @@ public class ValidationTests
     [Fact]
     public void EventPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateEventPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateEventPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Event payload is required");
 
         ValidationHelper.ValidateEventPayload(true, out var errorPrimitive).Should().BeFalse();
@@ -168,7 +168,7 @@ public class ValidationTests
     [Fact]
     public void ArtifactPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateArtifactPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateArtifactPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Artifact payload is required");
 
         ValidationHelper.ValidateArtifactPayload(3.14, out var errorPrimitive).Should().BeFalse();
