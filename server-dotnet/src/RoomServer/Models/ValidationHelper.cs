@@ -149,6 +149,7 @@ public static partial class ValidationHelper
                 // Example:
                 // if (element.TryGetProperty("port", out var portValue)) { /* intentionally not validated */ }
 
+                error = null;
                 return true;
             }
 
