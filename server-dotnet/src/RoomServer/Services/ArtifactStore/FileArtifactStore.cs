@@ -173,8 +173,9 @@ public sealed class FileArtifactStore : IArtifactStore
                 var key = (manifest.Name, entity);
 
                 if (!latest.TryGetValue(key, out var existing) ||
-                    manifest.Version > existing.Version ||
-                    (manifest.Version == existing.Version && manifest.Ts > existing.Ts))
+                    (manifest.Version != null && (existing.Version == null || manifest.Version > existing.Version)) ||
+                    (manifest.Version == null && existing.Version == null && manifest.Ts > existing.Ts) ||
+                    (manifest.Version != null && existing.Version != null && manifest.Version == existing.Version && manifest.Ts > existing.Ts))
                 {
                     latest[key] = manifest;
                 }
