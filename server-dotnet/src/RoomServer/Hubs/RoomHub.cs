@@ -65,8 +65,6 @@ public class RoomHub : Hub
             }
         }
 
-        userId ??= entity.OwnerUserId;
-
         _sessions.RemoveByConnection(Context.ConnectionId);
 
         var normalized = NormalizeEntity(entity);
