@@ -77,8 +77,10 @@ public class ResourceCatalog
 
         if (matches.Count > 1)
         {
-            _logger.LogWarning("Multiple tools found for ID '{ToolId}', using first match: {Key}", 
-                toolIdOrKey, matches[0].item.Key);
+            var matchingKeys = string.Join(", ", matches.Select(m => m.item.Key));
+            throw new InvalidOperationException(
+                $"Multiple tools found for ID '{toolIdOrKey}'. Matching keys: {matchingKeys}. " +
+                "Please use the full key (serverId:toolId) to resolve ambiguity.");
         }
 
         return matches[0];
