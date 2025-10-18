@@ -106,7 +106,7 @@ public static partial class ValidationHelper
 
         if (targetValue.ValueKind != JsonValueKind.String)
         {
-            error = "Command payload 'target' must be a non-empty string";
+            error = "Command payload 'target' must be a string";
             return false;
         }
 
