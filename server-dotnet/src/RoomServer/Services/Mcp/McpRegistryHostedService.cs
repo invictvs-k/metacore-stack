@@ -50,8 +50,18 @@ public class McpRegistryHostedService : IHostedService
     {
         _logger.LogInformation("Stopping MCP Registry");
 
-        // Cancel any ongoing initialization
-        _cancellationTokenSource?.Cancel();
+        // Cancel any ongoing initialization (check if not already disposed)
+        if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
+        {
+            try
+            {
+                _cancellationTokenSource.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
+        }
 
         // Wait for initialization task to complete (with timeout)
         if (_initializationTask != null)
@@ -66,6 +76,18 @@ public class McpRegistryHostedService : IHostedService
             }
         }
 
-        _cancellationTokenSource?.Dispose();
+        // Dispose the cancellation token source (check if not already disposed)
+        if (_cancellationTokenSource != null)
+        {
+            try
+            {
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
+            }
+            catch (ObjectDisposedException)
+            {
+                // Already disposed, ignore
+            }
+        }
     }
 }
