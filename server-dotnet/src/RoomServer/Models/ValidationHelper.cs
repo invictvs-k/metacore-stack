@@ -182,7 +182,7 @@ public static partial class ValidationHelper
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Artifact payload is required",
-                objectError: "Artifact payload must be an object",
+                objectError: "Artifact payload must be a JSON object",
                 invalidFormatError: "Invalid artifact payload format",
                 out var element,
                 out error))
