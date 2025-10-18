@@ -19,6 +19,7 @@ public class McpRegistry : IDisposable
     private readonly ConcurrentDictionary<string, IMcpClient> _clients = new();
     private readonly ResourceCatalog _catalog;
     private bool _initialized = false;
+    private bool _disposed = false;
 
     public ResourceCatalog Catalog => _catalog;
 
@@ -51,43 +52,99 @@ public class McpRegistry : IDisposable
 
         var defaultsConfig = _configuration.GetSection("McpDefaults").Get<McpDefaultsConfig>();
 
-        foreach (var serverConfig in serversConfig)
+        // Initialize servers concurrently to avoid sequential delays
+        var initTasks = serversConfig.Select(serverConfig => InitializeServerAsync(serverConfig, defaultsConfig)).ToArray();
+        await Task.WhenAll(initTasks);
+
+        _initialized = true;
+        _logger.LogInformation("McpRegistry initialized with {Count} servers", _clients.Count);
+    }
+
+    /// <summary>
+    /// Initializes a single MCP server with automatic retry on reconnection.
+    /// </summary>
+    private async Task InitializeServerAsync(McpServerConfig serverConfig, McpDefaultsConfig? defaultsConfig)
+    {
+        try
+        {
+            _logger.LogInformation("Initializing MCP server: {ServerId} at {Url}", serverConfig.id, serverConfig.url);
+            
+            var client = new McpClient(
+                serverConfig.id,
+                serverConfig.url,
+                _loggerFactory.CreateLogger<McpClient>());
+
+            _clients[serverConfig.id] = client;
+
+            // Connect and load tools
+            await client.ConnectAsync();
+            await LoadAndRegisterToolsAsync(client, serverConfig, defaultsConfig);
+
+            // Start background task to re-register tools on reconnection
+            _ = Task.Run(async () => await MonitorAndReregisterToolsAsync(client, serverConfig, defaultsConfig));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to initialize MCP server: {ServerId}", serverConfig.id);
+            
+            // Even if initial connection fails, start monitoring for future reconnections
+            if (_clients.TryGetValue(serverConfig.id, out var client))
+            {
+                _ = Task.Run(async () => await MonitorAndReregisterToolsAsync(client, serverConfig, defaultsConfig));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Monitors client connection and re-registers tools when reconnected.
+    /// </summary>
+    private async Task MonitorAndReregisterToolsAsync(IMcpClient client, McpServerConfig serverConfig, McpDefaultsConfig? defaultsConfig)
+    {
+        while (!_disposed)
         {
             try
             {
-                _logger.LogInformation("Initializing MCP server: {ServerId} at {Url}", serverConfig.id, serverConfig.url);
-                
-                var client = new McpClient(
-                    serverConfig.id,
-                    serverConfig.url,
-                    _loggerFactory.CreateLogger<McpClient>());
-
-                _clients[serverConfig.id] = client;
-
-                // Connect and load tools
-                await client.ConnectAsync();
-                var tools = await client.ListToolsAsync();
-
-                _logger.LogInformation("Loaded {Count} tools from {ServerId}", tools.Length, serverConfig.id);
-
-                // Register tools in catalog with merged policies
-                foreach (var tool in tools)
+                // Wait for client to be connected
+                while (!client.IsConnected && !_disposed)
                 {
-                    var mergedPolicy = MergePolicies(tool.policy, defaultsConfig, serverConfig.visibility);
-                    var mergedSpec = tool with { policy = mergedPolicy };
-                    
-                    _catalog.Register(serverConfig.id, mergedSpec, client);
+                    await Task.Delay(5000); // Check every 5 seconds
+                }
+
+                if (_disposed) break;
+
+                // Load and register tools
+                await LoadAndRegisterToolsAsync(client, serverConfig, defaultsConfig);
+
+                // Wait for disconnection before checking again
+                while (client.IsConnected && !_disposed)
+                {
+                    await Task.Delay(5000);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to initialize MCP server: {ServerId}", serverConfig.id);
-                // Continue with other servers even if one fails
+                _logger.LogError(ex, "Error monitoring MCP server: {ServerId}", serverConfig.id);
+                await Task.Delay(10000); // Wait before retrying
             }
         }
+    }
 
-        _initialized = true;
-        _logger.LogInformation("McpRegistry initialized with {Count} servers", _clients.Count);
+    /// <summary>
+    /// Loads tools from client and registers them in the catalog.
+    /// </summary>
+    private async Task LoadAndRegisterToolsAsync(IMcpClient client, McpServerConfig serverConfig, McpDefaultsConfig? defaultsConfig)
+    {
+        var tools = await client.ListToolsAsync();
+        _logger.LogInformation("Loaded {Count} tools from {ServerId}", tools.Length, serverConfig.id);
+
+        // Register tools in catalog with merged policies
+        foreach (var tool in tools)
+        {
+            var mergedPolicy = MergePolicies(tool.policy, defaultsConfig, serverConfig.visibility);
+            var mergedSpec = tool with { policy = mergedPolicy };
+            
+            _catalog.Register(serverConfig.id, mergedSpec, client);
+        }
     }
 
     /// <summary>
@@ -114,6 +171,8 @@ public class McpRegistry : IDisposable
 
     public void Dispose()
     {
+        _disposed = true;
+        
         foreach (var client in _clients.Values)
         {
             if (client is IDisposable disposable)
