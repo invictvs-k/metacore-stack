@@ -103,18 +103,22 @@ public partial class RoomHub : Hub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         
-        // Update room state to Active when first entity joins
+        // Update room state when entities join
         var roomContext = _roomContexts.GetOrCreate(roomId);
-        if (roomContext.State == RoomState.Init)
+        var wasInit = roomContext.State == RoomState.Init;
+        var wasEnded = roomContext.State == RoomState.Ended;
+
+        if (wasInit || wasEnded)
         {
             _roomContexts.UpdateState(roomId, RoomState.Active);
-            await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "active", entities = new[] { normalized } });
         }
-        else
+
+        if (!wasInit)
         {
             await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
-            await PublishRoomState(roomId);
         }
+
+        await PublishRoomState(roomId);
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
 
