@@ -27,7 +27,7 @@ public class McpRegistry : IDisposable
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _logger = _loggerFactory.CreateLogger<McpRegistry>();
-        _catalog = new ResourceCatalog(_logger);
+        _catalog = new ResourceCatalog(_loggerFactory.CreateLogger<ResourceCatalog>());
     }
 
     /// <summary>
