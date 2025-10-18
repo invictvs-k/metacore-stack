@@ -117,42 +117,50 @@ This document validates the end-to-end flows for "Layer 3" (Camada 3) as specifi
 - **Passed**: 8 tests ✅
 - **Failed**: 0 tests
 
-All Layer 3 flow tests pass successfully when run individually. Some tests show cleanup failures when run in batch due to a pre-existing MCP service disposal issue (see Known Issues below).
+All Layer 3 flow tests pass successfully both individually and in batch.
 
 ### Overall Test Suite
 - **Total**: 86 tests (up from 76 baseline)
-- **Passed**: 79 tests
-- **Failed**: 7 tests
-- **Improvement**: Reduced failures from 14 to 7
+- **Passed**: 83 tests ✅
+- **Failed**: 3 tests
+- **Improvement**: Reduced failures from 14 to 3 (79% improvement)
 
 ### Test Categories
 1. ✅ **Layer 3 Flow Tests**: 8/8 passing
 2. ✅ **Room Context Tests**: 8/8 passing
 3. ✅ **Validation Tests**: 13/13 passing
-4. ⚠️ **MCP Bridge Tests**: 4/7 passing (cleanup issues)
-5. ⚠️ **Security Tests**: 3/6 passing (cleanup issues)
+4. ✅ **MCP Bridge Tests**: 9/9 passing (cleanup issue fixed)
+5. ⚠️ **Security Tests**: 3/6 passing (JSON parsing issues - unrelated)
 6. ✅ **Artifact Store Tests**: 3/3 passing
 7. ✅ **Command Target Tests**: 6/6 passing
 
 ## Known Issues
 
-### MCP Service Cleanup (Pre-existing)
+### MCP Service Cleanup ✅ FIXED
 
-Several tests fail during cleanup with `ObjectDisposedException` in `McpRegistryHostedService.StopAsync()`. This is a pre-existing issue unrelated to Layer 3 flows.
+**Issue**: Tests were failing during cleanup with `ObjectDisposedException` in `McpRegistryHostedService.StopAsync()`.
 
-**Affected Tests**:
-- `McpBridge_SmokeTests.CallTool_WithNonexistentTool_ReturnsToolNotFound`
-- `McpBridge_SmokeTests.ListTools_WithNoMcpServers_ReturnsEmptyArray`
+**Root Cause**: The `CancellationTokenSource` was being disposed twice when `StopAsync()` was called multiple times during test teardown.
+
+**Fix Applied** (commit a9dd157):
+- Added null checks before calling `Cancel()` and `Dispose()`
+- Added try-catch blocks to gracefully handle `ObjectDisposedException`
+- Set `_cancellationTokenSource` to null after disposal to prevent reuse
+
+**Result**: All MCP tests now pass (9/9) ✅
+
+### Security Tests JSON Parsing (Unrelated)
+
+Three SecurityTests are failing due to JSON parsing issues when attempting to parse exception messages:
 - `SecurityTests.JoinOwnerWithoutAuthShouldFail`
 - `SecurityTests.DirectMessageToOwnerFromDifferentUserIsDenied`
 - `SecurityTests.CommandDeniedWhenPolicyRequiresOrchestrator`
-- `Layer3FlowTests.Flow32_MultipleEntities_AllReceiveJoinEvents` (when run in batch only)
 
-**Impact**: None on functionality - tests pass their assertions but fail during teardown
+**Root Cause**: Tests expect exception.Message to be valid JSON, but SignalR wraps the error message differently.
 
-**Root Cause**: The `CancellationTokenSource` in `McpRegistryHostedService` is being disposed twice
+**Impact**: None on Layer 3 functionality - these are test implementation issues
 
-**Status**: Out of scope for Layer 3 validation - requires separate MCP service refactoring
+**Status**: Out of scope for Layer 3 validation
 
 ## Validation Summary
 

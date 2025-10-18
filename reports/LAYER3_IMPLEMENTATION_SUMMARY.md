@@ -62,12 +62,14 @@ Falhou: 0 testes
 #### Suite Completa de Testes
 ```
 Total: 86 testes (antes: 76)
-Passou: 79 testes (antes: 62)
-Falhou: 7 testes (antes: 14)
-Melhoria: Redução de 50% nas falhas
+Passou: 83 testes (antes: 62)
+Falhou: 3 testes (antes: 14)
+Melhoria: Redução de 79% nas falhas
 ```
 
-As falhas restantes são devido a um problema pré-existente no serviço MCP (limpeza de recursos), não relacionado aos fluxos da Camada 3.
+**Correção do MCP**: O problema de cleanup do serviço MCP foi corrigido (commit a9dd157), resultando em todos os testes MCP passando (9/9) ✅
+
+As 3 falhas restantes são problemas de parsing JSON nos SecurityTests, não relacionados aos fluxos da Camada 3.
 
 ## Localização dos Pontos do Código
 
@@ -158,11 +160,17 @@ make run-server
 - **Impacto**: Nenhum - Esta é a arquitetura intencional para o MVP
 - **Acesso**: Entidades podem acessar artifacts via `/rooms/{roomId}/entities/{entityId}/artifacts`
 
-### Limpeza de Testes MCP (Pré-existente)
-- **Status**: 7 testes falham na fase de cleanup (não na execução)
-- **Causa**: `CancellationTokenSource` sendo disposed duas vezes em `McpRegistryHostedService`
-- **Impacto**: Nenhum na funcionalidade real - apenas em teardown de testes
-- **Ação**: Fora do escopo da validação de Camada 3
+### Limpeza de Testes MCP ✅ CORRIGIDO
+- **Status**: Corrigido no commit a9dd157
+- **Problema Original**: `CancellationTokenSource` sendo disposed duas vezes em `McpRegistryHostedService`
+- **Correção**: Adicionados checks de null e tratamento de exceção para evitar `ObjectDisposedException`
+- **Resultado**: Todos os 9 testes MCP agora passam ✅
+
+### Testes de Segurança (Fora do escopo)
+- **Status**: 3 testes SecurityTests falham por problema de parsing JSON
+- **Causa**: Testes esperam exception.Message em formato JSON, mas SignalR encapsula diferente
+- **Impacto**: Nenhum na funcionalidade da Camada 3
+- **Ação**: Requer ajuste nos testes, não no código de produção
 
 ## Conclusão
 
@@ -172,6 +180,7 @@ make run-server
 - ✅ Eventos corrigidos para corresponder à especificação
 - ✅ 8 novos testes automatizados cobrindo todas as transições
 - ✅ Todos os testes da Camada 3 passando
+- ✅ Problema de cleanup do MCP corrigido
 - ✅ Documentação completa criada
 - ✅ Instruções de teste fornecidas
 
@@ -179,7 +188,7 @@ A implementação está pronta para produção no escopo do MVP.
 
 ## Próximos Passos Recomendados (Opcional)
 
-1. **Corrigir problema de cleanup do MCP** - Refatorar `McpRegistryHostedService` para evitar double-dispose
+1. **Corrigir testes de segurança** - Ajustar SecurityTests para lidar corretamente com formato de exceção do SignalR
 2. **Adicionar métricas** - Instrumentar eventos ROOM.CREATED e ENTITY.JOINED com logging estruturado
 3. **Documentar API** - Adicionar exemplos de uso dos eventos na documentação da API
 4. **Testes de carga** - Validar comportamento com múltiplas salas e entidades simultâneas
