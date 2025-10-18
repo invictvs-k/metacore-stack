@@ -9,6 +9,10 @@ public sealed class PermissionService
         ArgumentNullException.ThrowIfNull(from);
         ArgumentNullException.ThrowIfNull(target);
 
+        if (target.Policy == null)
+        {
+            return false;
+        }
         return target.Policy.AllowCommandsFrom switch
         {
             "any" => true,
