@@ -158,10 +158,11 @@ public sealed class FileArtifactStore : IArtifactStore
                 return Array.Empty<ArtifactManifest>();
             }
 
-            var latest = new Dictionary<string, ArtifactManifest>(StringComparer.OrdinalIgnoreCase);
+            var latest = new Dictionary<(string Name, string Entity), ArtifactManifest>(ManifestKeyComparer.Instance);
             foreach (var manifest in manifests)
             {
-                latest[manifest.Name] = manifest;
+                var entity = manifest.Origin?.Entity ?? string.Empty;
+                latest[(manifest.Name, entity)] = manifest;
             }
 
             IEnumerable<ArtifactManifest> query = latest.Values;
@@ -350,6 +351,24 @@ public sealed class FileArtifactStore : IArtifactStore
         if (name.Contains("..", StringComparison.Ordinal) || name.Contains('/') || name.Contains('\\'))
         {
             throw new ArtifactStoreException(400, "InvalidArtifactName", "name contains invalid path tokens");
+        }
+    }
+
+    private sealed class ManifestKeyComparer : IEqualityComparer<(string Name, string Entity)>
+    {
+        public static ManifestKeyComparer Instance { get; } = new();
+
+        public bool Equals((string Name, string Entity) x, (string Name, string Entity) y)
+        {
+            return string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(x.Entity, y.Entity, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public int GetHashCode((string Name, string Entity) obj)
+        {
+            var nameHash = obj.Name is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Name);
+            var entityHash = obj.Entity is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Entity);
+            return HashCode.Combine(nameHash, entityHash);
         }
     }
 }
