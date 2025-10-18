@@ -105,8 +105,6 @@ public static partial class ValidationHelper
             return false;
         }
 
-        // If we reach here, all validation checks have passed
-        return true;
     }
 
     public static bool ValidateCommandPayload(object payload, out string? error)
