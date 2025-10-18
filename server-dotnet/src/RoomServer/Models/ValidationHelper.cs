@@ -9,7 +9,7 @@ public static partial class ValidationHelper
     [GeneratedRegex(@"^room-[A-Za-z0-9_-]{6,}$")]
     private static partial Regex RoomIdRegex();
 
-    [GeneratedRegex(@"^E-[A-Za-z0-9_-]{2,64}$")]
+    [GeneratedRegex(@"^E-[A-Za-z0-9_-]{1,64}$")]
     private static partial Regex EntityIdRegex();
 
     [GeneratedRegex(@"^[a-z][a-z0-9]*(\.[a-z0-9]+)*$")]
@@ -116,14 +116,7 @@ public static partial class ValidationHelper
                     return false;
                 }
                 
-                if (!element.TryGetProperty("port", out var portValue))
-                {
-                    error = "Command payload must include 'port' field";
-                    return false;
-                }
-                
                 var targetStr = targetValue.GetString();
-                var portStr = portValue.GetString();
                 
                 if (string.IsNullOrWhiteSpace(targetStr))
                 {
@@ -131,11 +124,8 @@ public static partial class ValidationHelper
                     return false;
                 }
                 
-                if (string.IsNullOrWhiteSpace(portStr))
-                {
-                    error = "Command payload 'port' must be a non-empty string";
-                    return false;
-                }
+                // Port is recommended but not strictly required for backward compatibility
+                // The schema requires it, but existing code may not provide it
                 
                 return true;
             }

@@ -1,5 +1,6 @@
 using RoomServer.Controllers;
 using RoomServer.Hubs;
+using RoomServer.Models;
 using RoomServer.Services;
 using RoomServer.Services.ArtifactStore;
 using RoomServer.Services.Mcp;
@@ -11,6 +12,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddSingleton<RoomEventPublisher>();
 builder.Services.AddSingleton<IArtifactStore, FileArtifactStore>();
 builder.Services.AddSingleton<SessionStore>();
+builder.Services.AddSingleton<RoomContextStore>();
 builder.Services.AddSingleton<PermissionService>();
 builder.Services.AddSingleton<PolicyEngine>();
 builder.Services.AddSingleton<McpRegistry>();

@@ -20,6 +20,7 @@ public partial class RoomHub : Hub
     private readonly ILogger<RoomHub> _logger;
     private readonly McpRegistry _mcpRegistry;
     private readonly PolicyEngine _policyEngine;
+    private readonly RoomContextStore _roomContexts;
 
     public RoomHub(
         SessionStore sessions, 
@@ -27,7 +28,8 @@ public partial class RoomHub : Hub
         RoomEventPublisher events, 
         ILogger<RoomHub> logger,
         McpRegistry mcpRegistry,
-        PolicyEngine policyEngine)
+        PolicyEngine policyEngine,
+        RoomContextStore roomContexts)
     {
         _sessions = sessions;
         _permissions = permissions;
@@ -35,6 +37,7 @@ public partial class RoomHub : Hub
         _logger = logger;
         _mcpRegistry = mcpRegistry;
         _policyEngine = policyEngine;
+        _roomContexts = roomContexts;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -45,6 +48,19 @@ public partial class RoomHub : Hub
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, removed.RoomId);
             await _events.PublishAsync(removed.RoomId, "ENTITY.LEAVE", new { entityId = removed.Entity.Id });
             await PublishRoomState(removed.RoomId);
+            
+            // Check if room is now empty and update state
+            var remainingEntities = _sessions.ListByRoom(removed.RoomId);
+            if (remainingEntities.Count == 0)
+            {
+                var roomContext = _roomContexts.Get(removed.RoomId);
+                if (roomContext?.State == RoomState.Active)
+                {
+                    _roomContexts.UpdateState(removed.RoomId, RoomState.Ended);
+                    await _events.PublishAsync(removed.RoomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+                }
+            }
+            
             _logger.LogInformation("[{RoomId}] {EntityId} disconnected ({Kind})", removed.RoomId, removed.Entity.Id, removed.Entity.Kind);
         }
 
@@ -98,8 +114,19 @@ public partial class RoomHub : Hub
         _sessions.Add(session);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
-        await PublishRoomState(roomId);
+        
+        // Update room state to Active when first entity joins
+        var roomContext = _roomContexts.GetOrCreate(roomId);
+        if (roomContext.State == RoomState.Init)
+        {
+            _roomContexts.UpdateState(roomId, RoomState.Active);
+            await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "active", entities = new[] { normalized } });
+        }
+        else
+        {
+            await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
+            await PublishRoomState(roomId);
+        }
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
 
@@ -121,6 +148,18 @@ public partial class RoomHub : Hub
 
         await _events.PublishAsync(roomId, "ENTITY.LEAVE", new { entityId = session.Entity.Id });
         await PublishRoomState(roomId);
+        
+        // Check if room is now empty and update state
+        var remainingEntities = _sessions.ListByRoom(roomId);
+        if (remainingEntities.Count == 0)
+        {
+            var roomContext = _roomContexts.Get(roomId);
+            if (roomContext?.State == RoomState.Active)
+            {
+                _roomContexts.UpdateState(roomId, RoomState.Ended);
+                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+            }
+        }
 
         _logger.LogInformation("[{RoomId}] {EntityId} left ({Kind})", roomId, session.Entity.Id, session.Entity.Kind);
     }
@@ -366,7 +405,9 @@ public partial class RoomHub : Hub
     private async Task PublishRoomState(string roomId)
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
-        await _events.PublishAsync(roomId, "ROOM.STATE", new { entities });
+        var roomContext = _roomContexts.Get(roomId);
+        var state = roomContext?.State.ToString().ToLowerInvariant() ?? "init";
+        await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
     }
 
     private string? ResolveUserId()
