@@ -29,7 +29,7 @@ public partial class RoomHub
             throw ErrorFactory.HubForbidden("PERM_DENIED", "cannot list tools for different room");
         }
 
-        var visibleTools = _mcpRegistry.Catalog.ListVisible(roomId, session, _policyEngine);
+        var visibleTools = _mcpRegistry.Catalog.ListVisible(session, _policyEngine);
 
         var dtos = visibleTools.Select(item => new CatalogItemDto(
             key: item.Key,

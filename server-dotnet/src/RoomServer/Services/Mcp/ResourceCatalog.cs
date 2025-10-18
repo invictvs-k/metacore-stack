@@ -32,10 +32,10 @@ public class ResourceCatalog
     }
 
     /// <summary>
-    /// Lists all tools visible to the specified entity in the room.
+    /// Lists all tools visible to the specified entity.
     /// Applies visibility policies via the PolicyEngine.
     /// </summary>
-    public IReadOnlyList<CatalogItem> ListVisible(string roomId, EntitySession session, PolicyEngine policyEngine)
+    public IReadOnlyList<CatalogItem> ListVisible(EntitySession session, PolicyEngine policyEngine)
     {
         var visibleTools = new List<CatalogItem>();
 
