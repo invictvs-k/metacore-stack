@@ -21,6 +21,7 @@ public class McpClient : IMcpClient, IDisposable
     private readonly ILogger<McpClient> _logger;
     private readonly SemaphoreSlim _sendLock = new(1, 1);
     private readonly ConcurrentDictionary<int, TaskCompletionSource<JsonElement>> _pendingRequests = new();
+    private readonly CancellationTokenSource _lifecycleCts = new();
     
     private ClientWebSocket? _webSocket;
     private CancellationTokenSource? _connectionCts;
@@ -29,6 +30,7 @@ public class McpClient : IMcpClient, IDisposable
     private ToolSpec[]? _cachedTools;
     private int _reconnectAttempts = 0;
     private const int MaxReconnectDelaySeconds = 60;
+    private bool _disposed = false;
 
     public string ServerId { get; }
     public bool IsConnected => _webSocket?.State == WebSocketState.Open;
@@ -314,7 +316,22 @@ public class McpClient : IMcpClient, IDisposable
         _logger.LogInformation("[{ServerId}] Scheduling reconnect attempt {Attempt} in {Delay}s", 
             ServerId, _reconnectAttempts, delaySeconds);
 
-        await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(delaySeconds), _lifecycleCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogDebug("[{ServerId}] Reconnect cancelled", ServerId);
+            return;
+        }
+
+        // Check if disposed or cancelled before attempting reconnect
+        if (_disposed || _lifecycleCts.IsCancellationRequested)
+        {
+            _logger.LogDebug("[{ServerId}] Client disposed, skipping reconnect", ServerId);
+            return;
+        }
 
         try
         {
@@ -328,8 +345,16 @@ public class McpClient : IMcpClient, IDisposable
 
     public void Dispose()
     {
+        if (_disposed)
+            return;
+
+        _disposed = true;
+        _lifecycleCts.Cancel();
+        
         DisconnectAsync().GetAwaiter().GetResult();
+        
         _sendLock.Dispose();
+        _lifecycleCts.Dispose();
     }
 }
 
