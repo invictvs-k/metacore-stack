@@ -326,7 +326,7 @@ public partial class RoomHub : Hub
         // Validate EntityId format
         if (!ValidationHelper.IsValidEntityId(entity.Id))
         {
-            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_ID", "entity.id must match pattern: E-[A-Za-z0-9_-]{2,64}");
+            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_ID", "entity.id must match pattern: E-[A-Za-z0-9_-]{1,64}");
         }
 
         if (string.IsNullOrWhiteSpace(entity.Kind))
