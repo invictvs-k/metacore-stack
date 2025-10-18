@@ -158,11 +158,26 @@ public sealed class FileArtifactStore : IArtifactStore
                 return Array.Empty<ArtifactManifest>();
             }
 
+            IEnumerable<ArtifactManifest> filteredManifests = manifests;
+
+            if (!string.IsNullOrWhiteSpace(req.EntityFilter))
+            {
+                filteredManifests = filteredManifests
+                    .Where(m => string.Equals(m.Origin?.Entity, req.EntityFilter, StringComparison.OrdinalIgnoreCase));
+            }
+
             var latest = new Dictionary<(string Name, string Entity), ArtifactManifest>(ManifestKeyComparer.Instance);
-            foreach (var manifest in manifests)
+            foreach (var manifest in filteredManifests)
             {
                 var entity = manifest.Origin?.Entity ?? string.Empty;
-                latest[(manifest.Name, entity)] = manifest;
+                var key = (manifest.Name, entity);
+
+                if (!latest.TryGetValue(key, out var existing) ||
+                    manifest.Version > existing.Version ||
+                    (manifest.Version == existing.Version && manifest.Ts > existing.Ts))
+                {
+                    latest[key] = manifest;
+                }
             }
 
             IEnumerable<ArtifactManifest> query = latest.Values;
@@ -175,11 +190,6 @@ public sealed class FileArtifactStore : IArtifactStore
             if (!string.IsNullOrWhiteSpace(req.Type))
             {
                 query = query.Where(m => string.Equals(m.Type, req.Type, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(req.EntityFilter))
-            {
-                query = query.Where(m => string.Equals(m.Origin.Entity, req.EntityFilter, StringComparison.OrdinalIgnoreCase));
             }
 
             if (req.Since.HasValue)
