@@ -34,7 +34,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         });
 
         await connectionA.StartAsync();
-        await connectionA.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-A",
             Kind = "human",
@@ -42,7 +42,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         });
 
         await connectionB.StartAsync();
-        await connectionB.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-B",
             Kind = "agent",
@@ -73,14 +73,14 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         await connectionA.StartAsync();
         await connectionB.StartAsync();
 
-        await connectionA.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-A",
             Kind = "human",
             DisplayName = "Alice"
         });
 
-        await connectionB.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-B",
             Kind = "agent",
@@ -122,14 +122,14 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         await connectionA.StartAsync();
         await connectionB.StartAsync();
 
-        await connectionA.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-A",
             Kind = "human",
             DisplayName = "Alice"
         });
 
-        await connectionB.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-B",
             Kind = "agent",
@@ -164,14 +164,14 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         await connectionA.StartAsync();
         await connectionB.StartAsync();
 
-        await connectionA.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-A",
             Kind = "human",
             DisplayName = "Alice"
         });
 
-        await connectionB.InvokeAsync("Join", RoomId, new EntityInfo
+        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
         {
             Id = "E-B",
             Kind = "agent",
