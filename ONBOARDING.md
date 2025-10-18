@@ -147,6 +147,8 @@ metacore-stack/
 
 ## 3. Arquitetura do Sistema e Fluxo de Dados
 
+> 💡 **Dica:** Para diagramas visuais detalhados, consulte [ARCHITECTURE.md](./ARCHITECTURE.md)
+
 ### Tipo de Arquitetura
 
 **Arquitetura Híbrida:**

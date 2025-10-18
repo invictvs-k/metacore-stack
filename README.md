@@ -12,6 +12,7 @@ Mono-repo com:
 ## 📚 Documentação
 
 - **[ONBOARDING.md](./ONBOARDING.md)** — **Guia completo para novos desenvolvedores** ⭐ Comece aqui!
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Diagramas e arquitetura visual do sistema
 - **[CONCEPTDEFINITION.md](./CONCEPTDEFINITION.md)** — Especificação funcional detalhada
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Guia de contribuição
 
