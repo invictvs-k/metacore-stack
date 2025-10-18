@@ -214,7 +214,7 @@ public class McpClient : IMcpClient, IDisposable
                     new ArraySegment<byte>(bytes),
                     WebSocketMessageType.Text,
                     endOfMessage: true,
-                    CancellationToken.None);
+                    _connectionCts?.Token ?? CancellationToken.None);
                 
                 _logger.LogDebug("[{ServerId}] Sent request {RequestId}", ServerId, requestId);
             }
