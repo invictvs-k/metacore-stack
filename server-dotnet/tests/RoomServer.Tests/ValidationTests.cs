@@ -168,7 +168,7 @@ public class ValidationTests
     [Fact]
     public void ArtifactPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateArtifactPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateArtifactPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Artifact payload is required");
 
         ValidationHelper.ValidateArtifactPayload(3.14, out var errorPrimitive).Should().BeFalse();
