@@ -65,7 +65,18 @@ public class McpClient : IMcpClient, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "[{ServerId}] Failed to connect", ServerId);
-            await ScheduleReconnectAsync();
+            // Schedule reconnection in background without blocking
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await ScheduleReconnectAsync();
+                }
+                catch (Exception reconnectEx)
+                {
+                    _logger.LogError(reconnectEx, "[{ServerId}] Error during reconnection", ServerId);
+                }
+            });
             throw;
         }
     }
