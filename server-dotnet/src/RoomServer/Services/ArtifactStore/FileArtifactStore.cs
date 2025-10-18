@@ -345,7 +345,7 @@ public sealed class FileArtifactStore : IArtifactStore
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArtifactStoreException(400, "InvalidArtifactName", "name is required");
+            throw new ArtifactStoreException(400, "InvalidArtifactName", "Name is required");
         }
 
         if (name.Contains("..", StringComparison.Ordinal) || name.Contains('/') || name.Contains('\\'))
