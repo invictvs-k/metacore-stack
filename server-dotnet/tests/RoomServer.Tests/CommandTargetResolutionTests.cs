@@ -189,7 +189,11 @@ public class CommandTargetResolutionTests : IAsyncLifetime
         });
 
         // Create a payload without a target property
-        var payloadWithoutTarget = JsonDocument.Parse("{\"action\":\"execute\"}").RootElement.Clone();
+        JsonElement payloadWithoutTarget;
+        using (var doc = JsonDocument.Parse("{\"action\":\"execute\"}"))
+        {
+            payloadWithoutTarget = doc.RootElement.Clone();
+        }
 
         var exception = await Assert.ThrowsAsync<HubException>(() => 
             senderConnection.InvokeAsync("SendToRoom", RoomId, new MessageModel
