@@ -48,18 +48,7 @@ public partial class RoomHub : Hub
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, removed.RoomId);
             await _events.PublishAsync(removed.RoomId, "ENTITY.LEAVE", new { entityId = removed.Entity.Id });
             await PublishRoomState(removed.RoomId);
-            
-            // Check if room is now empty and update state
-            var remainingEntities = _sessions.ListByRoom(removed.RoomId);
-            if (remainingEntities.Count == 0)
-            {
-                var roomContext = _roomContexts.Get(removed.RoomId);
-                if (roomContext?.State == RoomState.Active)
-                {
-                    _roomContexts.UpdateState(removed.RoomId, RoomState.Ended);
-                    await _events.PublishAsync(removed.RoomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
-                }
-            }
+            await CheckAndTransitionToEndedState(removed.RoomId);
             
             _logger.LogInformation("[{RoomId}] {EntityId} disconnected ({Kind})", removed.RoomId, removed.Entity.Id, removed.Entity.Kind);
         }
@@ -148,18 +137,7 @@ public partial class RoomHub : Hub
 
         await _events.PublishAsync(roomId, "ENTITY.LEAVE", new { entityId = session.Entity.Id });
         await PublishRoomState(roomId);
-        
-        // Check if room is now empty and update state
-        var remainingEntities = _sessions.ListByRoom(roomId);
-        if (remainingEntities.Count == 0)
-        {
-            var roomContext = _roomContexts.Get(roomId);
-            if (roomContext?.State == RoomState.Active)
-            {
-                _roomContexts.UpdateState(roomId, RoomState.Ended);
-                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
-            }
-        }
+        await CheckAndTransitionToEndedState(roomId);
 
         _logger.LogInformation("[{RoomId}] {EntityId} left ({Kind})", roomId, session.Entity.Id, session.Entity.Kind);
     }
@@ -408,6 +386,20 @@ public partial class RoomHub : Hub
         var roomContext = _roomContexts.Get(roomId);
         var state = roomContext?.State.ToString().ToLowerInvariant() ?? "init";
         await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
+    }
+
+    private async Task CheckAndTransitionToEndedState(string roomId)
+    {
+        var remainingEntities = _sessions.ListByRoom(roomId);
+        if (remainingEntities.Count == 0)
+        {
+            var roomContext = _roomContexts.Get(roomId);
+            if (roomContext?.State == RoomState.Active)
+            {
+                _roomContexts.UpdateState(roomId, RoomState.Ended);
+                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+            }
+        }
     }
 
     private string? ResolveUserId()
