@@ -16,43 +16,61 @@ export default function RoomDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchRoomDetails();
-  }, [roomId]);
+    const fetchRoomDetails = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const fetchRoomDetails = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Try to fetch room details from backend
-      const response = await fetch(`http://localhost:5000/rooms/${roomId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRoomName(data.name || `Sala ${roomId}`);
-      } else {
-        setRoomName(`Sala ${roomId}`);
-      }
-
-      // Try to fetch artifacts
-      const artifactsResponse = await fetch(
-        `http://localhost:5000/rooms/${roomId}/artifacts`,
-        {
+        // Try to fetch room details from backend
+        const response = await fetch(`http://localhost:5000/rooms/${roomId}`, {
           headers: {
             'Content-Type': 'application/json',
-            'X-Entity-Id': 'demo-entity',
           },
-        }
-      );
+        });
 
-      if (artifactsResponse.ok) {
-        const data = await artifactsResponse.json();
-        setArtifacts(data.items || []);
-      } else {
+        if (response.ok) {
+          const data = await response.json();
+          setRoomName(data.name || `Sala ${roomId}`);
+        } else {
+          setRoomName(`Sala ${roomId}`);
+        }
+
+        // Try to fetch artifacts
+        const artifactsResponse = await fetch(
+          `http://localhost:5000/rooms/${roomId}/artifacts`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Entity-Id': 'demo-entity',
+            },
+          }
+        );
+
+        if (artifactsResponse.ok) {
+          const data = await artifactsResponse.json();
+          setArtifacts(data.items || []);
+        } else {
+          // Use mock data
+          setArtifacts([
+            {
+              name: 'document.txt',
+              type: 'text/plain',
+              version: 1,
+              sha256: 'abc123...',
+              created: new Date().toISOString(),
+            },
+            {
+              name: 'image.png',
+              type: 'image/png',
+              version: 2,
+              sha256: 'def456...',
+              created: new Date().toISOString(),
+            },
+          ]);
+        }
+      } catch (err) {
+        console.log('Error fetching room details:', err);
+        setRoomName(`Sala ${roomId}`);
         // Use mock data
         setArtifacts([
           {
@@ -70,31 +88,13 @@ export default function RoomDetailPage() {
             created: new Date().toISOString(),
           },
         ]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.log('Error fetching room details:', err);
-      setRoomName(`Sala ${roomId}`);
-      // Use mock data
-      setArtifacts([
-        {
-          name: 'document.txt',
-          type: 'text/plain',
-          version: 1,
-          sha256: 'abc123...',
-          created: new Date().toISOString(),
-        },
-        {
-          name: 'image.png',
-          type: 'image/png',
-          version: 2,
-          sha256: 'def456...',
-          created: new Date().toISOString(),
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchRoomDetails();
+  }, [roomId]);
 
   if (loading) {
     return (
