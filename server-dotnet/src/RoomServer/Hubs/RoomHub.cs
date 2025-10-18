@@ -192,18 +192,41 @@ public class RoomHub : Hub
         await Clients.Group(roomId).SendAsync("message", message);
     }
 
+    /// <summary>
+    /// Resolves the target entity ID from a command payload.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method handles multiple payload types that can be received from different serialization contexts:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description><see cref="JsonElement"/> - When payload is deserialized by System.Text.Json inline</description></item>
+    /// <item><description><see cref="JsonDocument"/> - When payload is pre-parsed as a JSON document</description></item>
+    /// <item><description><see cref="IDictionary{TKey, TValue}"/> of string to object - When payload is a strongly-typed dictionary</description></item>
+    /// <item><description><see cref="IDictionary{TKey, TValue}"/> of string to string - When payload contains only string values</description></item>
+    /// </list>
+    /// <para>
+    /// The method attempts to extract the "target" property from the payload, which identifies the entity 
+    /// that should receive the command. The property must be a string value representing an entity ID.
+    /// </para>
+    /// </remarks>
+    /// <param name="payload">The command payload object, which should contain a "target" property.</param>
+    /// <returns>
+    /// The target entity ID as a string if found; otherwise, <c>null</c> if the payload type is not recognized 
+    /// or if the "target" property is not present or cannot be converted to a string.
+    /// </returns>
     private static string? ResolveCommandTarget(object payload)
     {
         switch (payload)
         {
             case JsonElement element when element.ValueKind == JsonValueKind.Object:
-                return element.TryGetProperty("target", out var value) ? value.GetString() : null;
+                return element.TryGetProperty("target", out var elementValue) ? elementValue.GetString() : null;
             case JsonDocument document when document.RootElement.ValueKind == JsonValueKind.Object:
-                return document.RootElement.TryGetProperty("target", out var value) ? value.GetString() : null;
+                return document.RootElement.TryGetProperty("target", out var docValue) ? docValue.GetString() : null;
             case IDictionary<string, object?> dict:
-                return dict.TryGetValue("target", out var value) ? value?.ToString() : null;
+                return dict.TryGetValue("target", out var dictValue) ? dictValue?.ToString() : null;
             case IDictionary<string, string> dictString:
-                return dictString.TryGetValue("target", out var value) ? value : null;
+                return dictString.TryGetValue("target", out var stringValue) ? stringValue : null;
             default:
                 return null;
         }
