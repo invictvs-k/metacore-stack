@@ -11,7 +11,7 @@ using RoomServer.Services;
 
 namespace RoomServer.Hubs;
 
-public class RoomHub : Hub
+public partial class RoomHub : Hub
 {
     private readonly SessionStore _sessions;
     private readonly PermissionService _permissions;

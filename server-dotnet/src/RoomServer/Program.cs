@@ -2,6 +2,7 @@ using RoomServer.Controllers;
 using RoomServer.Hubs;
 using RoomServer.Services;
 using RoomServer.Services.ArtifactStore;
+using RoomServer.Services.Mcp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +12,15 @@ builder.Services.AddSingleton<RoomEventPublisher>();
 builder.Services.AddSingleton<IArtifactStore, FileArtifactStore>();
 builder.Services.AddSingleton<SessionStore>();
 builder.Services.AddSingleton<PermissionService>();
+builder.Services.AddSingleton<PolicyEngine>();
+builder.Services.AddSingleton<McpRegistry>();
 builder.Logging.AddConsole();
 
 var app = builder.Build();
+
+// Initialize MCP Registry
+var mcpRegistry = app.Services.GetRequiredService<McpRegistry>();
+await mcpRegistry.InitializeAsync();
 
 app.MapGet("/", () => Results.Text("RoomServer alive"));
 app.MapHealthChecks("/health");
