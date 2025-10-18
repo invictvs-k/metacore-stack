@@ -210,7 +210,7 @@ public static partial class ValidationHelper
                 }
             }
 
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateEventPayload(document.RootElement, out error);
             }
@@ -263,7 +263,7 @@ public static partial class ValidationHelper
                 }
             }
 
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateArtifactPayload(document.RootElement, out error);
             }
