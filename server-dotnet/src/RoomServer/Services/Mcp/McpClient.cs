@@ -117,6 +117,7 @@ public class McpClient : IMcpClient, IDisposable
             tcs.TrySetCanceled();
         }
         _pendingRequests.Clear();
+        _cachedTools = null;
     }
 
     public async Task<ToolSpec[]> ListToolsAsync()
