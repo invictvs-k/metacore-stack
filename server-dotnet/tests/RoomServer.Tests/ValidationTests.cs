@@ -93,7 +93,7 @@ public class ValidationTests
         ValidationHelper.ValidateChatPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Chat payload is required");
 
-        ValidationHelper.ValidateChatPayload("text"!, out var errorPrimitive).Should().BeFalse();
+        ValidationHelper.ValidateChatPayload("text", out var errorPrimitive).Should().BeFalse();
         errorPrimitive.Should().Be("Chat payload must be a JSON object");
     }
 
