@@ -56,7 +56,7 @@ public static partial class ValidationHelper
         };
     }
 
-    public static bool ValidateChatPayload(object payload, out string? error)
+    public static bool ValidateChatPayload(object? payload, out string? error)
     {
         if (!TryGetJsonObjectPayload(
                 payload,
@@ -85,7 +85,7 @@ public static partial class ValidationHelper
         return true;
     }
 
-    public static bool ValidateCommandPayload(object payload, out string? error)
+    public static bool ValidateCommandPayload(object? payload, out string? error)
     {
         if (!TryGetJsonObjectPayload(
                 payload,
@@ -130,7 +130,7 @@ public static partial class ValidationHelper
         return true;
     }
 
-    public static bool ValidateEventPayload(object payload, out string? error)
+    public static bool ValidateEventPayload(object? payload, out string? error)
     {
         if (!TryGetJsonObjectPayload(
                 payload,
@@ -187,10 +187,10 @@ public static partial class ValidationHelper
     /// }
     /// </para>
     /// </summary>
-    /// <param name="payload">The payload object to validate. Must be a JSON object with the required manifest fields.</param>
+    /// <param name="payload">The payload object to validate. May be null; when provided, must be a JSON object with the required manifest fields.</param>
     /// <param name="error">Outputs a validation error message if validation fails; otherwise, null.</param>
     /// <returns>True if the payload is valid; false otherwise.</returns>
-    public static bool ValidateArtifactPayload(object payload, out string? error)
+    public static bool ValidateArtifactPayload(object? payload, out string? error)
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Artifact payload is required",
@@ -237,7 +237,7 @@ public static partial class ValidationHelper
     }
 
     private static bool TryGetJsonObjectPayload(
-        object payload,
+        object? payload,
         string requiredError,
         string objectError,
         string invalidFormatError,
