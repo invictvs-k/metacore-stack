@@ -104,6 +104,12 @@ public static partial class ValidationHelper
             return false;
         }
 
+        if (targetValue.ValueKind != JsonValueKind.String)
+        {
+            error = "Command payload 'target' must be a string";
+            return false;
+        }
+
         var targetStr = targetValue.GetString();
 
         if (string.IsNullOrWhiteSpace(targetStr))
@@ -140,6 +146,12 @@ public static partial class ValidationHelper
         if (!element.TryGetProperty("kind", out var kindValue))
         {
             error = "Event payload must include 'kind' field";
+            return false;
+        }
+
+        if (kindValue.ValueKind != JsonValueKind.String)
+        {
+            error = "Event payload 'kind' must be a string";
             return false;
         }
 
