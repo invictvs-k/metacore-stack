@@ -102,8 +102,8 @@ public static partial class ValidationHelper
             return false;
         }
 
-        error = "Chat payload must be a JSON object";
-        return false;
+        // If we reach here, all validation checks have passed
+        return true;
     }
 
     public static bool ValidateCommandPayload(object payload, out string? error)
