@@ -142,7 +142,7 @@ public class ValidationTests
     [Fact]
     public void EventPayload_NonJson_IsInvalid()
     {
-        ValidationHelper.ValidateEventPayload(null!, out var errorNull).Should().BeFalse();
+        ValidationHelper.ValidateEventPayload(null, out var errorNull).Should().BeFalse();
         errorNull.Should().Be("Event payload is required");
 
         ValidationHelper.ValidateEventPayload(true, out var errorPrimitive).Should().BeFalse();
