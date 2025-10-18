@@ -129,7 +129,7 @@ public static partial class ValidationHelper
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Event payload is required",
-                objectError: "Event payload must be an object",
+                objectError: "Event payload must be a JSON object",
                 invalidFormatError: "Invalid event payload format",
                 out var element,
                 out error))
