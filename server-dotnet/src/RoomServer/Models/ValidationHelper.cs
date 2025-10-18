@@ -58,225 +58,206 @@ public static partial class ValidationHelper
 
     public static bool ValidateChatPayload(object payload, out string? error)
     {
+        if (!TryGetJsonObjectPayload(
+                payload,
+                requiredError: "Chat payload is required",
+                objectError: "Chat payload must be an object",
+                invalidFormatError: "Invalid chat payload format",
+                out var element,
+                out error))
+        {
+            return false;
+        }
+
+        if (!element.TryGetProperty("text", out var textValue))
+        {
+            error = "Chat payload must include 'text' field";
+            return false;
+        }
+
+        if (textValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(textValue.GetString()))
+        {
+            error = "Chat payload 'text' must be a non-empty string";
+            return false;
+        }
+
         error = null;
-
-        if (payload is null)
-        {
-            error = "Chat payload is required";
-            return false;
-        }
-
-        try
-        {
-            if (payload is JsonElement element)
-            {
-                if (element.ValueKind != JsonValueKind.Object)
-                {
-                    error = "Chat payload must be an object";
-                    return false;
-                }
-
-                if (!element.TryGetProperty("text", out var textValue))
-                {
-                    error = "Chat payload must include 'text' field";
-                    return false;
-                }
-
-                if (textValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(textValue.GetString()))
-                {
-                    error = "Chat payload 'text' must be a non-empty string";
-                    return false;
-                }
-
-                return true;
-            }
-            else if (payload is JsonDocument document)
-            {
-                return ValidateChatPayload(document.RootElement, out error);
-            }
-            else
-            {
-                error = "Chat payload must be a JSON object";
-                return false;
-            }
-        }
-        catch
-        {
-            error = "Invalid chat payload format";
-            return false;
-        }
+        return true;
     }
 
     public static bool ValidateCommandPayload(object payload, out string? error)
     {
+        if (!TryGetJsonObjectPayload(
+                payload,
+                requiredError: "Command payload is required",
+                objectError: "Command payload must be an object",
+                invalidFormatError: "Invalid command payload format",
+                out var element,
+                out error))
+        {
+            return false;
+        }
+
+        if (!element.TryGetProperty("target", out var targetValue))
+        {
+            error = "Command payload must include 'target' field";
+            return false;
+        }
+
+        var targetStr = targetValue.GetString();
+
+        if (string.IsNullOrWhiteSpace(targetStr))
+        {
+            error = "Command payload 'target' must be a non-empty string";
+            return false;
+        }
+
+        // Port is recommended but not strictly required for backward compatibility
+        // The schema requires it, but existing code may not provide it
+
+        // Explicitly skip validation of 'port' field for backward compatibility
+        // If present, we do not validate its value
+        // Example:
+        // if (element.TryGetProperty("port", out var portValue)) { /* intentionally not validated */ }
+
         error = null;
-
-        if (payload is null)
-        {
-            error = "Command payload is required";
-            return false;
-        }
-
-        try
-        {
-            if (payload is JsonElement element)
-            {
-                if (element.ValueKind != JsonValueKind.Object)
-                {
-                    error = "Command payload must be an object";
-                    return false;
-                }
-
-                if (!element.TryGetProperty("target", out var targetValue))
-                {
-                    error = "Command payload must include 'target' field";
-                    return false;
-                }
-
-                var targetStr = targetValue.GetString();
-
-                if (string.IsNullOrWhiteSpace(targetStr))
-                {
-                    error = "Command payload 'target' must be a non-empty string";
-                    return false;
-                }
-
-                // Port is recommended but not strictly required for backward compatibility
-                // The schema requires it, but existing code may not provide it
-
-                // Explicitly skip validation of 'port' field for backward compatibility
-                // If present, we do not validate its value
-                // Example:
-                // if (element.TryGetProperty("port", out var portValue)) { /* intentionally not validated */ }
-
-                error = null;
-                return true;
-            }
-            else if (payload is JsonDocument document)
-            {
-                return ValidateCommandPayload(document.RootElement, out error);
-            }
-            else
-            {
-                error = "Command payload must be a JSON object";
-                return false;
-            }
-        }
-        catch
-        {
-            error = "Invalid command payload format";
-            return false;
-        }
+        return true;
     }
 
     public static bool ValidateEventPayload(object payload, out string? error)
     {
+        if (!TryGetJsonObjectPayload(
+                payload,
+                requiredError: "Event payload is required",
+                objectError: "Event payload must be an object",
+                invalidFormatError: "Invalid event payload format",
+                out var element,
+                out error))
+        {
+            return false;
+        }
+
+        if (!element.TryGetProperty("kind", out var kindValue))
+        {
+            error = "Event payload must include 'kind' field";
+            return false;
+        }
+
+        var kindStr = kindValue.GetString();
+
+        if (string.IsNullOrWhiteSpace(kindStr))
+        {
+            error = "Event payload 'kind' must be a non-empty string";
+            return false;
+        }
+
+        if (!IsValidEventKind(kindStr))
+        {
+            error = "Event payload 'kind' must be in SCREAMING_CASE format (e.g., ENTITY.JOIN, ROOM.STATE)";
+            return false;
+        }
+
         error = null;
-
-        if (payload is null)
-        {
-            error = "Event payload is required";
-            return false;
-        }
-
-        try
-        {
-            if (payload is JsonElement element)
-            {
-                if (element.ValueKind != JsonValueKind.Object)
-                {
-                    error = "Event payload must be an object";
-                    return false;
-                }
-
-                if (!element.TryGetProperty("kind", out var kindValue))
-                {
-                    error = "Event payload must include 'kind' field";
-                    return false;
-                }
-
-                var kindStr = kindValue.GetString();
-
-                if (string.IsNullOrWhiteSpace(kindStr))
-                {
-                    error = "Event payload 'kind' must be a non-empty string";
-                    return false;
-                }
-
-                if (!IsValidEventKind(kindStr))
-                {
-                    error = "Event payload 'kind' must be in SCREAMING_CASE format (e.g., ENTITY.JOIN, ROOM.STATE)";
-                    return false;
-                }
-
-                error = null;
-                return true;
-            }
-            else if (payload is JsonDocument document)
-            {
-                return ValidateEventPayload(document.RootElement, out error);
-            }
-            else
-            {
-                error = "Event payload must be a JSON object";
-                return false;
-            }
-        }
-        catch
-        {
-            error = "Invalid event payload format";
-            return false;
-        }
+        return true;
     }
 
     public static bool ValidateArtifactPayload(object payload, out string? error)
     {
+        if (!TryGetJsonObjectPayload(
+                payload,
+                requiredError: "Artifact payload is required",
+                objectError: "Artifact payload must be an object",
+                invalidFormatError: "Invalid artifact payload format",
+                out var element,
+                out error))
+        {
+            return false;
+        }
+
+        if (!element.TryGetProperty("manifest", out var manifestValue))
+        {
+            error = "Artifact payload must include 'manifest' field";
+            return false;
+        }
+
+        if (manifestValue.ValueKind != JsonValueKind.Object)
+        {
+            error = "Artifact payload 'manifest' must be an object";
+            return false;
+        }
+
+        if (!manifestValue.TryGetProperty("name", out var nameValue) || nameValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(nameValue.GetString()))
+        {
+            error = "Artifact payload 'manifest.name' must be a non-empty string";
+            return false;
+        }
+
+        if (!manifestValue.TryGetProperty("version", out var versionValue) || versionValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(versionValue.GetString()))
+        {
+            error = "Artifact payload 'manifest.version' must be a non-empty string";
+            return false;
+        }
+
+        if (!manifestValue.TryGetProperty("sha256", out var shaValue) || shaValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(shaValue.GetString()))
+        {
+            error = "Artifact payload 'manifest.sha256' must be a non-empty string";
+            return false;
+        }
+
+        error = null;
+        return true;
+    }
+
+    private static bool TryGetJsonObjectPayload(
+        object payload,
+        string requiredError,
+        string objectError,
+        string invalidFormatError,
+        out JsonElement element,
+        out string? error)
+    {
+        element = default;
         error = null;
 
         if (payload is null)
         {
-            error = "Artifact payload is required";
+            error = requiredError;
             return false;
         }
 
         try
         {
-            if (payload is JsonElement element)
+            switch (payload)
             {
-                if (element.ValueKind != JsonValueKind.Object)
-                {
-                    error = "Artifact payload must be an object";
-                    return false;
-                }
+                case JsonElement jsonElement:
+                    if (jsonElement.ValueKind != JsonValueKind.Object)
+                    {
+                        error = objectError;
+                        return false;
+                    }
 
-                if (!element.TryGetProperty("manifest", out var manifestValue))
-                {
-                    error = "Artifact payload must include 'manifest' field";
-                    return false;
-                }
+                    element = jsonElement.Clone();
+                    return true;
 
-                if (manifestValue.ValueKind != JsonValueKind.Object)
-                {
-                    error = "Artifact payload 'manifest' must be an object";
-                    return false;
-                }
+                case JsonDocument jsonDocument:
+                    var root = jsonDocument.RootElement;
+                    if (root.ValueKind != JsonValueKind.Object)
+                    {
+                        error = objectError;
+                        return false;
+                    }
 
-                error = null;
-                return true;
-            }
-            else if (payload is JsonDocument document)
-            {
-                return ValidateArtifactPayload(document.RootElement, out error);
-            }
-            else
-            {
-                error = "Artifact payload must be a JSON object";
-                return false;
+                    element = root.Clone();
+                    return true;
+
+                default:
+                    error = objectError;
+                    return false;
             }
         }
         catch
         {
-            error = "Invalid artifact payload format";
+            error = invalidFormatError;
             return false;
         }
     }

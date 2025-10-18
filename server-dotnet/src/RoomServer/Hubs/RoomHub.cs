@@ -118,7 +118,7 @@ public partial class RoomHub : Hub
             await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
         }
 
-        await PublishRoomState(roomId);
+        await PublishRoomState(roomId, wasInit || wasEnded ? RoomState.Active : null);
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
 
@@ -383,11 +383,11 @@ public partial class RoomHub : Hub
         }
     }
 
-    private async Task PublishRoomState(string roomId)
+    private async Task PublishRoomState(string roomId, RoomState? overrideState = null)
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
         var roomContext = _roomContexts.Get(roomId);
-        var state = roomContext?.State.ToString().ToLowerInvariant() ?? "init";
+        var state = (overrideState ?? roomContext?.State)?.ToString().ToLowerInvariant() ?? "init";
         await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
     }
 
@@ -400,7 +400,7 @@ public partial class RoomHub : Hub
             if (roomContext?.State == RoomState.Active)
             {
                 _roomContexts.UpdateState(roomId, RoomState.Ended);
-                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+                await PublishRoomState(roomId, RoomState.Ended);
             }
         }
     }
