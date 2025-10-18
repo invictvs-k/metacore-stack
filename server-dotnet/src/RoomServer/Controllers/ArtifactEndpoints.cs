@@ -184,9 +184,9 @@ public static class ArtifactEndpoints
                 return ErrorFactory.HttpForbidden("PERM_DENIED", "not allowed to access workspace");
             }
 
-            if (!TryParseListParameters(context.Request, out var listParams, out var errorResult))
+            if (!TryParseListParameters(context.Request, out var listParams, out var listParamsError))
             {
-                return errorResult!;
+                return listParamsError!;
             }
 
             var request = new ArtifactListRequest(

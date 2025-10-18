@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 using RoomServer.Models;
@@ -183,7 +184,7 @@ public class SecurityTests : IAsyncLifetime
         body.RootElement.GetProperty("code").GetString().Should().Be("PERM_DENIED");
     }
 
-    private HubConnection BuildConnection(Action<HttpConnectionOptions>? configure = null)
+    private HubConnection BuildConnection(Action<Microsoft.AspNetCore.Http.Connections.Client.HttpConnectionOptions>? configure = null)
     {
         return new HubConnectionBuilder()
             .WithUrl("http://localhost/room", options =>

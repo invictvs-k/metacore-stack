@@ -197,13 +197,13 @@ public class RoomHub : Hub
         switch (payload)
         {
             case JsonElement element when element.ValueKind == JsonValueKind.Object:
-                return element.TryGetProperty("target", out var value) ? value.GetString() : null;
+                return element.TryGetProperty("target", out var elementValue) ? elementValue.GetString() : null;
             case JsonDocument document when document.RootElement.ValueKind == JsonValueKind.Object:
-                return document.RootElement.TryGetProperty("target", out var value) ? value.GetString() : null;
+                return document.RootElement.TryGetProperty("target", out var docValue) ? docValue.GetString() : null;
             case IDictionary<string, object?> dict:
-                return dict.TryGetValue("target", out var value) ? value?.ToString() : null;
+                return dict.TryGetValue("target", out var dictValue) ? dictValue?.ToString() : null;
             case IDictionary<string, string> dictString:
-                return dictString.TryGetValue("target", out var value) ? value : null;
+                return dictString.TryGetValue("target", out var stringValue) ? stringValue : null;
             default:
                 return null;
         }
