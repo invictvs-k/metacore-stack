@@ -151,7 +151,7 @@ public static partial class ValidationHelper
 
         if (kindValue.ValueKind != JsonValueKind.String)
         {
-            error = "Event payload 'kind' must be a non-empty string";
+            error = "Event payload 'kind' must be a string";
             return false;
         }
 
