@@ -161,8 +161,24 @@ public static partial class ValidationHelper
         return true;
     }
 
+    /// <summary>
+    /// Validates that the provided payload is a JSON object containing a 'manifest' object
+    /// with required string properties: 'name', 'version', and 'sha256'.
+    /// <para>
+    /// Expected payload shape:
+    /// {
+    ///   "manifest": {
+    ///     "name": string (required, non-empty),
+    ///     "version": string (required, non-empty),
+    ///     "sha256": string (required, non-empty)
+    ///   }
+    /// }
+    /// </para>
+    /// </summary>
+    /// <param name="payload">The payload object to validate. Must be a JSON object with the required manifest fields.</param>
+    /// <param name="error">Outputs a validation error message if validation fails; otherwise, null.</param>
+    /// <returns>True if the payload is valid; false otherwise.</returns>
     public static bool ValidateArtifactPayload(object payload, out string? error)
-    {
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Artifact payload is required",
