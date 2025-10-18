@@ -91,14 +91,15 @@ public static partial class ValidationHelper
                 error = null;
                 return true;
             }
-
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateChatPayload(document.RootElement, out error);
             }
-
-            error = "Chat payload must be a JSON object";
-            return false;
+            else
+            {
+                error = "Chat payload must be a JSON object";
+                return false;
+            }
         }
         catch
         {
@@ -152,14 +153,15 @@ public static partial class ValidationHelper
                 error = null;
                 return true;
             }
-
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateCommandPayload(document.RootElement, out error);
             }
-
-            error = "Command payload must be a JSON object";
-            return false;
+            else
+            {
+                error = "Command payload must be a JSON object";
+                return false;
+            }
         }
         catch
         {
@@ -211,14 +213,15 @@ public static partial class ValidationHelper
                 error = null;
                 return true;
             }
-
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateEventPayload(document.RootElement, out error);
             }
-
-            error = "Event payload must be a JSON object";
-            return false;
+            else
+            {
+                error = "Event payload must be a JSON object";
+                return false;
+            }
         }
         catch
         {
@@ -262,14 +265,15 @@ public static partial class ValidationHelper
                 error = null;
                 return true;
             }
-
-            if (payload is JsonDocument document)
+            else if (payload is JsonDocument document)
             {
                 return ValidateArtifactPayload(document.RootElement, out error);
             }
-
-            error = "Artifact payload must be a JSON object";
-            return false;
+            else
+            {
+                error = "Artifact payload must be a JSON object";
+                return false;
+            }
         }
         catch
         {
