@@ -90,7 +90,7 @@ public static partial class ValidationHelper
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Command payload is required",
-                objectError: "Command payload must be an object",
+                objectError: "Command payload must be a JSON object",
                 invalidFormatError: "Invalid command payload format",
                 out var element,
                 out error))
