@@ -61,7 +61,7 @@ public sealed class FileArtifactStore : IArtifactStore
                 .DefaultIfEmpty(0)
                 .Max() + 1;
 
-            var metadata = req.Metadata is null ? null : new Dictionary<string, string>(req.Metadata);
+            var metadata = req.Metadata is null ? null : new Dictionary<string, object>(req.Metadata);
             var parents = req.Parents is null ? null : req.Parents.ToList();
 
             await using (var destination = File.Create(tempPath))
@@ -255,7 +255,7 @@ public sealed class FileArtifactStore : IArtifactStore
 
         await using var stream = File.Open(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read);
         var parents = new List<string> { sourceManifest.Sha256 };
-        var metadata = req.Metadata is null ? null : new Dictionary<string, string>(req.Metadata);
+        var metadata = req.Metadata is null ? null : new Dictionary<string, object>(req.Metadata);
         var writeReq = new ArtifactWriteRequest(
             req.RoomId,
             "room",

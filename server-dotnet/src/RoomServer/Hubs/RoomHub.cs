@@ -20,6 +20,7 @@ public partial class RoomHub : Hub
     private readonly ILogger<RoomHub> _logger;
     private readonly McpRegistry _mcpRegistry;
     private readonly PolicyEngine _policyEngine;
+    private readonly RoomContextStore _roomContexts;
 
     public RoomHub(
         SessionStore sessions, 
@@ -27,7 +28,8 @@ public partial class RoomHub : Hub
         RoomEventPublisher events, 
         ILogger<RoomHub> logger,
         McpRegistry mcpRegistry,
-        PolicyEngine policyEngine)
+        PolicyEngine policyEngine,
+        RoomContextStore roomContexts)
     {
         _sessions = sessions;
         _permissions = permissions;
@@ -35,6 +37,7 @@ public partial class RoomHub : Hub
         _logger = logger;
         _mcpRegistry = mcpRegistry;
         _policyEngine = policyEngine;
+        _roomContexts = roomContexts;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -45,6 +48,7 @@ public partial class RoomHub : Hub
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, removed.RoomId);
             await _events.PublishAsync(removed.RoomId, "ENTITY.LEAVE", new { entityId = removed.Entity.Id });
             await PublishRoomState(removed.RoomId);
+            await CheckAndTransitionToEndedState(removed.RoomId);
             _logger.LogInformation("[{RoomId}] {EntityId} disconnected ({Kind})", removed.RoomId, removed.Entity.Id, removed.Entity.Kind);
         }
 
@@ -55,6 +59,13 @@ public partial class RoomHub : Hub
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         ArgumentNullException.ThrowIfNull(entity);
+        
+        // Validate RoomId format
+        if (!ValidationHelper.IsValidRoomId(roomId))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ROOM_ID", "roomId must match pattern: room-[A-Za-z0-9_-]{6,}");
+        }
+        
         ValidateEntity(entity);
 
         var userId = ResolveUserId();
@@ -91,8 +102,19 @@ public partial class RoomHub : Hub
         _sessions.Add(session);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
-        await PublishRoomState(roomId);
+        
+        // Update room state to Active when first entity joins
+        var roomContext = _roomContexts.GetOrCreate(roomId);
+        if (roomContext.State == RoomState.Init)
+        {
+            _roomContexts.UpdateState(roomId, RoomState.Active);
+            await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "active", entities = new[] { normalized } });
+        }
+        else
+        {
+            await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
+            await PublishRoomState(roomId);
+        }
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
 
@@ -114,6 +136,7 @@ public partial class RoomHub : Hub
 
         await _events.PublishAsync(roomId, "ENTITY.LEAVE", new { entityId = session.Entity.Id });
         await PublishRoomState(roomId);
+        await CheckAndTransitionToEndedState(roomId);
 
         _logger.LogInformation("[{RoomId}] {EntityId} left ({Kind})", roomId, session.Entity.Id, session.Entity.Kind);
     }
@@ -133,6 +156,9 @@ public partial class RoomHub : Hub
         {
             throw ErrorFactory.HubForbidden("PERM_DENIED", "message sender mismatch");
         }
+
+        // Validate message payload based on type
+        ValidateMessagePayload(message);
 
         message.RoomId = roomId;
         message.Ts = DateTime.UtcNow;
@@ -274,9 +300,33 @@ public partial class RoomHub : Hub
             throw ErrorFactory.HubBadRequest("INVALID_ENTITY_SPEC", "entity.id is required");
         }
 
+        // Validate EntityId format
+        if (!ValidationHelper.IsValidEntityId(entity.Id))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_ID", "entity.id must match pattern: E-[A-Za-z0-9_-]{2,64}");
+        }
+
         if (string.IsNullOrWhiteSpace(entity.Kind))
         {
             throw ErrorFactory.HubBadRequest("INVALID_ENTITY_SPEC", "entity.kind is required");
+        }
+
+        // Validate EntityKind
+        if (!ValidationHelper.IsValidEntityKind(entity.Kind))
+        {
+            throw ErrorFactory.HubBadRequest("INVALID_ENTITY_KIND", "entity.kind must be one of: human, agent, npc, orchestrator");
+        }
+
+        // Validate Capabilities (PortIds)
+        if (entity.Capabilities is not null)
+        {
+            foreach (var capability in entity.Capabilities)
+            {
+                if (!ValidationHelper.IsValidPortId(capability))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_CAPABILITY", $"capability '{capability}' must match pattern: ^[a-z][a-z0-9]*(\\.[a-z0-9]+)*$");
+                }
+            }
         }
 
         if (entity.Policy is null)
@@ -290,10 +340,65 @@ public partial class RoomHub : Hub
         }
     }
 
+    private static void ValidateMessagePayload(MessageModel message)
+    {
+        var messageType = message.Type?.ToLowerInvariant();
+        
+        switch (messageType)
+        {
+            case "chat":
+                if (!ValidationHelper.ValidateChatPayload(message.Payload, out var chatError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_CHAT_PAYLOAD", chatError ?? "Invalid chat payload");
+                }
+                break;
+                
+            case "command":
+                if (!ValidationHelper.ValidateCommandPayload(message.Payload, out var commandError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_COMMAND_PAYLOAD", commandError ?? "Invalid command payload");
+                }
+                break;
+                
+            case "event":
+                if (!ValidationHelper.ValidateEventPayload(message.Payload, out var eventError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_EVENT_PAYLOAD", eventError ?? "Invalid event payload");
+                }
+                break;
+                
+            case "artifact":
+                if (!ValidationHelper.ValidateArtifactPayload(message.Payload, out var artifactError))
+                {
+                    throw ErrorFactory.HubBadRequest("INVALID_ARTIFACT_PAYLOAD", artifactError ?? "Invalid artifact payload");
+                }
+                break;
+                
+            default:
+                throw ErrorFactory.HubBadRequest("INVALID_MESSAGE_TYPE", $"message.type must be one of: chat, command, event, artifact (got: {message.Type})");
+        }
+    }
+
     private async Task PublishRoomState(string roomId)
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
-        await _events.PublishAsync(roomId, "ROOM.STATE", new { entities });
+        var roomContext = _roomContexts.Get(roomId);
+        var state = roomContext?.State.ToString().ToLowerInvariant() ?? "init";
+        await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
+    }
+
+    private async Task CheckAndTransitionToEndedState(string roomId)
+    {
+        var remainingEntities = _sessions.ListByRoom(roomId);
+        if (remainingEntities.Count == 0)
+        {
+            var roomContext = _roomContexts.Get(roomId);
+            if (roomContext?.State == RoomState.Active)
+            {
+                _roomContexts.UpdateState(roomId, RoomState.Ended);
+                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+            }
+        }
     }
 
     private string? ResolveUserId()
