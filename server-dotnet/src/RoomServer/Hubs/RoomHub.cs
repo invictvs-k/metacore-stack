@@ -118,6 +118,8 @@ public partial class RoomHub : Hub
             await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
         }
 
+        // The initial ROOM.STATE payload now uses the standard schema produced by PublishRoomState,
+        // aligning the first join with subsequent state updates.
         await PublishRoomState(roomId, wasInit || wasEnded ? RoomState.Active : null);
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
