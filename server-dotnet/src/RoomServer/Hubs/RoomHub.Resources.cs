@@ -29,17 +29,7 @@ public partial class RoomHub
             throw ErrorFactory.HubForbidden("PERM_DENIED", "cannot list tools for different room");
         }
 
-        // Get services from context (will be injected via constructor in final version)
-        var registry = Context.GetHttpContext()?.RequestServices.GetService(typeof(McpRegistry)) as McpRegistry;
-        var policyEngine = Context.GetHttpContext()?.RequestServices.GetService(typeof(PolicyEngine)) as PolicyEngine;
-
-        if (registry == null || policyEngine == null)
-        {
-            _logger.LogWarning("MCP services not available");
-            return Task.FromResult(Array.Empty<CatalogItemDto>());
-        }
-
-        var visibleTools = registry.Catalog.ListVisible(roomId, session, policyEngine);
+        var visibleTools = _mcpRegistry.Catalog.ListVisible(roomId, session, _policyEngine);
 
         var dtos = visibleTools.Select(item => new CatalogItemDto(
             key: item.Key,
@@ -72,21 +62,12 @@ public partial class RoomHub
             throw ErrorFactory.HubForbidden("PERM_DENIED", "cannot call tools in different room");
         }
 
-        // Get services from context
-        var registry = Context.GetHttpContext()?.RequestServices.GetService(typeof(McpRegistry)) as McpRegistry;
-        var policyEngine = Context.GetHttpContext()?.RequestServices.GetService(typeof(PolicyEngine)) as PolicyEngine;
-
-        if (registry == null || policyEngine == null)
-        {
-            throw ErrorFactory.HubBadRequest("MCP_UNAVAILABLE", "MCP services not available");
-        }
-
         // Resolve tool
         CatalogItem item;
         IMcpClient client;
         try
         {
-            (item, client) = registry.Catalog.Resolve(toolIdOrKey);
+            (item, client) = _mcpRegistry.Catalog.Resolve(toolIdOrKey);
         }
         catch (InvalidOperationException)
         {
@@ -94,13 +75,13 @@ public partial class RoomHub
         }
 
         // Validate permissions
-        if (!policyEngine.CanCall(session, item))
+        if (!_policyEngine.CanCall(session, item))
         {
             throw ErrorFactory.HubForbidden("PERM_DENIED", "You are not allowed to call this tool");
         }
 
         // Validate rate limit
-        if (!policyEngine.CheckRateLimit(session, item))
+        if (!_policyEngine.CheckRateLimit(session, item))
         {
             throw new HubException(JsonSerializer.Serialize(new
             {

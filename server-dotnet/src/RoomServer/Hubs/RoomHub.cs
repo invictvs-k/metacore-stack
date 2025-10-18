@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using RoomServer.Models;
 using RoomServer.Services;
+using RoomServer.Services.Mcp;
 
 namespace RoomServer.Hubs;
 
@@ -17,13 +18,23 @@ public partial class RoomHub : Hub
     private readonly PermissionService _permissions;
     private readonly RoomEventPublisher _events;
     private readonly ILogger<RoomHub> _logger;
+    private readonly McpRegistry _mcpRegistry;
+    private readonly PolicyEngine _policyEngine;
 
-    public RoomHub(SessionStore sessions, PermissionService permissions, RoomEventPublisher events, ILogger<RoomHub> logger)
+    public RoomHub(
+        SessionStore sessions, 
+        PermissionService permissions, 
+        RoomEventPublisher events, 
+        ILogger<RoomHub> logger,
+        McpRegistry mcpRegistry,
+        PolicyEngine policyEngine)
     {
         _sessions = sessions;
         _permissions = permissions;
         _events = events;
         _logger = logger;
+        _mcpRegistry = mcpRegistry;
+        _policyEngine = policyEngine;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
