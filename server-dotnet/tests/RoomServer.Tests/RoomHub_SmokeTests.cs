@@ -25,7 +25,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
 
         connectionA.On<RoomEvent>("event", evt =>
         {
-            if (evt.Payload.Kind == "ENTITY.JOIN" &&
+            if (evt.Payload.Kind == "ENTITY.JOINED" &&
                 evt.Payload.Data.TryGetProperty("entity", out var entity) &&
                 entity.GetProperty("id").GetString() == "E-Bob")
             {
@@ -50,7 +50,7 @@ public class RoomHub_SmokeTests : IAsyncLifetime
         });
 
         var joinEvent = await joinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
+        joinEvent.Payload.Kind.Should().Be("ENTITY.JOINED");
         joinEvent.RoomId.Should().Be(RoomId);
     }
 

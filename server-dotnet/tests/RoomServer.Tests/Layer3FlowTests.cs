@@ -29,17 +29,12 @@ public class Layer3FlowTests : IAsyncLifetime
         await using var connection = BuildConnection();
 
         var roomCreatedReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         connection.On<RoomEvent>("event", evt =>
         {
             if (evt.Payload.Kind == "ROOM.CREATED")
             {
                 roomCreatedReceived.TrySetResult(evt);
-            }
-            else if (evt.Payload.Kind == "ROOM.STATE")
-            {
-                roomStateReceived.TrySetResult(evt);
             }
         });
 
@@ -53,21 +48,12 @@ public class Layer3FlowTests : IAsyncLifetime
             DisplayName = "Creator"
         });
 
-        // Should receive ROOM.CREATED or ROOM.STATE with state=active
-        try
-        {
-            var roomCreated = await roomCreatedReceived.Task.WaitAsync(TimeSpan.FromSeconds(2));
-            roomCreated.Payload.Kind.Should().Be("ROOM.CREATED");
-            roomCreated.RoomId.Should().Be(RoomId);
-        }
-        catch (TimeoutException)
-        {
-            // If ROOM.CREATED is not emitted, check for ROOM.STATE with active
-            var roomState = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(1));
-            roomState.Payload.Kind.Should().Be("ROOM.STATE");
-            roomState.Payload.Data.TryGetProperty("state", out var state).Should().BeTrue();
-            state.GetString().Should().Be("active");
-        }
+        // Should receive ROOM.CREATED event
+        var roomCreated = await roomCreatedReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        roomCreated.Payload.Kind.Should().Be("ROOM.CREATED");
+        roomCreated.RoomId.Should().Be(RoomId);
+        roomCreated.Payload.Data.TryGetProperty("state", out var state).Should().BeTrue();
+        state.GetString().Should().Be("active");
 
         entities.Should().NotBeNull();
         entities.Should().Contain(e => e.Id == "E-Creator");
@@ -83,7 +69,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
         connection.On<RoomEvent>("event", evt =>
         {
-            if (evt.Payload.Kind == "ROOM.STATE" || evt.Payload.Kind == "ROOM.CREATED")
+            if (evt.Payload.Kind == "ROOM.CREATED")
             {
                 stateReceived.TrySetResult(evt);
             }
@@ -99,12 +85,11 @@ public class Layer3FlowTests : IAsyncLifetime
 
         var stateEvent = await stateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
         stateEvent.Should().NotBeNull();
+        stateEvent.Payload.Kind.Should().Be("ROOM.CREATED");
         
         // The event should indicate active state
-        if (stateEvent.Payload.Data.TryGetProperty("state", out var state))
-        {
-            state.GetString().Should().Be("active");
-        }
+        stateEvent.Payload.Data.TryGetProperty("state", out var state).Should().BeTrue();
+        state.GetString().Should().Be("active");
     }
 
     [Fact]
@@ -118,7 +103,7 @@ public class Layer3FlowTests : IAsyncLifetime
         connection.On<RoomEvent>("event", evt =>
         {
             eventsReceived.Add(evt);
-            if (evt.Payload.Kind == "ROOM.STATE" || evt.Payload.Kind == "ROOM.CREATED")
+            if (evt.Payload.Kind == "ROOM.CREATED")
             {
                 completionSource.TrySetResult(true);
             }
@@ -134,10 +119,9 @@ public class Layer3FlowTests : IAsyncLifetime
 
         await completionSource.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
-        // Should have received at least one event about room state
+        // Should have received at least one event about room creation
         eventsReceived.Should().NotBeEmpty();
-        eventsReceived.Should().Contain(e => 
-            e.Payload.Kind == "ROOM.STATE" || e.Payload.Kind == "ROOM.CREATED");
+        eventsReceived.Should().Contain(e => e.Payload.Kind == "ROOM.CREATED");
     }
 
     #endregion
@@ -154,8 +138,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
         connectionA.On<RoomEvent>("event", evt =>
         {
-            // Looking for ENTITY.JOINED or ENTITY.JOIN event
-            if ((evt.Payload.Kind == "ENTITY.JOINED" || evt.Payload.Kind == "ENTITY.JOIN") &&
+            if (evt.Payload.Kind == "ENTITY.JOINED" &&
                 evt.Payload.Data.TryGetProperty("entity", out var entity) &&
                 entity.GetProperty("id").GetString() == "E-Second")
             {
@@ -188,9 +171,7 @@ public class Layer3FlowTests : IAsyncLifetime
         var joinEvent = await entityJoinedReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
         joinEvent.Should().NotBeNull();
         joinEvent.RoomId.Should().Be(RoomId);
-        
-        // The event should be ENTITY.JOINED (or ENTITY.JOIN in current implementation)
-        joinEvent.Payload.Kind.Should().Match(k => k == "ENTITY.JOINED" || k == "ENTITY.JOIN");
+        joinEvent.Payload.Kind.Should().Be("ENTITY.JOINED");
     }
 
     [Fact]
@@ -272,7 +253,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
         connectionA.On<RoomEvent>("event", evt =>
         {
-            if (evt.Payload.Kind == "ENTITY.JOIN" || evt.Payload.Kind == "ENTITY.JOINED")
+            if (evt.Payload.Kind == "ENTITY.JOINED")
             {
                 if (evt.Payload.Data.TryGetProperty("entity", out var entity))
                 {
@@ -283,7 +264,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
         connectionB.On<RoomEvent>("event", evt =>
         {
-            if (evt.Payload.Kind == "ENTITY.JOIN" || evt.Payload.Kind == "ENTITY.JOINED")
+            if (evt.Payload.Kind == "ENTITY.JOINED")
             {
                 if (evt.Payload.Data.TryGetProperty("entity", out var entity))
                 {

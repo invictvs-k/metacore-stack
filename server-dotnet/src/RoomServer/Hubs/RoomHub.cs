@@ -108,11 +108,13 @@ public partial class RoomHub : Hub
         if (roomContext.State == RoomState.Init)
         {
             _roomContexts.UpdateState(roomId, RoomState.Active);
-            await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "active", entities = new[] { normalized } });
+            // Emit ROOM.CREATED event as per Flow 3.1 specification
+            await _events.PublishAsync(roomId, "ROOM.CREATED", new { state = "active", entities = new[] { normalized } });
         }
         else
         {
-            await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
+            // Emit ENTITY.JOINED event as per Flow 3.2 specification
+            await _events.PublishAsync(roomId, "ENTITY.JOINED", new { entity = normalized });
             await PublishRoomState(roomId);
         }
 

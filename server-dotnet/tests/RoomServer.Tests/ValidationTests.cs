@@ -60,7 +60,8 @@ public class ValidationTests
     }
 
     [Theory]
-    [InlineData("ENTITY.JOIN", true)]
+    [InlineData("ENTITY.JOINED", true)]
+    [InlineData("ROOM.CREATED", true)]
     [InlineData("ROOM.STATE", true)]
     [InlineData("MY.CUSTOM.EVENT", true)]
     [InlineData("SIMPLE", true)]
@@ -107,7 +108,7 @@ public class ValidationTests
     [Fact]
     public void EventPayload_WithValidKind_IsValid()
     {
-        var payload = JsonDocument.Parse("{\"kind\":\"ENTITY.JOIN\",\"data\":{}}").RootElement;
+        var payload = JsonDocument.Parse("{\"kind\":\"ENTITY.JOINED\",\"data\":{}}").RootElement;
         ValidationHelper.ValidateEventPayload(payload, out var error).Should().BeTrue();
         error.Should().BeNull();
     }
