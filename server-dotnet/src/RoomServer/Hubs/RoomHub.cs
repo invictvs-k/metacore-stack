@@ -49,7 +49,6 @@ public partial class RoomHub : Hub
             await _events.PublishAsync(removed.RoomId, "ENTITY.LEAVE", new { entityId = removed.Entity.Id });
             await PublishRoomState(removed.RoomId);
             await CheckAndTransitionToEndedState(removed.RoomId);
-            
             _logger.LogInformation("[{RoomId}] {EntityId} disconnected ({Kind})", removed.RoomId, removed.Entity.Id, removed.Entity.Kind);
         }
 
