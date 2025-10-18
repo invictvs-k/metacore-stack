@@ -12,6 +12,32 @@ export interface ApiResponse<T> {
 }
 
 /**
+ * Type Definitions
+ */
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt?: string;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+  created: string;
+  artifactCount?: number;
+}
+
+export interface Artifact {
+  name: string;
+  type: string;
+  version: number;
+  sha256: string;
+  created: string;
+  metadata?: Record<string, string>;
+}
+
+/**
  * Generic fetch wrapper with error handling
  */
 async function fetchApi<T>(
@@ -49,14 +75,14 @@ async function fetchApi<T>(
  */
 export const authApi = {
   login: async (email: string, password: string) => {
-    return fetchApi<{ token: string; user: any }>('/api/auth/login', {
+    return fetchApi<{ token: string; user: User }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   },
 
   register: async (name: string, email: string, password: string) => {
-    return fetchApi<{ token: string; user: any }>('/api/auth/register', {
+    return fetchApi<{ token: string; user: User }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     });
@@ -81,22 +107,22 @@ export const authApi = {
  */
 export const roomsApi = {
   list: async () => {
-    return fetchApi<{ rooms: any[] }>('/api/rooms');
+    return fetchApi<{ rooms: Room[] }>('/api/rooms');
   },
 
   get: async (roomId: string) => {
-    return fetchApi<any>(`/rooms/${roomId}`);
+    return fetchApi<Room>(`/rooms/${roomId}`);
   },
 
   create: async (name: string) => {
-    return fetchApi<{ room: any }>('/api/rooms', {
+    return fetchApi<{ room: Room }>('/api/rooms', {
       method: 'POST',
       body: JSON.stringify({ name }),
     });
   },
 
   listArtifacts: async (roomId: string, entityId: string = 'demo-entity') => {
-    return fetchApi<{ items: any[] }>(`/rooms/${roomId}/artifacts`, {
+    return fetchApi<{ items: Artifact[] }>(`/rooms/${roomId}/artifacts`, {
       headers: {
         'X-Entity-Id': entityId,
       },

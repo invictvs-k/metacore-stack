@@ -3,14 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-
-interface Artifact {
-  name: string;
-  type: string;
-  version: number;
-  sha256: string;
-  created: string;
-}
+import { Artifact } from '@/lib/api';
 
 export default function RoomDetailPage() {
   const params = useParams();

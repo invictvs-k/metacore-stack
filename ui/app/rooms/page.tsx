@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-
-interface Room {
-  id: string;
-  name: string;
-  created: string;
-  artifactCount?: number;
-}
+import { Room } from '@/lib/api';
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
