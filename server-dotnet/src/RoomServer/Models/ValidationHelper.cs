@@ -191,6 +191,12 @@ public static partial class ValidationHelper
     /// <param name="error">Outputs a validation error message if validation fails; otherwise, null.</param>
     /// <returns>True if the payload is valid; false otherwise.</returns>
     public static bool ValidateArtifactPayload(object? payload, out string? error)
+    {
+        if (payload is null)
+        {
+            error = null;
+            return true;
+        }
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Artifact payload is required",
