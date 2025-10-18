@@ -9,6 +9,9 @@ public static partial class ValidationHelper
     [GeneratedRegex(@"^room-[A-Za-z0-9_-]{6,}$")]
     private static partial Regex RoomIdRegex();
 
+    // Note: The regex below allows 1-64 characters after 'E-' for backward compatibility,
+    // even though the schema (see IMPLEMENTATION_SUMMARY.md line 73 and the PR description)
+    // requires 2-64 characters. Do not change this unless backward compatibility is no longer required.
     [GeneratedRegex(@"^E-[A-Za-z0-9_-]{1,64}$")]
     private static partial Regex EntityIdRegex();
 
