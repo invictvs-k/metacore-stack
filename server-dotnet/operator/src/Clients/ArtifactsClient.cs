@@ -45,7 +45,7 @@ public sealed class ArtifactsClient : IArtifactsClient
         multipartContent.Add(new StringContent(spec.Name), "name");
         multipartContent.Add(new StringContent(spec.Type), "type");
         multipartContent.Add(new StringContent(spec.Workspace), "workspace");
-        multipartContent.Add(new StringContent(string.Join(",", spec.Tags)), "tags");
+        multipartContent.Add(new StringContent(string.Join(",", spec.Tags ?? new List<string>())), "tags");
         multipartContent.Add(new ByteArrayContent(content), "file", spec.Name);
         
         var response = await _httpClient.PostAsync($"/room/{roomId}/artifacts/seed", multipartContent, ct);
@@ -78,7 +78,7 @@ public sealed class ArtifactsClient : IArtifactsClient
     
     public static string BuildFingerprint(ArtifactSeedSpec spec, byte[] content)
     {
-        var components = $"{spec.Name}|{spec.Type}|{spec.Workspace}|{string.Join(",", spec.Tags)}|{Convert.ToBase64String(content)}";
+        var components = $"{spec.Name}|{spec.Type}|{spec.Workspace}|{string.Join(",", spec.Tags ?? new List<string>())}|{Convert.ToBase64String(content)}";
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(components));
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
