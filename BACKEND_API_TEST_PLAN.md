@@ -1094,7 +1094,7 @@ Validar que eventos são gravados em arquivo linha a linha.
 - Exemplo com envelope completo:
   ```json
   {"id":"01JEH7QR8STNM5PQHX9YKW2V3Z","roomId":"room-test123","channel":"main","from":"system","type":"event","ts":"2025-10-19T01:00:00Z","correlationId":null,"payload":{"kind":"ENTITY.JOIN","entity":"E-user01"}}
-  {"id":"01JEH7QS4BVCX7NPTK2LWM8D9Q","roomId":"room-test123","channel":"main","from":"system","type":"event","ts":"2025-10-19T01:00:05Z","correlationId":null,"payload":{"kind":"ROOM.STATE","state":"Active","entities":["E-user01","E-user02"]}}
+  {"id":"01JEH7QS4BVCX7NPTK2LWM8D9Q","roomId":"room-test123","channel":"main","from":"system","type":"event","ts":"2025-10-19T01:00:05Z","correlationId":null,"payload":{"kind":"ROOM.STATE","state":"Active","entities":[{"id":"E-user01","kind":"user","displayName":"Alice"},{"id":"E-user02","kind":"user","displayName":"Bob"}]}}
   ```
 
 **Considerações Adicionais:**
