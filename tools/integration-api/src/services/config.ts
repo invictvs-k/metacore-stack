@@ -9,10 +9,12 @@ const __dirname = path.dirname(__filename);
 
 const CONFIG_PATH = path.resolve(__dirname, '../../../../configs/dashboard.settings.json');
 
-// Default configuration values
-const DEFAULT_SSE_RECONNECT_INTERVAL = 5000; // 5 seconds
-const DEFAULT_SSE_MAX_RECONNECT_INTERVAL = 30000; // 30 seconds
-const DEFAULT_SSE_RECONNECT_BACKOFF_MULTIPLIER = 1.5;
+// Default configuration values grouped together for better organization
+const DEFAULT_CONFIG = {
+  SSE_RECONNECT_INTERVAL: 5000, // 5 seconds
+  SSE_MAX_RECONNECT_INTERVAL: 30000, // 30 seconds
+  SSE_RECONNECT_BACKOFF_MULTIPLIER: 1.5,
+} as const;
 
 let cachedConfig: DashboardSettings | null = null;
 let configChecksum: string | null = null;
@@ -47,9 +49,9 @@ export async function loadConfig(): Promise<DashboardSettings> {
       },
       ui: {
         theme: 'system',
-        sseReconnectInterval: DEFAULT_SSE_RECONNECT_INTERVAL,
-        sseMaxReconnectInterval: DEFAULT_SSE_MAX_RECONNECT_INTERVAL,
-        sseReconnectBackoffMultiplier: DEFAULT_SSE_RECONNECT_BACKOFF_MULTIPLIER
+        sseReconnectInterval: DEFAULT_CONFIG.SSE_RECONNECT_INTERVAL,
+        sseMaxReconnectInterval: DEFAULT_CONFIG.SSE_MAX_RECONNECT_INTERVAL,
+        sseReconnectBackoffMultiplier: DEFAULT_CONFIG.SSE_RECONNECT_BACKOFF_MULTIPLIER
       }
     };
     return cachedConfig;

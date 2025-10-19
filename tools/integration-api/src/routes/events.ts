@@ -8,11 +8,14 @@ export const eventsRouter = Router();
 
 // SSE Helper function
 function setupSSE(res: Response) {
+  const config = getConfig();
+  const retryInterval = config.ui?.sseReconnectInterval || 5000;
+  
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
-  res.write('retry: 5000\n\n');
+  res.write(`retry: ${retryInterval}\n\n`);
   res.flushHeaders();
 }
 

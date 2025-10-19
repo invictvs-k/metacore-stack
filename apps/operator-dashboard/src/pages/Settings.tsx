@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Save, RefreshCw } from 'lucide-react';
 import { useConfig } from '../hooks/useConfig';
 
@@ -7,11 +7,13 @@ export default function Settings() {
   const [editedConfig, setEditedConfig] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const isInitialized = useRef(false);
 
   // Load config into editor when it becomes available
   useEffect(() => {
-    if (config && !editedConfig) {
+    if (config && !isInitialized.current) {
       setEditedConfig(JSON.stringify(config, null, 2));
+      isInitialized.current = true;
     }
   }, [config]);
 

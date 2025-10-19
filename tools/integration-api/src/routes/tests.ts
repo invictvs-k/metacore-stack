@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { listScenarios, runTest, getRun, getRunLogs, getRunMetadata } from '../services/tests.js';
+import { getConfig } from '../services/config.js';
 
 export const testsRouter = Router();
 
@@ -44,12 +45,14 @@ testsRouter.get('/runs/:runId', async (req, res) => {
 // GET /api/tests/stream/:runId - SSE stream of test logs
 testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   const { runId } = req.params;
+  const config = getConfig();
+  const retryInterval = config.ui?.sseReconnectInterval || 5000;
   
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('X-Accel-Buffering', 'no');
-  res.write('retry: 5000\n\n');
+  res.write(`retry: ${retryInterval}\n\n`);
   res.flushHeaders();
 
   // Send initial connection message
