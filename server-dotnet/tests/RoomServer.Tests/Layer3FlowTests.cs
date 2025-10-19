@@ -56,7 +56,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - Room is created and entity is present
     entities.Should().NotBeNull();
     entities.Should().HaveCount(1);
-    entities.First().Id.Should().Be("E-Human1");
+    entities.Should().ContainSingle(e => e.Id == "E-Human1");
   }
 
   [Fact]
