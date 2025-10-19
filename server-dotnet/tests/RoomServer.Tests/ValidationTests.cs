@@ -20,10 +20,11 @@ public class ValidationTests
     }
 
     [Theory]
-    [InlineData("E-A", true)]
+    [InlineData("E-AB", true)]
     [InlineData("E-ABCD1234", true)]
     [InlineData("E-Test_Entity-123", true)]
     [InlineData("E-", false)] // No ID after prefix
+    [InlineData("E-A", false)] // Too short (< 2 chars)
     [InlineData("Entity-123", false)] // Wrong prefix
     [InlineData("E123", false)] // Missing dash
     public void EntityId_Validation_WorksCorrectly(string entityId, bool shouldBeValid)
@@ -152,7 +153,7 @@ public class ValidationTests
     [Fact]
     public void ArtifactPayload_WithManifest_IsValid()
     {
-        var payload = JsonDocument.Parse("{\"manifest\":{\"name\":\"test.txt\"}}").RootElement;
+        var payload = JsonDocument.Parse("{\"manifest\":{\"name\":\"test.txt\",\"version\":\"1\",\"sha256\":\"abc123\"}}").RootElement;
         ValidationHelper.ValidateArtifactPayload(payload, out var error).Should().BeTrue();
         error.Should().BeNull();
     }

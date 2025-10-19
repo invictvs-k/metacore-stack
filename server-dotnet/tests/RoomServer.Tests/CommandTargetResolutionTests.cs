@@ -20,7 +20,7 @@ namespace RoomServer.Tests;
 public class CommandTargetResolutionTests : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-cmd-test";
+    private const string RoomId = "room-cmd-test01";
 
     [Fact]
     public async Task CommandWithJsonElementPayload_ShouldResolveTarget()

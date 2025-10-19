@@ -19,7 +19,7 @@ namespace RoomServer.Tests;
 public class SecurityTests : IAsyncLifetime
 {
     private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-security";
+    private const string RoomId = "room-security01";
 
     [Fact]
     public async Task JoinOwnerWithoutAuthShouldFail()

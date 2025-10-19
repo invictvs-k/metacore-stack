@@ -22,7 +22,7 @@ public sealed class FileArtifactStoreTests : IAsyncLifetime
         var request = new ArtifactWriteRequest(
             "room-a",
             "room",
-            "E-1",
+            "E-01",
             "note.txt",
             "text/plain",
             stream,
@@ -49,11 +49,11 @@ public sealed class FileArtifactStoreTests : IAsyncLifetime
     public async Task WriteAsync_IncrementsVersion()
     {
         await using var first = CreateStream("v1");
-        var req1 = new ArtifactWriteRequest("room-b", "room", "E-1", "story.md", "text/markdown", first, first.Length, null, null, null);
+        var req1 = new ArtifactWriteRequest("room-b", "room", "E-01", "story.md", "text/markdown", first, first.Length, null, null, null);
         var manifest1 = await _store.WriteAsync(req1);
 
         await using var second = CreateStream("v2");
-        var req2 = new ArtifactWriteRequest("room-b", "room", "E-1", "story.md", "text/markdown", second, second.Length, null, null, null);
+        var req2 = new ArtifactWriteRequest("room-b", "room", "E-01", "story.md", "text/markdown", second, second.Length, null, null, null);
         var manifest2 = await _store.WriteAsync(req2);
 
         manifest1.Version.Should().Be(1);
