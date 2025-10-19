@@ -106,10 +106,56 @@ public static class OperatorHttpApi
             var recentEntries = auditLog.GetRecent(count ?? 100);
             return Results.Ok(new { entries = recentEntries });
         });
+        
+        // POST /mcp/load - Load MCP providers on RoomServer
+        app.MapPost("/mcp/load", async (
+            [FromBody] LoadMcpProvidersRequestDto requestDto,
+            [FromServices] IMcpClient mcpClient,
+            [FromServices] ILogger<Program> logger,
+            CancellationToken ct) =>
+        {
+            logger.LogInformation("Received /mcp/load request with {Count} providers", requestDto.Providers.Length);
+            
+            try
+            {
+                await mcpClient.LoadMcpProvidersAsync(requestDto.Providers, ct);
+                return Results.Ok(new { message = "MCP providers loaded", count = requestDto.Providers.Length });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to load MCP providers");
+                return Results.Problem(title: "Failed to load MCP providers", detail: ex.Message, statusCode: 500);
+            }
+        });
+        
+        // GET /mcp/status - Get MCP status from RoomServer
+        app.MapGet("/mcp/status", async (
+            [FromServices] IMcpClient mcpClient,
+            [FromServices] ILogger<Program> logger,
+            CancellationToken ct) =>
+        {
+            logger.LogDebug("Received /mcp/status request");
+            
+            try
+            {
+                var status = await mcpClient.GetMcpStatusAsync(ct);
+                return Results.Ok(status);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to get MCP status");
+                return Results.Problem(title: "Failed to get MCP status", detail: ex.Message, statusCode: 500);
+            }
+        });
     }
 }
 
 public sealed class ApplyRequestDto
 {
     public RoomSpec Spec { get; set; } = default!;
+}
+
+public sealed class LoadMcpProvidersRequestDto
+{
+    public required McpProviderConfig[] Providers { get; set; }
 }

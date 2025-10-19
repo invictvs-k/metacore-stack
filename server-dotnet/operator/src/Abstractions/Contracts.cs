@@ -103,4 +103,29 @@ public interface IMcpClient
 {
     Task<bool> IsAvailableAsync(CancellationToken ct = default);
     Task EnsureResourceAsync(string roomId, ResourceSpec spec, CancellationToken ct = default);
+    Task LoadMcpProvidersAsync(McpProviderConfig[] providers, CancellationToken ct = default);
+    Task<McpStatusResponse> GetMcpStatusAsync(CancellationToken ct = default);
+}
+
+public sealed class McpProviderConfig
+{
+    public string Id { get; set; } = default!;
+    public string Url { get; set; } = default!;
+    public string? Visibility { get; set; }
+}
+
+public sealed class McpStatusResponse
+{
+    public bool Enabled { get; set; } = true;
+    public List<McpProviderStatus> Providers { get; set; } = new();
+}
+
+public sealed class McpProviderStatus
+{
+    public string Id { get; set; } = default!;
+    public string State { get; set; } = default!;
+    public int Attempts { get; set; }
+    public long LastChangeAt { get; set; }
+    public string? LastError { get; set; }
+    public long? NextRetryAt { get; set; }
 }

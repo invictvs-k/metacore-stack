@@ -56,4 +56,47 @@ public sealed class McpClient : IMcpClient
         var response = await _httpClient.PostAsJsonAsync($"/mcp/resources", request, ct);
         response.EnsureSuccessStatusCode();
     }
+    
+    public async Task LoadMcpProvidersAsync(McpProviderConfig[] providers, CancellationToken ct = default)
+    {
+        if (!_enabled)
+        {
+            _logger.LogWarning("MCP is disabled, cannot load providers");
+            return;
+        }
+        
+        _logger.LogInformation("Loading {Count} MCP providers", providers.Length);
+        
+        var request = new
+        {
+            providers = providers.Select(p => new
+            {
+                id = p.Id,
+                url = p.Url,
+                visibility = p.Visibility
+            }).ToArray()
+        };
+        
+        var response = await _httpClient.PostAsJsonAsync("/admin/mcp/load", request, ct);
+        response.EnsureSuccessStatusCode();
+        
+        _logger.LogInformation("MCP providers load request sent successfully");
+    }
+    
+    public async Task<McpStatusResponse> GetMcpStatusAsync(CancellationToken ct = default)
+    {
+        if (!_enabled)
+        {
+            _logger.LogDebug("MCP is disabled");
+            return new McpStatusResponse { Enabled = false, Providers = new List<McpProviderStatus>() };
+        }
+        
+        _logger.LogDebug("Fetching MCP status");
+        
+        var response = await _httpClient.GetAsync("/admin/mcp/status", ct);
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadFromJsonAsync<McpStatusResponse>(ct);
+        return result ?? new McpStatusResponse { Enabled = true, Providers = new List<McpProviderStatus>() };
+    }
 }
