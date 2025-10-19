@@ -851,7 +851,7 @@ Validar upload de artefato para workspace privado de entidade.
    ```bash
    curl -X POST http://localhost:5000/rooms/room-test123/entities/E-agent01/artifacts \
      -H "X-Entity-Id: E-agent01" \
-     -F "spec={\"name\":\"analysis.json\",\"type\":\"application/json\"}" \
+     -F "spec={\"name\":\"analysis.json\",\"type\":\"application/json\"};type=application/json" \
      -F "data=@analysis.json"
    ```
 2. Verificar permissões aplicadas
