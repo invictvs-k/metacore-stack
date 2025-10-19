@@ -54,6 +54,8 @@ public class McpConnectionManager
     private const int MaxRetryAttempts = 5;
     private const int MaxBackoffSeconds = 60;
     private const int LogRateLimitWindowMs = 60000; // 1 minute
+    private const int MonitorRegistrationRetryLimit = 5;
+    private static readonly TimeSpan MonitorRegistrationRetryDelay = TimeSpan.FromMilliseconds(50);
     
     private bool _disposed = false;
 
@@ -168,7 +170,7 @@ public class McpConnectionManager
                         await LoadAndRegisterToolsAsync(providerId, client, config);
 
                         // Start monitoring for reconnection in background
-                        EnsureConnectionMonitor(providerId, client, config);
+                        await EnsureConnectionMonitorAsync(providerId, client, config);
                         return;
                     }
                 }
@@ -242,9 +244,8 @@ public class McpConnectionManager
         }
     }
 
-    private void EnsureConnectionMonitor(string providerId, IMcpClient client, McpServerConfig config)
+    private async Task EnsureConnectionMonitorAsync(string providerId, IMcpClient client, McpServerConfig config)
     {
-        var retryDelay = TimeSpan.FromMilliseconds(50);
         var attempts = 0;
 
         while (true)
@@ -266,13 +267,13 @@ public class McpConnectionManager
 
             attempts++;
 
-            if (attempts >= 5)
+            if (attempts >= MonitorRegistrationRetryLimit)
             {
                 _logger.LogWarning("[{ProviderId}] Connection monitor restart attempts exceeded retry limit", providerId);
                 return;
             }
 
-            Thread.Sleep(retryDelay);
+            await Task.Delay(MonitorRegistrationRetryDelay);
         }
     }
 
