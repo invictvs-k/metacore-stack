@@ -51,7 +51,7 @@ public class McpRegistryHostedService : IHostedService
         _logger.LogInformation("Stopping MCP Registry");
 
         // Cancel any ongoing initialization (check if not already disposed)
-        if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
+        if (_cancellationTokenSource != null)
         {
             try
             {
