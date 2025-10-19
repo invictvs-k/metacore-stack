@@ -379,7 +379,7 @@ Validar que Join cria sessão corretamente e adiciona entidade ao grupo SignalR.
 **Passos de Execução:**
 1. Executar testes de SessionStore:
    ```bash
-   dotnet test --filter "FullyQualifiedName~SessionStore|RoomHub"
+   dotnet test --filter "(FullyQualifiedName~SessionStore)|(FullyQualifiedName~RoomHub)"
    ```
 2. Conectar via SignalR e fazer Join
 3. Verificar que entidade aparece em ListEntities
