@@ -1,10 +1,9 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RoomServer.Services;
-using System.Text;
-using System.Text.Json;
+using Metacore.Shared.Sse;
 
 namespace RoomServer.Controllers;
 
@@ -16,17 +15,16 @@ public static class EventsEndpoints
     {
         // GET /events - Server-Sent Events endpoint
         app.MapGet("/events", async (
-            HttpContext context, 
+            HttpContext context,
             RoomEventPublisher eventPublisher,
-            IConfiguration configuration,
-            ILogger<Program> logger) =>
+            ILogger<EventsEndpoints> logger) =>
         {
-            context.Response.Headers["Content-Type"] = "text/event-stream";
-            context.Response.Headers["Cache-Control"] = "no-cache";
-            context.Response.Headers["Connection"] = "keep-alive";
-            context.Response.Headers["X-Accel-Buffering"] = "no";
+            SseStreamWriter.ConfigureResponse(context.Response);
+            var cancellationToken = context.RequestAborted;
 
-            // Send initial connected event
+            await using var sse = new SseStreamWriter(context.Response, logger);
+            await sse.StartAsync(cancellationToken);
+
             var connectedEvent = new
             {
                 type = "connected",
@@ -34,42 +32,31 @@ public static class EventsEndpoints
                 timestamp = DateTime.UtcNow.ToString("O"),
                 message = "Connected to RoomServer events"
             };
-            
-            await SendSseEventAsync(context.Response, connectedEvent);
-            await context.Response.Body.FlushAsync();
 
-            // Get configurable heartbeat interval
-            var heartbeatIntervalMs = configuration.GetValue<int?>("Events:HeartbeatIntervalMs") ?? DefaultHeartbeatIntervalMs;
-            
-            // Keep connection alive with periodic heartbeats
-            var cancellationToken = context.RequestAborted;
-            
+            await sse.WriteEventAsync(
+                connectedEvent,
+                eventName: "connected",
+                cancellationToken: cancellationToken);
+
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
+                await foreach (var evt in eventPublisher.SubscribeAsync(cancellationToken))
                 {
-                    // Send heartbeat comment (keeps connection alive)
-                    await context.Response.WriteAsync(": ping\n\n");
-                    await context.Response.Body.FlushAsync();
-                    
-                    // Wait before next heartbeat
-                    await Task.Delay(heartbeatIntervalMs, cancellationToken);
+                    await sse.WriteEventAsync(
+                        evt,
+                        eventName: evt.Type,
+                        eventId: evt.Id,
+                        cancellationToken: cancellationToken);
                 }
             }
             catch (OperationCanceledException)
             {
-                // Client disconnected, this is expected
+                // Client disconnected
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error in SSE stream");
+                logger.LogError(ex, "Error streaming RoomServer events.");
             }
         });
-    }
-
-    private static async Task SendSseEventAsync(HttpResponse response, object data)
-    {
-        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-        await response.WriteAsync($"data: {json}\n\n");
     }
 }

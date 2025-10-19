@@ -22,4 +22,10 @@
     <Compile Remove="tests/**/*.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\shared\Channels\ChannelSubscriptionManager.cs" />
+    <Compile Include="..\shared\Channels\ChannelSettings.cs" />
+    <Compile Include="..\shared\Sse\SseStreamWriter.cs" />
+  </ItemGroup>
+
 </Project>
