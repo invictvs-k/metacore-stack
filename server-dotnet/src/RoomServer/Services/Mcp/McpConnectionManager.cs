@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ public class McpConnectionManager
     private readonly ConcurrentDictionary<string, ProviderStatus> _providerStates = new();
     private readonly ConcurrentDictionary<string, McpServerConfig> _providerConfigs = new();
     private readonly ConcurrentDictionary<string, IMcpClient> _clients = new();
-    private readonly ConcurrentDictionary<string, Task> _monitorTasks = new();
+    private readonly ConcurrentDictionary<string, MonitorRegistration> _monitorTasks = new();
     private readonly ConcurrentDictionary<string, long> _logRateLimitGate = new();
     private readonly ResourceCatalog _catalog;
     private readonly McpDefaultsConfig? _defaults;
@@ -57,6 +58,19 @@ public class McpConnectionManager
     private bool _disposed = false;
 
     public ResourceCatalog Catalog => _catalog;
+
+    private sealed class MonitorRegistration
+    {
+        public MonitorRegistration(Task task, Guid token)
+        {
+            Task = task;
+            Token = token;
+        }
+
+        public Task Task { get; }
+
+        public Guid Token { get; }
+    }
 
     public McpConnectionManager(IConfiguration configuration, ILoggerFactory loggerFactory)
     {
@@ -116,6 +130,11 @@ public class McpConnectionManager
             return;
         }
 
+        await ConnectProviderAsync(providerId, config);
+    }
+
+    private async Task ConnectProviderAsync(string providerId, McpServerConfig config)
+    {
         await _connectionLock.WaitAsync();
         try
         {
@@ -149,7 +168,7 @@ public class McpConnectionManager
                         await LoadAndRegisterToolsAsync(providerId, client, config);
 
                         // Start monitoring for reconnection in background
-                        EnsureConnectionMonitor(providerId, client);
+                        EnsureConnectionMonitor(providerId, client, config);
                         return;
                     }
                 }
@@ -182,7 +201,7 @@ public class McpConnectionManager
     /// <summary>
     /// Monitors connection and attempts reconnection if disconnected.
     /// </summary>
-    private async Task MonitorConnectionAsync(string providerId, IMcpClient client)
+    private async Task MonitorConnectionAsync(string providerId, IMcpClient client, McpServerConfig config, Guid registrationToken)
     {
         try
         {
@@ -196,7 +215,7 @@ public class McpConnectionManager
                     {
                         _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
                         SetState(providerId, McpState.Connecting);
-                        await ConnectProviderAsync(providerId);
+                        await ConnectProviderAsync(providerId, config);
 
                         if (client.IsConnected)
                         {
@@ -216,21 +235,36 @@ public class McpConnectionManager
         }
         finally
         {
-            _monitorTasks.TryRemove(providerId, out _);
+            if (_monitorTasks.TryGetValue(providerId, out var registration) && registration.Token == registrationToken)
+            {
+                _monitorTasks.TryRemove(new KeyValuePair<string, MonitorRegistration>(providerId, registration));
+            }
         }
     }
 
-    private void EnsureConnectionMonitor(string providerId, IMcpClient client)
+    private void EnsureConnectionMonitor(string providerId, IMcpClient client, McpServerConfig config)
     {
-        _monitorTasks.AddOrUpdate(
-            providerId,
-            _ => StartMonitorTask(providerId, client),
-            (_, existing) => existing.IsCompleted ? StartMonitorTask(providerId, client) : existing);
+        while (true)
+        {
+            var registration = _monitorTasks.AddOrUpdate(
+                providerId,
+                _ => StartMonitorTask(providerId, client, config),
+                (_, existing) => existing.Task.IsCompleted ? StartMonitorTask(providerId, client, config) : existing);
+
+            if (!registration.Task.IsCompleted)
+            {
+                return;
+            }
+
+            _monitorTasks.TryRemove(new KeyValuePair<string, MonitorRegistration>(providerId, registration));
+        }
     }
 
-    private Task StartMonitorTask(string providerId, IMcpClient client)
+    private MonitorRegistration StartMonitorTask(string providerId, IMcpClient client, McpServerConfig config)
     {
-        return Task.Run(() => MonitorConnectionAsync(providerId, client));
+        var token = Guid.NewGuid();
+        var monitorTask = Task.Run(() => MonitorConnectionAsync(providerId, client, config, token));
+        return new MonitorRegistration(monitorTask, token);
     }
 
     /// <summary>
