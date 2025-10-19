@@ -512,7 +512,7 @@ public class Layer3FlowTests : IAsyncLifetime, IClassFixture<WebApplicationFacto
         .WithUrl(new Uri(_factory.Server.BaseAddress, "/room"), options =>
         {
           options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
-          options.Transports = HttpTransportType.WebSockets | HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling;
+          options.Transports = HttpTransportType.LongPolling;
         })
         .WithAutomaticReconnect()
         .Build();
