@@ -11,6 +11,8 @@ import config from './config.js';
 import Logger from './utils/logger.js';
 import HttpClient from './utils/http-client.js';
 import MessageBuilder from './utils/message-builder.js';
+import TraceLogger from './utils/trace-logger.js';
+import TracedHttpClient from './utils/traced-http-client.js';
 
 // Initialize logger
 const logger = new Logger(config.execution.verbose);
@@ -24,7 +26,7 @@ logger.info('Configuration loaded', {
 });
 
 // Export for use in scenarios
-export { config, logger, HttpClient, MessageBuilder };
+export { config, logger, HttpClient, MessageBuilder, TraceLogger, TracedHttpClient };
 
 // If run directly, show usage
 if (import.meta.url === `file://${process.argv[1]}`) {
