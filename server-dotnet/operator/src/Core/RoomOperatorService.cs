@@ -73,7 +73,7 @@ public sealed class RoomOperatorService
             // Process next queued request
             if (_requestQueue.TryDequeue(out var nextRequest))
             {
-                _ = Task.Run(async () => await ApplySpecAsync(nextRequest, ct), ct);
+                _ = Task.Run(async () => await ApplySpecAsync(nextRequest, CancellationToken.None));
             }
         }
     }
