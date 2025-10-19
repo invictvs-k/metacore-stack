@@ -20,6 +20,9 @@ pnpm-lock.yaml
 **/.ai-flow/
 dist/
 coverage/
+*.egg-info/
+__pycache__/
+*.pyc
 
 # verification reports
 environment-validation-report-*.md
