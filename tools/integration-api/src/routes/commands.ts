@@ -76,8 +76,9 @@ async function loadCatalog(): Promise<CommandCatalog> {
   try {
     const content = await fs.readFile(CATALOG_PATH, 'utf-8');
     const catalog: CommandCatalog = JSON.parse(content);
+    const defaultCommandMap: Record<string, Command> = Object.fromEntries(defaultCatalog.commands.map(cmd => [cmd.id, cmd]));
     const commands = (catalog.commands ?? defaultCatalog.commands).map((cmd) => {
-      const fallback = defaultCatalog.commands.find((item) => item.id === cmd.id);
+      const fallback = defaultCommandMap[cmd.id];
       return fallback ? { ...fallback, ...cmd } : cmd;
     });
 
