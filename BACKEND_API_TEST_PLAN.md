@@ -1165,19 +1165,12 @@ Validar formato consistente de erros em métodos SignalR.
 - Tipo: HubException
 - **Nota**: HubException não segue o formato de envelope de mensagem (Seção 1.1). É uma estrutura de erro específica do SignalR.
 - Estrutura do erro:
-  ```javascript
+  ```json
   {
-    error: "VALIDATION_ERROR | PERM_DENIED | NOT_FOUND | ...",
-    code: "...",
-    message: "Human readable description"
+    "error": "VALIDATION_ERROR | PERM_DENIED | NOT_FOUND | ...",
+    "code": "...",
+    "message": "Human readable description"
   }
-  ```
-- Exemplo concreto:
-  ```javascript
-  {
-    error: "VALIDATION_ERROR",
-    code: "VALIDATION_ERROR",
-    message: "Entity ID must follow pattern ^E-[A-Za-z0-9_-]{2,64}$"
   }
   ```
 - Códigos padronizados:
