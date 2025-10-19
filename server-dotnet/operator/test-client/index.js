@@ -38,15 +38,15 @@ Usage:
   npm run test:all      - Run all scenarios
 
 Environment Variables:
-  OPERATOR_URL          - RoomOperator base URL (default: http://localhost:8080)
-  ROOMSERVER_URL        - RoomServer base URL (default: http://localhost:5000)
+  OPERATOR_URL          - RoomOperator base URL (default: http://localhost:40802)
+  ROOMSERVER_URL        - RoomServer base URL (default: http://localhost:40801)
   ROOM_AUTH_TOKEN       - Authentication token for RoomServer
   TEST_ROOM_ID          - Test room ID (default: room-test-integration)
   VERBOSE               - Enable verbose logging (default: false)
 
 Examples:
-  export OPERATOR_URL=http://localhost:8080
-  export ROOMSERVER_URL=http://localhost:5000
+  export OPERATOR_URL=http://localhost:40802
+  export ROOMSERVER_URL=http://localhost:40801
   export ROOM_AUTH_TOKEN=your-token
   npm run test:basic
 `);
