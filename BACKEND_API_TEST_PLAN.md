@@ -1430,7 +1430,7 @@ curl -v http://localhost:5000/health
 ```bash
 curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
   -H "X-Entity-Id: E-test01" \
-  -F "spec={\"name\":\"test.txt\",\"type\":\"text/plain\"}" \
+  -F "spec={\"name\":\"test.txt\",\"type\":\"text/plain\"};type=application/json" \
   -F "data=@test.txt"
 ```
 
