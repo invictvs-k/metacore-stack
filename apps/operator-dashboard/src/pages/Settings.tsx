@@ -13,7 +13,7 @@ export default function Settings() {
     if (config && !editedConfig) {
       setEditedConfig(JSON.stringify(config, null, 2));
     }
-  }, [config, editedConfig]);
+  }, [config]);
 
   const handleLoad = () => {
     if (config) {
