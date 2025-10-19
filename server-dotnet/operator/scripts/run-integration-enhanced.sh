@@ -374,23 +374,33 @@ run_test_scenarios() {
         local start_time=$(date +%s%3N)
         local scenario_log="${LOGS_DIR}/test-client-${scenario}.log"
         
+        local exit_code=0
+
         case "$scenario" in
             basic-flow|basic)
+                set +e
                 timeout $SCENARIO_TIMEOUT npm run test:basic-enhanced > "$scenario_log" 2>&1
+                exit_code=$?
+                set -e
                 ;;
             error-cases|error)
+                set +e
                 timeout $SCENARIO_TIMEOUT npm run test:error > "$scenario_log" 2>&1
+                exit_code=$?
+                set -e
                 ;;
             stress-test|stress)
+                set +e
                 timeout $SCENARIO_TIMEOUT npm run test:stress > "$scenario_log" 2>&1
+                exit_code=$?
+                set -e
                 ;;
             *)
                 log_warn "Unknown scenario: $scenario, skipping"
                 continue
                 ;;
         esac
-        
-        local exit_code=$?
+
         local end_time=$(date +%s%3N)
         local duration=$(($end_time - $start_time))
         
