@@ -1159,6 +1159,12 @@ Validar formato consistente de erros em métodos SignalR.
 - Estrutura:
   ```javascript
   {
+    id: "evt-123456",
+    roomId: "room-abc",
+    channel: "signalr",
+    from: "roomserver",
+    ts: 1712345678901,
+    correlationId: "corr-7890",
     error: "VALIDATION_ERROR | PERM_DENIED | NOT_FOUND | ...",
     code: "...",
     message: "Human readable description"
