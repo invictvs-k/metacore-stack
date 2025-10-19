@@ -253,7 +253,10 @@ public class Layer3FlowTests : IAsyncLifetime
       });
     });
 
-    exception.Message.Should().Contain("INVALID_ENTITY_ID");
+    // Parse the exception message as JSON and assert the error code
+    using var doc = JsonDocument.Parse(exception.Message);
+    var code = doc.RootElement.GetProperty("Code").GetString();
+    code.Should().Be("INVALID_ENTITY_ID");
   }
 
   [Fact]
