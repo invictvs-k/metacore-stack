@@ -21,6 +21,8 @@ pnpm-lock.yaml
 dist/
 coverage/
 *.egg-info/
+__pycache__/
+*.pyc
 
 # verification reports
 environment-validation-report-*.md
