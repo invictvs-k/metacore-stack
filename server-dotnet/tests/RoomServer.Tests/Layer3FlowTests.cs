@@ -546,6 +546,7 @@ public class Layer3FlowTests : IAsyncLifetime, IClassFixture<WebApplicationFacto
 
   public Task InitializeAsync() => Task.CompletedTask;
 
+  public Task DisposeAsync() => Task.CompletedTask;
   private sealed record RoomEvent(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("roomId")] string RoomId,
