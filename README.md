@@ -74,6 +74,10 @@ npm run test:all
   - Cenários adicionais: 2 testes
   - 15 testes automatizados, 100% aprovação
 
+## Documentação
+
+- [Plano de Testes da API Backend](docs/BACKEND_API_TEST_PLAN.md)
+- [Implementação do Room Host](docs/ROOM_HOST_IMPLEMENTATION.md)
 ## Licença
 
 MIT (ajuste conforme necessidade)
