@@ -247,25 +247,26 @@ public sealed class ReconcilePhases
         }
         
         // 6. Apply policies
-        if (!string.IsNullOrEmpty(spec.Spec.Policies.DmVisibilityDefault))
+        // Always apply dmVisibilityDefault policy, using default value 'team' if null or empty
+        var dmVisibilityDefaultValue = string.IsNullOrEmpty(spec.Spec.Policies.DmVisibilityDefault)
+            ? "team"
+            : spec.Spec.Policies.DmVisibilityDefault;
+        try
         {
-            try
+            await _retryPolicy.ExecuteAsync(async () =>
             {
-                await _retryPolicy.ExecuteAsync(async () =>
-                {
-                    await _policiesClient.ApplyPolicyAsync(spec.Spec.RoomId, "dmVisibilityDefault", 
-                        spec.Spec.Policies.DmVisibilityDefault, ct);
-                }, ct);
-                
-                _auditLog.LogEvent("policy.applied", result.CorrelationId, _operatorVersion, spec.Metadata.Version,
-                    new Dictionary<string, object> { ["policyName"] = "dmVisibilityDefault" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to apply policy dmVisibilityDefault");
-                result.Warnings.Add($"Failed to apply policy: {ex.Message}");
-                result.PartialSuccess = true;
-            }
+                await _policiesClient.ApplyPolicyAsync(spec.Spec.RoomId, "dmVisibilityDefault", 
+                    dmVisibilityDefaultValue, ct);
+            }, ct);
+            
+            _auditLog.LogEvent("policy.applied", result.CorrelationId, _operatorVersion, spec.Metadata.Version,
+                new Dictionary<string, object> { ["policyName"] = "dmVisibilityDefault" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to apply policy dmVisibilityDefault");
+            result.Warnings.Add($"Failed to apply policy: {ex.Message}");
+            result.PartialSuccess = true;
         }
     }
     
