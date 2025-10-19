@@ -11,14 +11,14 @@ This document provides a quick summary of the Layer 3 flow validation work compl
 ## Test Results
 
 ### Layer 3 Flow Tests
-- **Total Tests Created:** 16
-- **Passing:** 16 (100%)
+- **Total Tests Created:** 15
+- **Passing:** 15 (100%)
 - **Failing:** 0
 - **Test File:** `server-dotnet/tests/RoomServer.Tests/Layer3FlowTests.cs`
 
 ### Overall Project Tests
-- **Total Tests:** 97 (81 existing + 16 new)
-- **Passing:** 93 (77 existing + 16 new)
+- **Total Tests:** 96 (81 existing + 15 new)
+- **Passing:** 92 (77 existing + 15 new)
 - **Failing:** 4 (pre-existing SecurityTests failures, unrelated to Layer 3)
 - **New Tests Impact:** ✅ No regressions introduced
 
