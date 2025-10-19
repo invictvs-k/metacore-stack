@@ -42,7 +42,7 @@ testsRouter.get('/runs/:runId', async (req, res) => {
 });
 
 // GET /api/tests/stream/:runId - SSE stream of test logs
-testsRouter.get('/stream/:runId', (req: Request, res: Response) => {
+testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   const { runId } = req.params;
   
   res.setHeader('Content-Type', 'text/event-stream');
