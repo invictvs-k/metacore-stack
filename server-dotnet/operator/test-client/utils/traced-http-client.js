@@ -7,6 +7,21 @@
 
 import HttpClient from './http-client.js';
 
+/**
+ * HTTP client with integrated trace logging for performance and behavior tracking.
+ *
+ * Extends {@link HttpClient} to provide detailed trace logging for all HTTP operations,
+ * including operation start, request/response details, metrics, and error reporting.
+ *
+ * @class
+ * @extends HttpClient
+ * @param {object} config - Configuration object for the HTTP client.
+ * @param {object} logger - Logger instance for standard logging.
+ * @param {object} [traceLogger=null] - Optional trace logger for detailed operation tracing.
+ *
+ * @example
+ * const client = new TracedHttpClient(config, logger, traceLogger);
+ */
 class TracedHttpClient extends HttpClient {
   constructor(config, logger, traceLogger = null) {
     super(config, logger);
