@@ -758,7 +758,7 @@ Verificar broadcast de mensagens para todos na sala.
 **Resultados Esperados:**
 - Mensagem broadcast para grupo SignalR da sala
 - Todos clientes conectados recebem
-- Ordenação preservada (FIFO)
+- Ordenação por conexão é preservada (FIFO por cliente)
 - Latência baixa (< 100ms para rede local)
 
 **Considerações Adicionais:**
