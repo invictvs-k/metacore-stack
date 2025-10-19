@@ -31,7 +31,7 @@ class MockResponder(OpenAIResponder):
         })
 
 
-def test_room_agent_sends_command(room_server: Dict[str, str]) -> None:
+def test_room_agent_sends_command(room_server: Dict[str, object]) -> None:
     room_id = "room-agent01"
     responder = MockResponder()
     agent_client = RoomClient(f"{room_server['base_url']}/room")

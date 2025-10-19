@@ -31,7 +31,7 @@ def _wait_for_health(timeout: float = 45.0) -> None:
 
 
 @pytest.fixture(scope="session")
-def room_server() -> Iterator[Dict[str, str]]:
+def room_server() -> Iterator[Dict[str, object]]:
     env = os.environ.copy()
     env.setdefault("ASPNETCORE_URLS", f"{SERVER_URL}")
     process = subprocess.Popen(
@@ -65,6 +65,6 @@ def room_server() -> Iterator[Dict[str, str]]:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def ensure_server_exists(room_server: Dict[str, str]) -> None:
+def ensure_server_exists(room_server: Dict[str, object]) -> None:
     # The fixture ensures the server is started before any tests run.
     return None

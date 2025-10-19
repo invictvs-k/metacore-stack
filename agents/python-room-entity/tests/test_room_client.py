@@ -5,7 +5,7 @@ from python_room_entity.client import RoomClient
 from python_room_entity.config import EntitySpec
 
 
-def test_room_client_join_chat_and_command(room_server: Dict[str, str]) -> None:
+def test_room_client_join_chat_and_command(room_server: Dict[str, object]) -> None:
     client = RoomClient(f"{room_server['base_url']}/room")
     messages: "queue.Queue[Dict[str, object]]" = queue.Queue()
     events: "queue.Queue[Dict[str, object]]" = queue.Queue()
