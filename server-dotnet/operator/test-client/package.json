@@ -1,0 +1,24 @@
+{
+  "name": "roomoperator-test-client",
+  "version": "1.0.0",
+  "description": "Test client for RoomOperator-RoomServer integration",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test:basic": "node scenarios/basic-flow.js",
+    "test:basic-enhanced": "node scenarios/basic-flow-enhanced.js",
+    "test:error": "node scenarios/error-cases.js",
+    "test:stress": "node scenarios/stress-test.js",
+    "test:all": "npm run test:basic && npm run test:error && npm run test:stress",
+    "test:all-enhanced": "npm run test:basic-enhanced && npm run test:error && npm run test:stress"
+  },
+  "keywords": [
+    "roomoperator",
+    "integration-test"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}
