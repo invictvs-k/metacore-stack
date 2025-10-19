@@ -1373,8 +1373,7 @@ curl -v http://localhost:5000/health
 curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
   -H "X-Entity-Id: E-test01" \
   -F "spec={\"name\":\"test.txt\",\"type\":\"text/plain\"}" \
-  -F "data=@test.txt" \
-  -F "entityId=E-test01"
+  -F "data=@test.txt"
 ```
 
 **Promoção de Artefato:**
