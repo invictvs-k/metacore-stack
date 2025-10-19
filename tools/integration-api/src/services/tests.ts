@@ -79,7 +79,7 @@ export async function listScenarios(): Promise<TestScenario[]> {
 export async function runTest(scenarioId: string | 'all'): Promise<string> {
   const runId = uuidv4();
   const config = getConfig();
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_');
   const artifactsPath = path.join(ROOT_DIR, config.testClient.artifactsDir, timestamp, 'runs', runId);
 
   await fs.mkdir(artifactsPath, { recursive: true });
