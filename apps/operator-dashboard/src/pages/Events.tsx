@@ -122,6 +122,12 @@ function EventCard({ event }: EventCardProps) {
     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
     : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
 
+  // Extract event type - handle nested payload structure from RoomServer
+  const eventType = event.payload?.kind || event.type;
+  
+  // Extract event data - handle nested payload structure
+  const eventData = event.payload?.data || event.data || event.payload;
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
       <div className="flex items-start justify-between mb-2">
@@ -130,16 +136,21 @@ function EventCard({ event }: EventCardProps) {
             {event.source}
           </span>
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {event.type}
+            {eventType}
           </span>
+          {event.roomId && (
+            <span className="text-xs text-gray-500 dark:text-gray-500">
+              room: {event.roomId}
+            </span>
+          )}
         </div>
         <span className="text-xs text-gray-500 dark:text-gray-500">
-          {new Date(event.timestamp || event.receivedAt).toLocaleTimeString()}
+          {new Date(event.ts || event.timestamp || event.receivedAt).toLocaleTimeString()}
         </span>
       </div>
-      {event.data && (
+      {eventData && (
         <pre className="text-sm bg-gray-50 dark:bg-gray-900 p-3 rounded overflow-x-auto">
-          {JSON.stringify(event.data, null, 2)}
+          {JSON.stringify(eventData, null, 2)}
         </pre>
       )}
     </div>

@@ -111,6 +111,7 @@ app.UseHttpMetrics();
 
 // Map operator endpoints
 app.MapOperatorEndpoints();
+app.MapEventsEndpoints();
 
 // Start the application
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
