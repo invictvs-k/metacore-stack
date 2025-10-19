@@ -116,6 +116,7 @@ public sealed class McpProviderConfig
 
 public sealed class McpStatusResponse
 {
+    public bool Enabled { get; set; } = true;
     public List<McpProviderStatus> Providers { get; set; } = new();
 }
 

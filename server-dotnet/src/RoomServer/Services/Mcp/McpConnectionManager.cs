@@ -53,7 +53,7 @@ public class McpConnectionManager
     private const int MaxBackoffSeconds = 60;
     private const int LogRateLimitWindowMs = 60000; // 1 minute
     
-    private bool _disposed = false;
+    private volatile bool _disposed = false;
 
     public ResourceCatalog Catalog => _catalog;
 
