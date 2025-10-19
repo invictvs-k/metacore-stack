@@ -74,23 +74,27 @@ public sealed class RoomOperatorService
         {
             _reconcileLock.Release();
             
-            // Process next queued request
+            // Process next queued request in the background
             if (_requestQueue.TryDequeue(out var nextRequest))
             {
-                _ = Task.Run(
-                    async () =>
-                    {
-                        try
-                        {
-                            await ApplySpecAsync(nextRequest, _serviceCancellationToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "Unhandled exception in fire-and-forget ApplySpecAsync for room {RoomId}", nextRequest.Spec.Spec.RoomId);
-                        }
-                    },
-                    _serviceCancellationToken);
+                _ = ProcessQueuedRequestAsync(nextRequest);
             }
+        }
+    }
+    
+    private async Task ProcessQueuedRequestAsync(ApplyRequest request)
+    {
+        try
+        {
+            await Task.Run(
+                async () => await ApplySpecAsync(request, _serviceCancellationToken).ConfigureAwait(false),
+                _serviceCancellationToken
+            ).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unhandled exception processing queued request for room {RoomId}", 
+                request.Spec.Spec.RoomId);
         }
     }
     
