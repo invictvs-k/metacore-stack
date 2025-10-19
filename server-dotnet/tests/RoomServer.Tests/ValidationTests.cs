@@ -90,6 +90,16 @@ public class ValidationTests
     }
 
     [Fact]
+    public void ChatPayload_NonJson_IsInvalid()
+    {
+        ValidationHelper.ValidateChatPayload(null, out var errorNull).Should().BeFalse();
+        errorNull.Should().Be("Chat payload is required");
+
+        ValidationHelper.ValidateChatPayload("text", out var errorPrimitive).Should().BeFalse();
+        errorPrimitive.Should().Be("Chat payload must be a JSON object");
+    }
+
+    [Fact]
     public void CommandPayload_WithTarget_IsValid()
     {
         var payload = JsonDocument.Parse("{\"target\":\"E-TARGET\",\"port\":\"test.port\",\"inputs\":{}}").RootElement;
@@ -103,6 +113,16 @@ public class ValidationTests
         var payload = JsonDocument.Parse("{\"port\":\"test.port\",\"inputs\":{}}").RootElement;
         ValidationHelper.ValidateCommandPayload(payload, out var error).Should().BeFalse();
         error.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void CommandPayload_NonJson_IsInvalid()
+    {
+        ValidationHelper.ValidateCommandPayload(null!, out var errorNull).Should().BeFalse();
+        errorNull.Should().Be("Command payload is required");
+
+        ValidationHelper.ValidateCommandPayload(42, out var errorPrimitive).Should().BeFalse();
+        errorPrimitive.Should().Be("Command payload must be a JSON object");
     }
 
     [Fact]
@@ -122,6 +142,16 @@ public class ValidationTests
     }
 
     [Fact]
+    public void EventPayload_NonJson_IsInvalid()
+    {
+        ValidationHelper.ValidateEventPayload(null, out var errorNull).Should().BeFalse();
+        errorNull.Should().Be("Event payload is required");
+
+        ValidationHelper.ValidateEventPayload(true, out var errorPrimitive).Should().BeFalse();
+        errorPrimitive.Should().Be("Event payload must be a JSON object");
+    }
+
+    [Fact]
     public void ArtifactPayload_WithManifest_IsValid()
     {
         var payload = JsonDocument.Parse("{\"manifest\":{\"name\":\"test.txt\"}}").RootElement;
@@ -135,5 +165,15 @@ public class ValidationTests
         var payload = JsonDocument.Parse("{\"data\":{}}").RootElement;
         ValidationHelper.ValidateArtifactPayload(payload, out var error).Should().BeFalse();
         error.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void ArtifactPayload_NonJson_IsInvalid()
+    {
+        ValidationHelper.ValidateArtifactPayload(null, out var errorNull).Should().BeFalse();
+        errorNull.Should().Be("Artifact payload is required");
+
+        ValidationHelper.ValidateArtifactPayload(3.14, out var errorPrimitive).Should().BeFalse();
+        errorPrimitive.Should().Be("Artifact payload must be a JSON object");
     }
 }
