@@ -31,10 +31,15 @@ namespace RoomServer.Tests;
 /// 4. System emits ENTITY.JOIN event
 /// 5. Entity receives list of available resources
 /// </summary>
-public class Layer3FlowTests : IAsyncLifetime
+public class Layer3FlowTests : IAsyncLifetime, IClassFixture<WebApplicationFactory<Program>>
 {
-  private readonly WebApplicationFactory<Program> _factory = new();
+  private readonly WebApplicationFactory<Program> _factory;
   private static readonly TimeSpan EventTimeout = TimeSpan.FromSeconds(10);
+
+  public Layer3FlowTests(WebApplicationFactory<Program> factory)
+  {
+    _factory = factory;
+  }
   private const string EventKindRoomState = "ROOM.STATE";
   private const string EventKindEntityJoin = "ENTITY.JOIN";
 
