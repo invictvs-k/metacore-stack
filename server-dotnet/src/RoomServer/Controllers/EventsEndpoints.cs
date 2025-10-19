@@ -8,6 +8,8 @@ namespace RoomServer.Controllers;
 
 public static class EventsEndpoints
 {
+    private static readonly JsonSerializerOptions SseSerializerOptions = new(JsonSerializerDefaults.Web);
+
     public static void MapEventsEndpoints(this WebApplication app)
     {
         // GET /events - Server-Sent Events endpoint
@@ -29,7 +31,7 @@ public static class EventsEndpoints
                 message = "Connected to RoomServer events"
             };
 
-            var writeLock = new SemaphoreSlim(1, 1);
+            using var writeLock = new SemaphoreSlim(1, 1);
 
             await writeLock.WaitAsync(cancellationToken);
             try
@@ -86,7 +88,7 @@ public static class EventsEndpoints
 
     private static async Task SendSseEventAsync(HttpResponse response, object data, CancellationToken cancellationToken)
     {
-        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+        var json = JsonSerializer.Serialize(data, SseSerializerOptions);
         await response.WriteAsync($"data: {json}\n\n", cancellationToken);
     }
 

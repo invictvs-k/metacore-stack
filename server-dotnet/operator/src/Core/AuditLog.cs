@@ -1,5 +1,6 @@
 using RoomOperator.Abstractions;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
@@ -8,6 +9,14 @@ namespace RoomOperator.Core;
 
 public sealed class AuditLog
 {
+    private const int ChannelCapacity = 256;
+    private static readonly BoundedChannelOptions SubscriberChannelOptions = new(ChannelCapacity)
+    {
+        SingleReader = true,
+        AllowSynchronousContinuations = false,
+        FullMode = BoundedChannelFullMode.DropOldest
+    };
+
     private readonly ConcurrentQueue<AuditEntry> _entries = new();
     private readonly int _maxEntries;
     private readonly ILogger<AuditLog> _logger;
@@ -19,16 +28,25 @@ public sealed class AuditLog
         _maxEntries = maxEntries;
     }
 
-    public IAsyncEnumerable<AuditEntry> SubscribeAsync(CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<AuditEntry> SubscribeAsync(int replayCount = 100, CancellationToken cancellationToken = default)
     {
-        var channel = Channel.CreateUnbounded<AuditEntry>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            AllowSynchronousContinuations = false
-        });
+        var channel = Channel.CreateBounded<AuditEntry>(SubscriberChannelOptions);
 
         var subscriptionId = Guid.NewGuid();
         _subscribers[subscriptionId] = channel.Writer;
+
+        if (replayCount > 0)
+        {
+            var snapshot = _entries.TakeLast(replayCount).ToList();
+            foreach (var entry in snapshot)
+            {
+                if (!channel.Writer.TryWrite(entry))
+                {
+                    CompleteSubscription(subscriptionId);
+                    return ReadAllAsync(channel.Reader, subscriptionId, default, cancellationToken);
+                }
+            }
+        }
 
         var registration = cancellationToken.Register(() => CompleteSubscription(subscriptionId));
 
