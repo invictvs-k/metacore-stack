@@ -23,6 +23,8 @@ def _wait_for_health(timeout: float = 45.0) -> None:
             response = requests.get(f"{SERVER_URL}/health", timeout=2.0)
             if response.status_code == 200:
                 return
+            else:
+                time.sleep(0.5)
         except requests.RequestException:
             time.sleep(0.5)
     raise RuntimeError("RoomServer healthcheck did not become ready in time")
