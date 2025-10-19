@@ -95,7 +95,7 @@ Validar que operações principais (Join, Leave, Send) geram logs adequados com 
 
 **Resultados Esperados:**
 - Logs de Join contêm: roomId, entityId, timestamp
-- Logs de SendToRoom contêm: roomId, entityId, messageType, channel (se DM)
+- Logs de SendToRoom contêm: roomId, entityId, type, channel (se DM)
 - Logs de Leave contêm: roomId, entityId
 - Formato estruturado e legível
 - Logs aparecem em tempo real no console
