@@ -80,7 +80,29 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
 
   // Set up polling for new logs
   let lastLogCount = logs.length;
-  const pollInterval = setInterval(() => {
+  let completed = false;
+  let isPolling = false;
+  let heartbeat: NodeJS.Timeout | null = null;
+  let pollInterval: NodeJS.Timeout | null = null;
+
+  const finalizeRun = (exitCode: number) => {
+    if (completed) {
+      return;
+    }
+
+    completed = true;
+    res.write(`event: done\n`);
+    res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+    }
+    if (heartbeat) {
+      clearInterval(heartbeat);
+    }
+    res.end();
+  };
+
+  const pollForUpdates = async () => {
     const currentLogs = getRunLogs(runId);
     if (currentLogs.length > lastLogCount) {
       const newLogs = currentLogs.slice(lastLogCount);
@@ -94,21 +116,52 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     // Check if run is complete
     const currentRun = getRun(runId);
     if (!currentRun || currentRun.status !== 'running') {
-      const exitCode = currentRun?.exitCode ?? -1;
-      res.write(`event: done\n`);
-      res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
-      clearInterval(pollInterval);
-      res.end();
+      let exitCode: number;
+
+      if (currentRun?.exitCode !== undefined) {
+        exitCode = currentRun.exitCode;
+      } else {
+        try {
+          const metadata = await getRunMetadata(runId);
+          exitCode = metadata?.exitCode ?? -1;
+        } catch (error) {
+          exitCode = -1;
+        }
+      }
+
+      finalizeRun(exitCode);
     }
+  };
+
+  pollInterval = setInterval(() => {
+    if (completed || isPolling) {
+      return;
+    }
+
+    isPolling = true;
+
+    pollForUpdates()
+      .catch(() => {
+        finalizeRun(-1);
+      })
+      .finally(() => {
+        isPolling = false;
+      });
   }, 500); // Poll more frequently for logs (500ms)
 
   // Heartbeat
-  const heartbeat = setInterval(() => {
+  heartbeat = setInterval(() => {
     res.write(': ping\n\n');
   }, 10000);
 
   req.on('close', () => {
-    clearInterval(pollInterval);
-    clearInterval(heartbeat);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+    if (heartbeat) {
+      clearInterval(heartbeat);
+      heartbeat = null;
+    }
   });
 });
