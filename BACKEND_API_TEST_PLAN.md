@@ -1225,17 +1225,26 @@ Verificar formato de erros em endpoints REST.
   - 404: Not Found (recurso inexistente)
   - 409: Conflict (conflito de estado)
   - 500: Internal Server Error (erro inesperado)
-- Corpo JSON:
+- Corpo JSON (consistente com HubException em Seção 9.1):
   ```json
   {
     "error": "ERROR_CODE",
+    "code": "ERROR_CODE",
     "message": "Descriptive message"
+  }
+  ```
+- Exemplo concreto:
+  ```json
+  {
+    "error": "VALIDATION_ERROR",
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid fromEntity field in promote request"
   }
   ```
 
 **Considerações Adicionais:**
 - ⚠️ Erro 500 deve logar stack trace no servidor mas não enviar ao cliente
-- Manter consistência entre REST e SignalR errors
+- Manter consistência entre REST e SignalR errors (ambos incluem error, code, message)
 
 ---
 
