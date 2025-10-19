@@ -117,7 +117,7 @@ check_port_available() {
             return 1
         fi
     elif command -v netstat &> /dev/null; then
-        if netstat -an | grep -q ":$port.*LISTEN"; then
+        if netstat -an | grep -E -q "[:.]$port[[:space:]]+.*LISTEN"; then
             return 1
         fi
     fi
