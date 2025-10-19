@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using RoomOperator.Core;
 using System.Text.Json;
+using System.Threading;
 
 namespace RoomOperator.HttpApi;
 
@@ -10,14 +11,16 @@ public static class EventsEndpoints
     public static void MapEventsEndpoints(this WebApplication app)
     {
         // GET /events - Server-Sent Events endpoint
-        app.MapGet("/events", async (HttpContext context, RoomOperatorService operatorService) =>
+        app.MapGet("/events", async (HttpContext context, AuditLog auditLog) =>
         {
             context.Response.Headers["Content-Type"] = "text/event-stream";
             context.Response.Headers["Cache-Control"] = "no-cache";
             context.Response.Headers["Connection"] = "keep-alive";
             context.Response.Headers["X-Accel-Buffering"] = "no";
 
-            // Send initial connected event
+            var cancellationToken = context.RequestAborted;
+            await context.Response.StartAsync(cancellationToken);
+
             var connectedEvent = new
             {
                 type = "connected",
@@ -25,40 +28,106 @@ public static class EventsEndpoints
                 timestamp = DateTime.UtcNow.ToString("O"),
                 message = "Connected to RoomOperator events"
             };
-            
-            await SendSseEventAsync(context.Response, connectedEvent);
-            await context.Response.Body.FlushAsync();
 
-            // Keep connection alive with periodic heartbeats
-            var cancellationToken = context.RequestAborted;
-            
+            var writeLock = new SemaphoreSlim(1, 1);
+
+            await writeLock.WaitAsync(cancellationToken);
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
+                await SendSseEventAsync(context.Response, connectedEvent, cancellationToken);
+                await context.Response.Body.FlushAsync(cancellationToken);
+            }
+            finally
+            {
+                writeLock.Release();
+            }
+
+            var recentEntries = auditLog.GetRecent();
+            foreach (var entry in recentEntries)
+            {
+                await writeLock.WaitAsync(cancellationToken);
+                try
                 {
-                    // Send heartbeat comment (keeps connection alive)
-                    await context.Response.WriteAsync(": ping\n\n");
-                    await context.Response.Body.FlushAsync();
-                    
-                    // Wait 10 seconds before next heartbeat
-                    await Task.Delay(10000, cancellationToken);
+                    await SendSseEventAsync(context.Response, entry, cancellationToken);
+                    await context.Response.Body.FlushAsync(cancellationToken);
+                }
+                finally
+                {
+                    writeLock.Release();
+                }
+            }
+
+            using var heartbeatCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var heartbeatTask = RunHeartbeatAsync(context.Response, writeLock, heartbeatCts.Token);
+
+            try
+            {
+                await foreach (var entry in auditLog.SubscribeAsync(cancellationToken))
+                {
+                    await writeLock.WaitAsync(cancellationToken);
+                    try
+                    {
+                        await SendSseEventAsync(context.Response, entry, cancellationToken);
+                        await context.Response.Body.FlushAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        writeLock.Release();
+                    }
                 }
             }
             catch (OperationCanceledException)
             {
-                // Client disconnected, this is expected
+                // Client disconnected
             }
             catch (Exception ex)
             {
-                // Log error but don't throw
-                Console.WriteLine($"Error in SSE stream: {ex.Message}");
+                Console.WriteLine($"Error in RoomOperator SSE stream: {ex.Message}");
+            }
+            finally
+            {
+                heartbeatCts.Cancel();
+                try
+                {
+                    await heartbeatTask.ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    // Expected when the client disconnects
+                }
             }
         });
     }
 
-    private static async Task SendSseEventAsync(HttpResponse response, object data)
+    private static async Task SendSseEventAsync(HttpResponse response, object data, CancellationToken cancellationToken)
     {
         var json = JsonSerializer.Serialize(data, new JsonSerializerOptions(JsonSerializerDefaults.Web));
-        await response.WriteAsync($"data: {json}\n\n");
+        await response.WriteAsync($"data: {json}\n\n", cancellationToken);
+    }
+
+    private static async Task RunHeartbeatAsync(HttpResponse response, SemaphoreSlim writeLock, CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (true)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+
+                await writeLock.WaitAsync(cancellationToken);
+                try
+                {
+                    await response.WriteAsync(": ping\n\n", cancellationToken);
+                    await response.Body.FlushAsync(cancellationToken);
+                }
+                finally
+                {
+                    writeLock.Release();
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when the client disconnects
+        }
     }
 }
