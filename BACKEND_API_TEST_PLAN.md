@@ -624,6 +624,7 @@ Verificar comportamento com e sem autenticação JWT.
 - Para alternar entre os modos de autenticação, configure a variável de ambiente `AUTH_MODE`:
     - `AUTH_MODE=dev` — desativa autenticação JWT (modo desenvolvimento)
     - `AUTH_MODE=prod` — ativa autenticação JWT obrigatória (modo produção)
+    - Referência: O valor de `AUTH_MODE` é lido no arquivo [`src/RoomServer/Startup.cs`](../server-dotnet/src/RoomServer/Startup.cs) (veja o trecho que lê `Environment.GetEnvironmentVariable("AUTH_MODE")`). Isso determina se a autenticação JWT será aplicada, em conjunto com `ASPNETCORE_ENVIRONMENT`.
 
 ---
 
