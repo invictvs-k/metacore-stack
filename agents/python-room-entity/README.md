@@ -28,9 +28,7 @@ pytest
 ```
 
 To run the agent manually you will need a running RoomServer instance and a
-valid OpenAI API key (via `OPENAI_API_KEY`). The `examples/` folder contains a
-minimal script that instantiates the agent, joins a room, and relays actions
-from the selected OpenAI model.
+valid OpenAI API key (via `OPENAI_API_KEY`). You can instantiate the agent, join a room, and relay actions from the selected OpenAI model using the provided modules.
 
 ## Project Layout
 
