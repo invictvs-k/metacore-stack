@@ -53,6 +53,8 @@ export interface Command {
   description: string;
   paramsSchema: any;
   usage?: string;
+  method?: string;
+  endpoint?: string;
 }
 
 export interface CommandCatalog {

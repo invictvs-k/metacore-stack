@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
+import { Readable } from 'stream';
+import fetch, { AbortError } from 'node-fetch';
 import { getConfig } from '../services/config.js';
 
 export const eventsRouter = Router();
@@ -16,6 +18,131 @@ function setupSSE(res: Response) {
 
 function sendSSEMessage(res: Response, data: any) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
+}
+
+function parseAndForwardChunk(
+  chunk: string,
+  res: Response,
+  source: 'roomserver' | 'roomoperator'
+) {
+  const events = chunk.split(/\n\n/);
+
+  for (const rawEvent of events) {
+    if (!rawEvent.trim()) {
+      continue;
+    }
+
+    const lines = rawEvent.split('\n');
+    const dataLines: string[] = [];
+    let eventType: string | undefined;
+    let eventId: string | undefined;
+
+    for (const line of lines) {
+      if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trimStart());
+      } else if (line.startsWith('event:')) {
+        eventType = line.slice(6).trim();
+      } else if (line.startsWith('id:')) {
+        eventId = line.slice(3).trim();
+      }
+    }
+
+    if (dataLines.length === 0) {
+      continue;
+    }
+
+    const dataPayload = dataLines.join('\n');
+    let parsed: any;
+
+    try {
+      parsed = JSON.parse(dataPayload);
+    } catch {
+      parsed = dataPayload;
+    }
+
+    const message: Record<string, any> =
+      parsed && typeof parsed === 'object'
+        ? { ...parsed }
+        : {
+          type: eventType ?? 'message',
+          data: parsed
+        };
+
+    if (!message.type) {
+      message.type = eventType ?? 'message';
+    }
+
+    message.source = message.source ?? source;
+    message.timestamp = message.timestamp ?? new Date().toISOString();
+
+    if (eventId) {
+      message.id = eventId;
+    }
+
+    sendSSEMessage(res, message);
+  }
+}
+
+async function proxyEventStream(
+  _req: Request,
+  res: Response,
+  eventUrl: string,
+  source: 'roomserver' | 'roomoperator'
+) {
+  const controller = new AbortController();
+
+  try {
+    const upstreamResponse = await fetch(eventUrl, {
+      headers: { Accept: 'text/event-stream' },
+      signal: controller.signal
+    });
+
+    if (!upstreamResponse.ok || !upstreamResponse.body) {
+      sendSSEMessage(res, {
+        source,
+        type: 'error',
+        timestamp: new Date().toISOString(),
+        error: `Failed to connect to upstream events (${upstreamResponse.status})`
+      });
+      return () => controller.abort();
+    }
+
+    const readable = Readable.fromWeb(upstreamResponse.body as any);
+    readable.on('data', (chunk: Buffer) => {
+      parseAndForwardChunk(chunk.toString(), res, source);
+    });
+    readable.on('error', (error: Error) => {
+      sendSSEMessage(res, {
+        source,
+        type: 'error',
+        timestamp: new Date().toISOString(),
+        error: error.message
+      });
+    });
+    readable.on('end', () => {
+      sendSSEMessage(res, {
+        source,
+        type: 'disconnected',
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    const cleanup = () => {
+      controller.abort();
+      readable.destroy();
+    };
+
+    return cleanup;
+  } catch (error: any) {
+    const message = error instanceof AbortError ? 'Connection closed' : error.message;
+    sendSSEMessage(res, {
+      source,
+      type: 'error',
+      timestamp: new Date().toISOString(),
+      error: message
+    });
+    return () => controller.abort();
+  }
 }
 
 // GET /api/events/roomserver - SSE proxy for RoomServer events
@@ -37,20 +164,11 @@ eventsRouter.get('/roomserver', async (req: Request, res: Response) => {
     res.write(': ping\n\n');
   }, 10000);
 
-  // Simulate connection to RoomServer (in production, this would be a real EventSource)
-  // For now, we'll send periodic status updates
-  const mockInterval = setInterval(() => {
-    sendSSEMessage(res, {
-      type: 'status',
-      source: 'roomserver',
-      timestamp: new Date().toISOString(),
-      data: { status: 'running', connections: 1 }
-    });
-  }, 30000);
+  const cleanup = await proxyEventStream(req, res, eventUrl, 'roomserver');
 
   req.on('close', () => {
     clearInterval(heartbeat);
-    clearInterval(mockInterval);
+    cleanup?.();
   });
 });
 
@@ -73,25 +191,21 @@ eventsRouter.get('/roomoperator', async (req: Request, res: Response) => {
     res.write(': ping\n\n');
   }, 10000);
 
-  // Simulate connection to RoomOperator
-  const mockInterval = setInterval(() => {
-    sendSSEMessage(res, {
-      type: 'status',
-      source: 'roomoperator',
-      timestamp: new Date().toISOString(),
-      data: { status: 'running', activeReconciliations: 0 }
-    });
-  }, 30000);
+  const cleanup = await proxyEventStream(req, res, eventUrl, 'roomoperator');
 
   req.on('close', () => {
     clearInterval(heartbeat);
-    clearInterval(mockInterval);
+    cleanup?.();
   });
 });
 
 // GET /api/events/combined - Combined SSE stream from both sources
 eventsRouter.get('/combined', async (req: Request, res: Response) => {
   setupSSE(res);
+
+  const config = getConfig();
+  const roomServerUrl = `${config.roomServer.baseUrl}${config.roomServer.events.path}`;
+  const roomOperatorUrl = `${config.roomOperator.baseUrl}${config.roomOperator.events.path}`;
 
   // Send initial connection message
   sendSSEMessage(res, {
@@ -105,19 +219,12 @@ eventsRouter.get('/combined', async (req: Request, res: Response) => {
     res.write(': ping\n\n');
   }, 10000);
 
-  // Simulate combined events
-  const mockInterval = setInterval(() => {
-    const source = Math.random() > 0.5 ? 'roomserver' : 'roomoperator';
-    sendSSEMessage(res, {
-      type: 'status',
-      source,
-      timestamp: new Date().toISOString(),
-      data: { status: 'running' }
-    });
-  }, 15000);
+  const cleanupRoomServer = await proxyEventStream(req, res, roomServerUrl, 'roomserver');
+  const cleanupRoomOperator = await proxyEventStream(req, res, roomOperatorUrl, 'roomoperator');
 
   req.on('close', () => {
     clearInterval(heartbeat);
-    clearInterval(mockInterval);
+    cleanupRoomServer?.();
+    cleanupRoomOperator?.();
   });
 });
