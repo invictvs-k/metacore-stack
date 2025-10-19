@@ -124,7 +124,7 @@ Verificar que o CORS está configurado corretamente para permitir conexões de d
 **Resultados Esperados:**
 - Header presente: `Access-Control-Allow-Origin: *` (ou origem específica)
 - Header presente: `Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`
-- Header presente: `Access-Control-Allow-Headers: *` (ou lista de headers permitidos)
+- Header presente: `Access-Control-Allow-Headers: Authorization, Content-Type, X-Entity-Id` (ou echo do valor de `Access-Control-Request-Headers`)
 - Código HTTP: 200 ou 204
 
 **Considerações Adicionais:**
