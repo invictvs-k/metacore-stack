@@ -60,6 +60,10 @@ class RoomClient:
     def is_connected(self) -> bool:
         return self._hub is not None and not self._disconnected.is_set()
 
+    @property
+    def verify_ssl(self) -> bool:
+        """Whether SSL verification is enabled for the hub connection."""
+        return self._verify_ssl
     def connect(self) -> None:
         """Initialise the SignalR hub connection."""
 
