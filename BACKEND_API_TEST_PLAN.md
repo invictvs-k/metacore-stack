@@ -885,10 +885,11 @@ Validar promoção de artefato de workspace privado para sala.
 2. Promover para sala:
    ```bash
    curl -X POST http://localhost:5000/rooms/room-test123/artifacts/promote \
+     -H "X-Entity-Id: E-agent01" \
      -H "Content-Type: application/json" \
      -d '{
        "name": "analysis.json",
-       "fromEntityId": "E-agent01"
+       "fromEntity": "E-agent01"
      }'
    ```
 
@@ -1129,6 +1130,7 @@ Verificar formato de erros em endpoints REST.
    ```bash
    curl -X POST http://localhost:5000/rooms/invalid/artifacts
    curl -X POST http://localhost:5000/rooms/room-test/artifacts/promote \
+     -H "X-Entity-Id: E-test01" \
      -H "Content-Type: application/json" \
      -d '{"invalid": "data"}'
    ```
@@ -1379,10 +1381,11 @@ curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
 **Promoção de Artefato:**
 ```bash
 curl -X POST http://localhost:5000/rooms/room-test123/artifacts/promote \
+  -H "X-Entity-Id: E-test01" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test.txt",
-    "fromEntityId": "E-test01"
+    "fromEntity": "E-test01"
   }'
 ```
 
