@@ -28,7 +28,26 @@ Validar que o Hub SignalR está corretamente mapeado no endpoint `/room` e aceit
    ```bash
    # Verificar resposta de negociação SignalR (endpoint recomendado para validação)
    curl -X POST http://localhost:5000/room/negotiate
+   ```
+
+**Resultados Esperados:**
+- Servidor iniciado sem erros na porta 5000 (HTTP) ou 5001 (HTTPS)
 - Logs do console mostram: "Now listening on: http://localhost:5000"
+- Endpoint `/room/negotiate` retorna código HTTP 200
+- Resposta JSON contém campos: `connectionId`, `availableTransports` (incluindo WebSocket)
+- Exemplo de resposta:
+  ```json
+  {
+    "connectionId": "abc123...",
+    "availableTransports": [
+      {
+        "transport": "WebSockets",
+        "transferFormats": ["Text", "Binary"]
+      }
+    ],
+    "negotiateVersion": 1
+  }
+  ```
 
 **Considerações Adicionais:**
 - Verificar que o CORS está configurado para permitir conexões de origem local
