@@ -381,8 +381,11 @@ dotnet test
 
 ```javascript
 // Exemplo de conexão manual (JavaScript)
+// Recomenda-se configurar a URL base via variável de ambiente ou configuração.
+// O host/porta pode variar em ambientes locais/dev/prod.
+const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("http://localhost:5000/room")
+    .withUrl(`${BASE_URL}/room`)
     .build();
 
 // Listener de eventos
