@@ -43,26 +43,15 @@ def room_server() -> Iterator[Dict[str, object]]:
         ],
         cwd=str(ROOT),
         env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     try:
         _wait_for_health()
     except Exception:
         process.terminate()
-        try:
-            stdout, stderr = process.communicate(timeout=5)
-        except Exception:
-            stdout, stderr = b"", b""
-        # Get last 20 lines of each output
-        def last_lines(data, n=20):
-            return b"\n".join(data.splitlines()[-n:]).decode(errors="replace") if data else ""
-        out_tail = last_lines(stdout)
-        err_tail = last_lines(stderr)
         raise RuntimeError(
-            "RoomServer failed to start (healthcheck failed).\n"
-            f"Last 20 lines of stdout:\n{out_tail}\n"
-            f"Last 20 lines of stderr:\n{err_tail}"
+            "RoomServer failed to start (healthcheck failed). Output is unavailable because stdout/stderr were redirected to DEVNULL."
         ) from None
 
     yield {"base_url": SERVER_URL, "process": process}
