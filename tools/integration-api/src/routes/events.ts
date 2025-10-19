@@ -110,7 +110,7 @@ async function proxyEventStream(
     if (
       typeof upstreamResponse.body === 'object' &&
       upstreamResponse.body !== null &&
-      typeof (upstreamResponse.body as ReadableStream).getReader === 'function'
+      upstreamResponse.body instanceof ReadableStream
     ) {
       const readable = Readable.fromWeb(upstreamResponse.body as ReadableStream);
       readable.on('data', (chunk: Buffer) => {
