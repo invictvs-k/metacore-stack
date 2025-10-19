@@ -99,6 +99,37 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     res.end();
   };
 
+  const pollForUpdates = async () => {
+    const currentLogs = getRunLogs(runId);
+    if (currentLogs.length > lastLogCount) {
+      const newLogs = currentLogs.slice(lastLogCount);
+      for (const log of newLogs) {
+        res.write(`event: log\n`);
+        res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
+      }
+      lastLogCount = currentLogs.length;
+    }
+
+    // Check if run is complete
+    const currentRun = getRun(runId);
+    if (!currentRun || currentRun.status !== 'running') {
+      let exitCode: number;
+
+      if (currentRun?.exitCode !== undefined) {
+        exitCode = currentRun.exitCode;
+      } else {
+        try {
+          const metadata = await getRunMetadata(runId);
+          exitCode = metadata?.exitCode ?? -1;
+        } catch (error) {
+          exitCode = -1;
+        }
+      }
+
+      finalizeRun(exitCode);
+    }
+  };
+
   const pollInterval = setInterval(() => {
     if (completed || isPolling) {
       return;
@@ -106,34 +137,7 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
 
     isPolling = true;
 
-    (async () => {
-      const currentLogs = getRunLogs(runId);
-      if (currentLogs.length > lastLogCount) {
-        const newLogs = currentLogs.slice(lastLogCount);
-        for (const log of newLogs) {
-          res.write(`event: log\n`);
-          res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
-        }
-        lastLogCount = currentLogs.length;
-      }
-
-      // Check if run is complete
-      const currentRun = getRun(runId);
-      if (!currentRun || currentRun.status !== 'running') {
-        let exitCode = currentRun?.exitCode;
-
-        if (exitCode === undefined) {
-          try {
-            const metadata = await getRunMetadata(runId);
-            exitCode = metadata?.exitCode ?? -1;
-          } catch (error) {
-            exitCode = -1;
-          }
-        }
-
-        finalizeRun(exitCode ?? -1);
-      }
-    })()
+    pollForUpdates()
       .catch(() => {
         finalizeRun(-1);
       })
