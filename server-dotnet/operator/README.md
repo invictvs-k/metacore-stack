@@ -129,7 +129,7 @@ Full documentation available at `/docs/room-operator.md`:
 dotnet build
 
 # Build with tests
-dotnet build /home/runner/work/metacore-stack/metacore-stack/server-dotnet/RoomServer.sln
+dotnet build ../RoomServer.sln
 ```
 
 ## Docker
