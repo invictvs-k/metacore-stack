@@ -37,7 +37,12 @@ void ConfigureAuthenticatedClient(HttpClient client)
 builder.Services.AddHttpClient<IRoomClient, SignalRClient>(ConfigureAuthenticatedClient);
 builder.Services.AddHttpClient<IArtifactsClient, ArtifactsClient>(ConfigureAuthenticatedClient);
 builder.Services.AddHttpClient<IPoliciesClient, PoliciesClient>(ConfigureAuthenticatedClient);
-builder.Services.AddHttpClient<IMcpClient, McpClient>(ConfigureAuthenticatedClient);
+builder.Services.AddHttpClient<IMcpClient, McpClient>(client => {
+    ConfigureAuthenticatedClient(client);
+}).AddTypedClient((httpClient, sp) => {
+    var logger = sp.GetRequiredService<ILogger<McpClient>>();
+    return new McpClient(httpClient, logger, mcpEnabled);
+});
 
 // Configure core services
 builder.Services.AddSingleton(sp => 
