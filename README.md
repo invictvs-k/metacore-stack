@@ -66,13 +66,18 @@ npm run test:all
 * Conventional Commits
 * CI: build + lint + teste + validação de schemas
 
+## Validação de Fluxos
+
+* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](LAYER3_VALIDATION_SUMMARY.md))
+  - Fluxo 3.1: Criação de Sala (5 testes)
+  - Fluxo 3.2: Entrada de Entidade (8 testes)
+  - Cenários adicionais: 2 testes
+  - 15 testes automatizados, 100% aprovação
+
 ## Documentação
 
-* [**BACKEND_API_TEST_PLAN.md**](./BACKEND_API_TEST_PLAN.md) — Plano de testes detalhado para Backend/APIs
-* [ROOM_HOST_IMPLEMENTATION.md](./ROOM_HOST_IMPLEMENTATION.md) — Status de implementação do Room Host
-* [ENVIRONMENT_VERIFICATION.md](./ENVIRONMENT_VERIFICATION.md) — Verificação do ambiente de desenvolvimento
-* [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) — Resumo de mudanças de implementação
-
+- [Plano de Testes da API Backend](docs/BACKEND_API_TEST_PLAN.md)
+- [Implementação do Room Host](docs/ROOM_HOST_IMPLEMENTATION.md)
 ## Licença
 
 MIT (ajuste conforme necessidade)
