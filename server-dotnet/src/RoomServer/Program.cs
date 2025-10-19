@@ -15,21 +15,21 @@ builder.Services.AddCors(options =>
   {
     if (builder.Environment.IsDevelopment())
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+      policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     }
     else
     {
-        // Read allowed origins from configuration or environment variable
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-        if (allowedOrigins == null || allowedOrigins.Length == 0)
-        {
-            throw new InvalidOperationException("No allowed CORS origins configured for production.");
-        }
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+      // Read allowed origins from configuration or environment variable
+      var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+      if (allowedOrigins == null || allowedOrigins.Length == 0)
+      {
+        throw new InvalidOperationException("No allowed CORS origins configured for production.");
+      }
+      policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     }
   });
 });

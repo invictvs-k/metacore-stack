@@ -63,7 +63,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Arrange
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
-    
+
     var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     // Listen for ROOM.STATE event
@@ -87,7 +87,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - Room state event shows transition from init
     var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
     roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
-    
+
     var stateData = roomStateEvent.Payload.Data;
     stateData.TryGetProperty("state", out var state).Should().BeTrue();
     state.GetString().Should().Be("active"); // Transitioned from init to active
@@ -99,7 +99,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // This test validates that the system is in init state before entities connect
     // Since we can't directly observe init state (it transitions immediately on first join),
     // we validate that the room state is properly managed through the RoomContextStore
-    
+
     // This is implicitly tested by the transition behavior - room starts in init,
     // then transitions to active when first entity joins
     await Task.CompletedTask;
@@ -111,7 +111,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Arrange
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
-    
+
     var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connection.On<RoomEvent>("event", evt =>
@@ -144,7 +144,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Arrange
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
-    
+
     var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connection.On<RoomEvent>("event", evt =>
@@ -175,11 +175,11 @@ public class Layer3FlowTests : IAsyncLifetime
   public async Task Flow31_Complete_RoomCreationFullFlow()
   {
     // This test validates the complete Room Creation flow end-to-end
-    
+
     // Arrange
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
-    
+
     var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connection.On<RoomEvent>("event", evt =>
@@ -203,17 +203,17 @@ public class Layer3FlowTests : IAsyncLifetime
     // Step 1: Room created
     entities.Should().NotBeNull();
     entities.Should().HaveCount(1);
-    
+
     // Step 2-4: Room initializes, waits, and emits ROOM.STATE
     var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
     roomStateEvent.Should().NotBeNull();
     roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
-    
+
     // Step 5: Room transitions to active
     var stateData = roomStateEvent.Payload.Data;
     stateData.TryGetProperty("state", out var state).Should().BeTrue();
     state.GetString().Should().Be("active");
-    
+
     // Verify entities list in state
     stateData.TryGetProperty("entities", out var entitiesInState).Should().BeTrue();
     entitiesInState.GetArrayLength().Should().Be(1);
@@ -329,7 +329,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - Entity is connected (workspace loading is internal)
     // The workspace is managed by the artifact store and is available per entity
     entities.Should().ContainSingle(e => e.Id == "E-WorkspaceAgent");
-    
+
     // Note: Workspace loading is implicit in the current implementation
     // The artifact store provides workspace paths per entity when needed
   }
@@ -341,7 +341,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
-    
+
     var entityJoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connectionA.On<RoomEvent>("event", evt =>
@@ -376,7 +376,7 @@ public class Layer3FlowTests : IAsyncLifetime
     joinEvent.Should().NotBeNull();
     joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
     joinEvent.RoomId.Should().Be(roomId);
-    
+
     // Verify entity data in event
     var entityData = joinEvent.Payload.Data.GetProperty("entity");
     entityData.GetProperty("id").GetString().Should().Be("E-NewAgent");
@@ -404,7 +404,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - Entity receives list of available entities/resources
     entities.Should().NotBeNull();
     entities.Should().ContainSingle(e => e.Id == "E-ResourceAgent");
-    
+
     // The entity also has capabilities which represent available resources
     var agent = entities.First(e => e.Id == "E-ResourceAgent");
     agent.Capabilities.Should().NotBeNull();
@@ -416,12 +416,12 @@ public class Layer3FlowTests : IAsyncLifetime
   public async Task Flow32_Complete_EntityConnectionFullFlow()
   {
     // This test validates the complete Entity Connection flow end-to-end
-    
+
     // Arrange
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
-    
+
     var entityJoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connectionA.On<RoomEvent>("event", evt =>
@@ -458,19 +458,19 @@ public class Layer3FlowTests : IAsyncLifetime
     // Step 1: Entity connects
     entities.Should().NotBeNull();
     entities.Should().HaveCount(2); // Both entities present
-    
+
     // Step 2: Credentials validated (implicit - join succeeded)
     entities.Should().ContainSingle(e => e.Id == "E-CompleteAgent");
-    
+
     // Step 3: Workspace loaded (implicit - managed by artifact store)
     var agent = entities.First(e => e.Id == "E-CompleteAgent");
     agent.Should().NotBeNull();
-    
+
     // Step 4: ENTITY.JOIN event emitted
     var joinEvent = await entityJoinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
     joinEvent.Should().NotBeNull();
     joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
-    
+
     // Step 5: Entity receives list of resources
     agent.Capabilities.Should().Contain("text.generate");
     agent.Capabilities.Should().Contain("plan");
@@ -488,7 +488,7 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connHuman = BuildConnection();
     await using var connAgent1 = BuildConnection();
     await using var connAgent2 = BuildConnection();
-    
+
     var agent2JoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     connHuman.On<RoomEvent>("event", evt =>
@@ -533,7 +533,7 @@ public class Layer3FlowTests : IAsyncLifetime
     finalEntities.Should().ContainSingle(e => e.Id == "E-Human1");
     finalEntities.Should().ContainSingle(e => e.Id == "E-Agent1");
     finalEntities.Should().ContainSingle(e => e.Id == "E-Agent2");
-    
+
     // Verify ENTITY.JOIN event was broadcast
     var joinEvent = await agent2JoinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
     joinEvent.Should().NotBeNull();
@@ -546,7 +546,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var conn1 = BuildConnection();
     await using var conn2 = BuildConnection();
-    
+
     var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     conn1.On<RoomEvent>("event", evt =>
