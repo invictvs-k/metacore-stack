@@ -1130,6 +1130,7 @@ Verificar formato de erros em endpoints REST.
    ```bash
    curl -X POST http://localhost:5000/rooms/invalid/artifacts
    curl -X POST http://localhost:5000/rooms/room-test/artifacts/promote \
+     -H "Content-Type: application/json" \
      -d '{"invalid": "data"}'
    ```
 2. Analisar respostas de erro
