@@ -187,16 +187,11 @@ public static partial class ValidationHelper
     /// }
     /// </para>
     /// </summary>
-    /// <param name="payload">The payload object to validate. May be null; when provided, must be a JSON object with the required manifest fields.</param>
+    /// <param name="payload">The payload object to validate. Must be a JSON object with the required manifest fields.</param>
     /// <param name="error">Outputs a validation error message if validation fails; otherwise, null.</param>
     /// <returns>True if the payload is valid; false otherwise.</returns>
     public static bool ValidateArtifactPayload(object? payload, out string? error)
     {
-        if (payload is null)
-        {
-            error = null;
-            return true;
-        }
         if (!TryGetJsonObjectPayload(
                 payload,
                 requiredError: "Artifact payload is required",
