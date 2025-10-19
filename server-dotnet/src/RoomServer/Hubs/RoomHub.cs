@@ -21,6 +21,7 @@ public partial class RoomHub : Hub
     private readonly McpRegistry _mcpRegistry;
     private readonly PolicyEngine _policyEngine;
     private readonly RoomContextStore _roomContexts;
+    private readonly RoomObservabilityService _observability;
 
     public RoomHub(
         SessionStore sessions, 
@@ -29,7 +30,8 @@ public partial class RoomHub : Hub
         ILogger<RoomHub> logger,
         McpRegistry mcpRegistry,
         PolicyEngine policyEngine,
-        RoomContextStore roomContexts)
+        RoomContextStore roomContexts,
+        RoomObservabilityService observability)
     {
         _sessions = sessions;
         _permissions = permissions;
@@ -38,6 +40,7 @@ public partial class RoomHub : Hub
         _mcpRegistry = mcpRegistry;
         _policyEngine = policyEngine;
         _roomContexts = roomContexts;
+        _observability = observability;
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -102,6 +105,9 @@ public partial class RoomHub : Hub
         _sessions.Add(session);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+        
+        // Track entity join for observability
+        _observability.TrackEntityJoin(roomId, normalized.Id);
         
         // Update room state when entities join
         var roomContext = _roomContexts.GetOrCreate(roomId);
@@ -178,6 +184,9 @@ public partial class RoomHub : Hub
         {
             await HandleRoomMessage(roomId, message, fromSession);
         }
+
+        // Track message for observability
+        _observability.TrackMessage(roomId, message.Type);
 
         _logger.LogInformation("[{RoomId}] {From} → {Channel} :: {Type}", roomId, message.From, message.Channel, message.Type);
     }
@@ -403,6 +412,11 @@ public partial class RoomHub : Hub
             {
                 _roomContexts.UpdateState(roomId, RoomState.Ended);
                 await PublishRoomState(roomId, RoomState.Ended);
+                
+                // Write room-run.json summary when room ends
+                await _observability.WriteRoomRunSummaryAsync(roomId);
+                
+                _logger.LogInformation("[{RoomId}] Room ended and summary written", roomId);
             }
         }
     }
