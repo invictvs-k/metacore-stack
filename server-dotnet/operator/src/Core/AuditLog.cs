@@ -31,7 +31,7 @@ public sealed class AuditLog
         int replayCount,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var (subscriptionId, reader, writer) = _subscriptions.CreateSubscription();
+        var (subscriptionId, reader, _) = _subscriptions.CreateSubscription();
 
         using var registration = cancellationToken.Register(() => _subscriptions.Complete(subscriptionId));
 
@@ -42,13 +42,8 @@ public sealed class AuditLog
                 var snapshot = _entries.TakeLast(replayCount).ToList();
                 foreach (var entry in snapshot)
                 {
-                    var wroteEntry = await TryWriteWithBackpressureAsync(writer, entry, cancellationToken)
-                        .ConfigureAwait(false);
-
-                    if (!wroteEntry)
-                    {
-                        yield break;
-                    }
+                    cancellationToken.ThrowIfCancellationRequested();
+                    yield return entry;
                 }
             }
 
@@ -126,22 +121,6 @@ public sealed class AuditLog
     public List<AuditEntry> GetByCorrelation(string correlationId)
     {
         return _entries.Where(e => e.CorrelationId == correlationId).ToList();
-    }
-
-    private static async ValueTask<bool> TryWriteWithBackpressureAsync(
-        ChannelWriter<AuditEntry> writer,
-        AuditEntry entry,
-        CancellationToken cancellationToken)
-    {
-        while (await writer.WaitToWriteAsync(cancellationToken).ConfigureAwait(false))
-        {
-            if (writer.TryWrite(entry))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static async IAsyncEnumerable<AuditEntry> ReadAllAsync(

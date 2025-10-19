@@ -31,7 +31,6 @@ public sealed class SseStreamWriter : IAsyncDisposable
     {
         response.ContentType = "text/event-stream; charset=utf-8";
         response.Headers["Cache-Control"] = "no-cache";
-        response.Headers["Connection"] = "keep-alive";
         response.Headers["X-Accel-Buffering"] = "no";
     }
 
