@@ -305,7 +305,7 @@ Validar que uma sala é criada implicitamente no primeiro Join e transiciona par
 - Evento `ROOM.STATE` recebido com `state: "Active"`
 - Evento `ENTITY.JOIN` recebido
 - Logs mostram criação de contexto de sala
-- RoomId validado (formato `room-[A-Za-z0-9_-]{6,}`)
+- RoomId validado (formato `^room-[A-Za-z0-9_-]{6,}$`)
 
 **Considerações Adicionais:**
 - Primeira entidade sempre pode entrar (sem autenticação em dev)
