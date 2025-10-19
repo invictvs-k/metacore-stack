@@ -1013,10 +1013,16 @@ Validar execução de ferramenta MCP e retorno de resultado.
 - Catalog resolvido com base em toolIdOrKey
 - Permissão CanCall aplicada
 - Evento `RESOURCE.CALLED` emitido antes da execução
-- Evento `RESOURCE.RESULT` emitido após execução:
+- Evento `RESOURCE.RESULT` emitido após execução (envelope completo conforme Seção 1.1):
   ```json
   {
+    "id": "01JEH7R5K7BMWX3QVP2YTCNHZF",
+    "roomId": "room-test123",
+    "channel": "main",
+    "from": "system",
     "type": "event",
+    "ts": "2025-10-19T03:00:00Z",
+    "correlationId": null,
     "payload": {
       "kind": "RESOURCE.RESULT",
       "ok": true,
