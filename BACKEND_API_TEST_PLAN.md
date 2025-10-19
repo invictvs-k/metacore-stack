@@ -621,7 +621,9 @@ Verificar comportamento com e sem autenticação JWT.
 
 **Considerações Adicionais:**
 - ⚠️ Documentar claramente diferença entre dev e prod
-- Configurar variável de ambiente para alternar modo
+- Para alternar entre os modos de autenticação, configure a variável de ambiente `AUTH_MODE`:
+    - `AUTH_MODE=dev` — desativa autenticação JWT (modo desenvolvimento)
+    - `AUTH_MODE=prod` — ativa autenticação JWT obrigatória (modo produção)
 
 ---
 
