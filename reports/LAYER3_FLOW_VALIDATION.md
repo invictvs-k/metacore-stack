@@ -288,7 +288,7 @@ A especificação menciona "ENTITY.JOINED", mas a implementação usa `ENTITY.JO
 ### 6.1 Execução dos Testes
 
 ```bash
-$ cd /home/runner/work/metacore-stack/metacore-stack/server-dotnet
+$ cd server-dotnet
 $ dotnet test --filter "FullyQualifiedName~Layer3FlowTests"
 
 Test summary: total: 15, failed: 0, succeeded: 15, skipped: 0, duration: 2.7s
