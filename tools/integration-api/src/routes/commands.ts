@@ -130,7 +130,7 @@ commandsRouter.post('/execute', async (req, res) => {
     const baseUrl = config.roomOperator.baseUrl.replace(/\/$/, '');
     const url = new URL(endpoint, `${baseUrl}/`).toString();
 
-    const hasBody = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
+    const hasBody = ['POST', 'PUT', 'PATCH'].includes(method);
 
     let finalUrl = url;
     let body: string | undefined;
