@@ -2,6 +2,8 @@ import { useEffect, useRef, useCallback } from 'react';
 
 interface UseSSEOptions {
   reconnectInterval?: number;
+  maxReconnectInterval?: number;
+  reconnectBackoffMultiplier?: number;
 }
 
 export function useSSE(
@@ -10,9 +12,15 @@ export function useSSE(
   enabled: boolean = true,
   options: UseSSEOptions = {}
 ) {
-  const { reconnectInterval = 5000 } = options;
+  const { 
+    reconnectInterval = 5000,
+    maxReconnectInterval = 30000,
+    reconnectBackoffMultiplier = 1.5
+  } = options;
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const currentReconnectDelayRef = useRef<number>(reconnectInterval);
+  const reconnectAttemptsRef = useRef<number>(0);
 
   const connect = useCallback(() => {
     if (!enabled || !url) return;
@@ -35,19 +43,34 @@ export function useSSE(
         eventSource.close();
         eventSourceRef.current = null;
         
-        // Reconnect after configured interval
+        // Increment reconnection attempts
+        reconnectAttemptsRef.current += 1;
+        
+        // Calculate next delay with exponential backoff
+        const nextDelay = Math.min(
+          currentReconnectDelayRef.current * reconnectBackoffMultiplier,
+          maxReconnectInterval
+        );
+        currentReconnectDelayRef.current = nextDelay;
+        
+        console.log(`Reconnecting in ${Math.round(nextDelay / 1000)}s (attempt ${reconnectAttemptsRef.current})...`);
+        
+        // Reconnect after calculated delay
         reconnectTimeoutRef.current = setTimeout(() => {
           connect();
-        }, reconnectInterval);
+        }, nextDelay);
       };
 
       eventSource.onopen = () => {
         console.log('SSE connection established:', url);
+        // Reset backoff on successful connection
+        currentReconnectDelayRef.current = reconnectInterval;
+        reconnectAttemptsRef.current = 0;
       };
     } catch (error) {
       console.error('Error creating EventSource:', error);
     }
-  }, [url, onMessage, enabled, reconnectInterval]);
+  }, [url, onMessage, enabled, reconnectInterval, maxReconnectInterval, reconnectBackoffMultiplier]);
 
   useEffect(() => {
     connect();
@@ -60,8 +83,11 @@ export function useSSE(
         eventSourceRef.current.close();
         eventSourceRef.current = null;
       }
+      // Reset refs on cleanup
+      currentReconnectDelayRef.current = reconnectInterval;
+      reconnectAttemptsRef.current = 0;
     };
-  }, [connect]);
+  }, [connect, reconnectInterval]);
 
   return {
     reconnect: connect

@@ -112,7 +112,9 @@ export default function Settings() {
             <li><strong>testClient.runner:</strong> Path to test runner script</li>
             <li><strong>integrationApi.port:</strong> Port for the Integration API</li>
             <li><strong>ui.theme:</strong> UI theme (light, dark, or system)</li>
-            <li><strong>ui.sseReconnectInterval:</strong> SSE reconnection interval in milliseconds (default: 5000)</li>
+            <li><strong>ui.sseReconnectInterval:</strong> Initial SSE reconnection interval in ms (default: 5000)</li>
+            <li><strong>ui.sseMaxReconnectInterval:</strong> Maximum SSE reconnection interval in ms (default: 30000)</li>
+            <li><strong>ui.sseReconnectBackoffMultiplier:</strong> Exponential backoff multiplier (default: 1.5)</li>
           </ul>
         </div>
       </div>

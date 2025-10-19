@@ -27,6 +27,8 @@ export interface DashboardSettings {
     theme: string;
     refreshInterval?: number;
     sseReconnectInterval?: number;
+    sseMaxReconnectInterval?: number;
+    sseReconnectBackoffMultiplier?: number;
   };
 }
 

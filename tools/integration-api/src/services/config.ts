@@ -42,7 +42,9 @@ export async function loadConfig(): Promise<DashboardSettings> {
       },
       ui: {
         theme: 'system',
-        sseReconnectInterval: 5000
+        sseReconnectInterval: 5000,
+        sseMaxReconnectInterval: 30000,
+        sseReconnectBackoffMultiplier: 1.5
       }
     };
     return cachedConfig;

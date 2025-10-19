@@ -26,6 +26,8 @@
   "ui": {
     "theme": "system",
     "refreshInterval": 5000,
-    "sseReconnectInterval": 5000
+    "sseReconnectInterval": 5000,
+    "sseMaxReconnectInterval": 30000,
+    "sseReconnectBackoffMultiplier": 1.5
   }
 }

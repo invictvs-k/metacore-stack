@@ -20,7 +20,9 @@ export default function Tests() {
   }, []);
 
   const sseOptions = {
-    reconnectInterval: config?.ui?.sseReconnectInterval || 5000
+    reconnectInterval: config?.ui?.sseReconnectInterval || 5000,
+    maxReconnectInterval: config?.ui?.sseMaxReconnectInterval || 30000,
+    reconnectBackoffMultiplier: config?.ui?.sseReconnectBackoffMultiplier || 1.5
   };
 
   useSSE(
