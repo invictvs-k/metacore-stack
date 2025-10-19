@@ -74,7 +74,7 @@ private async Task PublishRoomState(string roomId, RoomState? overrideState = nu
 | 2 | `Flow31_Step2_RoomInitializesInInitState` | Passo 2 | ✅ PASS |
 | 3 | `Flow31_Step3_SystemWaitsForEntitiesBeforeActivating` | Passo 3 | ✅ PASS |
 | 4 | `Flow31_Step4_SystemEmitsRoomStateEvent` | Passo 4 | ✅ PASS |
-| 6 | `Flow31_Complete_RoomCreationFullFlow` | Fluxo Completo | ✅ PASS |
+| 5 | `Flow31_Complete_RoomCreationFullFlow` | Fluxo Completo | ✅ PASS |
 
 ### 2.4 Observações Importantes
 
