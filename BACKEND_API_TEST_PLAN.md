@@ -706,23 +706,31 @@ Testar validações básicas de mensagens.
 ### 5.4 SendToRoom - Mensagens Diretas (DM)
 
 **Objetivo do Teste:**
-Validar roteamento de DMs via channel @E-*.
+Validar roteamento de DMs via channel @E-* e via campo `payload.to`, conforme precedência documentada na Seção 1.1.
 
 **Passos de Execução:**
 1. Enviar mensagem com channel: "@E-target01"
 2. Verificar que apenas destinatário recebe
 3. Testar DM para entidade inexistente
+4. Enviar mensagem com campo `payload.to: ["target01"]` (sem channel @E-*)
+5. Verificar que apenas destinatário recebe
+6. Testar DM para entidade inexistente via `payload.to`
+7. Enviar mensagem com ambos: channel "@E-target01" e `payload.to: ["target02"]`
+8. Verificar que a mensagem é roteada para o destinatário especificado em `payload.to` (target02), conforme precedência
 
 **Resultados Esperados:**
 - Channel iniciado com @ indica DM
+- Campo `payload.to` indica DM para destinatário(s) especificado(s)
+- Quando ambos estão presentes, `payload.to` tem precedência sobre channel @E-* para roteamento de DM (conforme Seção 1.1)
 - EntityId do destinatário resolvido
 - Permissão CanDirectMessage aplicada
-- Mensagem enviada apenas para conexões do destinatário
-- DM para entidade inexistente: Erro `NOT_FOUND` ("Target not found")
+- Mensagem enviada apenas para conexões do(s) destinatário(s) especificado(s)
+- DM para entidade inexistente: Erro `NOT_FOUND` ("Target not found") tanto via channel quanto via `payload.to`
 
 **Considerações Adicionais:**
 - ⚠️ DM pode ter múltiplos destinatários (múltiplas conexões)
 - Verificar que permissões de visibilidade são aplicadas
+- Especificar claramente nos testes que `payload.to` tem precedência sobre channel @E-* quando ambos são fornecidos
 
 ---
 
