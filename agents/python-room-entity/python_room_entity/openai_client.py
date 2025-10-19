@@ -27,7 +27,7 @@ class OpenAIChatClient(OpenAIResponder):
 
     model: str = "gpt-4o-mini"
     temperature: float = 0.2
-    max_output_tokens: Optional[int] = 1_000
+    max_tokens: Optional[int] = 1_000
     client: Optional[OpenAI] = None
 
     def __post_init__(self) -> None:  # pragma: no cover - sanity guard
@@ -42,7 +42,7 @@ class OpenAIChatClient(OpenAIResponder):
         response = self.client.chat.completions.create(
             model=kwargs.get("model", self.model),
             temperature=float(kwargs.get("temperature", self.temperature)),
-            max_output_tokens=kwargs.get("max_output_tokens", self.max_output_tokens),
+            max_tokens=kwargs.get("max_tokens", self.max_tokens),
             messages=list(messages),
         )
         choice = response.choices[0]
