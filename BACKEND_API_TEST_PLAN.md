@@ -197,8 +197,8 @@ Verificar que o modelo MessageModel contém todos os campos obrigatórios confor
 
 **Considerações Adicionais:**
 - ⚠️ Campo `correlationId` é opcional mas deve ser preservado quando fornecido
-- Campo `to` (para mensagens diretas) deve ser respeitado quando presente
-- ⚠️ **Nota sobre mensagens diretas (DM):** O mecanismo canônico para endereçamento de DMs é o campo `to` na mensagem. O uso de canais do tipo `@E-*` também é suportado para compatibilidade, mas quando ambos estão presentes, o campo `to` tem precedência. Clientes devem priorizar o campo `to` para DMs e tratar o canal `@E-*` como mecanismo alternativo/legado. Documentação adicional sobre compatibilidade pode ser encontrada na seção 5.4.
+- Campo `payload.to` (para mensagens diretas) deve ser respeitado quando presente
+- ⚠️ **Nota sobre mensagens diretas (DM):** O mecanismo canônico para endereçamento de DMs é o campo `payload.to` na mensagem. O uso de canais do tipo `@E-*` também é suportado para compatibilidade, mas quando ambos estão presentes, o campo `payload.to` tem precedência. Clientes devem priorizar o campo `payload.to` para DMs e tratar o canal `@E-*` como mecanismo alternativo/legado. Documentação adicional sobre compatibilidade pode ser encontrada na seção 5.4.
 
 ---
 
