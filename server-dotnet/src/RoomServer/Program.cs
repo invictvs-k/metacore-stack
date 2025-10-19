@@ -54,6 +54,7 @@ app.MapHub<RoomHub>("/room");
 app.MapArtifactEndpoints();
 app.MapMcpStatusEndpoints();
 app.MapMcpAdminEndpoints();
+app.MapEventsEndpoints();
 
 app.Run();
 
