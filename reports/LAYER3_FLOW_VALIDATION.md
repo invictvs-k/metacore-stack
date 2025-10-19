@@ -291,11 +291,11 @@ A especificação menciona "ENTITY.JOINED", mas a implementação usa `ENTITY.JO
 $ cd /home/runner/work/metacore-stack/metacore-stack/server-dotnet
 $ dotnet test --filter "FullyQualifiedName~Layer3FlowTests"
 
-Test summary: total: 16, failed: 0, succeeded: 16, skipped: 0, duration: 2.7s
+Test summary: total: 15, failed: 0, succeeded: 15, skipped: 0, duration: 2.7s
 Build succeeded with 4 warning(s) in 4.3s
 ```
 
-**Resultado:** ✅ **16/16 testes passaram com sucesso**
+**Resultado:** ✅ **15/15 testes passaram com sucesso**
 
 ### 6.2 Logs de Exemplo (Fluxo Completo)
 
@@ -355,7 +355,7 @@ Todos os passos especificados estão funcionando corretamente conforme validado 
 | Eventos emitidos | ✅ Implementado | Nomenclatura ligeiramente diferente |
 | Validação de credenciais | ✅ Implementado | Validação robusta e completa |
 | Workspaces | ✅ Implementado | Gerenciamento sob demanda |
-| Testes automatizados | ✅ Implementado | 16 testes, 100% de aprovação |
+| Testes automatizados | ✅ Implementado | 15 testes, 100% de aprovação |
 
 ---
 
@@ -416,7 +416,7 @@ A validação completa dos fluxos de ponta a ponta da Camada 3 foi concluída co
 
 **Resumo Final:**
 
-- ✅ **16/16 testes passaram**
+- ✅ **15/15 testes passaram**
 - ✅ **Fluxo 3.1** (Criação de Sala) completamente funcional
 - ✅ **Fluxo 3.2** (Entrada de Entidade) completamente funcional
 - ✅ **Código-fonte mapeado** para cada etapa dos fluxos
