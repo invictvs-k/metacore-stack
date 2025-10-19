@@ -83,6 +83,7 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   let completed = false;
   let isPolling = false;
   let heartbeat: NodeJS.Timeout | null = null;
+  let pollInterval: NodeJS.Timeout | null = null;
 
   const finalizeRun = (exitCode: number) => {
     if (completed) {
@@ -92,7 +93,9 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     completed = true;
     res.write(`event: done\n`);
     res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
-    clearInterval(pollInterval);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+    }
     if (heartbeat) {
       clearInterval(heartbeat);
     }
@@ -130,7 +133,7 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     }
   };
 
-  const pollInterval = setInterval(() => {
+  pollInterval = setInterval(() => {
     if (completed || isPolling) {
       return;
     }
@@ -152,7 +155,10 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   }, 10000);
 
   req.on('close', () => {
-    clearInterval(pollInterval);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
     if (heartbeat) {
       clearInterval(heartbeat);
       heartbeat = null;
