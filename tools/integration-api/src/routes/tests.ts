@@ -80,35 +80,78 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
 
   // Set up polling for new logs
   let lastLogCount = logs.length;
-  const pollInterval = setInterval(() => {
-    const currentLogs = getRunLogs(runId);
-    if (currentLogs.length > lastLogCount) {
-      const newLogs = currentLogs.slice(lastLogCount);
-      for (const log of newLogs) {
-        res.write(`event: log\n`);
-        res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
-      }
-      lastLogCount = currentLogs.length;
+  let completed = false;
+  let isPolling = false;
+  let heartbeat: NodeJS.Timeout | null = null;
+
+  const finalizeRun = (exitCode: number) => {
+    if (completed) {
+      return;
     }
 
-    // Check if run is complete
-    const currentRun = getRun(runId);
-    if (!currentRun || currentRun.status !== 'running') {
-      const exitCode = currentRun?.exitCode ?? -1;
-      res.write(`event: done\n`);
-      res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
-      clearInterval(pollInterval);
-      res.end();
+    completed = true;
+    res.write(`event: done\n`);
+    res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
+    clearInterval(pollInterval);
+    if (heartbeat) {
+      clearInterval(heartbeat);
     }
+    res.end();
+  };
+
+  const pollInterval = setInterval(() => {
+    if (completed || isPolling) {
+      return;
+    }
+
+    isPolling = true;
+
+    (async () => {
+      const currentLogs = getRunLogs(runId);
+      if (currentLogs.length > lastLogCount) {
+        const newLogs = currentLogs.slice(lastLogCount);
+        for (const log of newLogs) {
+          res.write(`event: log\n`);
+          res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
+        }
+        lastLogCount = currentLogs.length;
+      }
+
+      // Check if run is complete
+      const currentRun = getRun(runId);
+      if (!currentRun || currentRun.status !== 'running') {
+        let exitCode = currentRun?.exitCode;
+
+        if (exitCode === undefined) {
+          try {
+            const metadata = await getRunMetadata(runId);
+            exitCode = metadata?.exitCode ?? -1;
+          } catch (error) {
+            exitCode = -1;
+          }
+        }
+
+        finalizeRun(exitCode ?? -1);
+      }
+    })()
+      .catch(() => {
+        finalizeRun(-1);
+      })
+      .finally(() => {
+        isPolling = false;
+      });
   }, 500); // Poll more frequently for logs (500ms)
 
   // Heartbeat
-  const heartbeat = setInterval(() => {
+  heartbeat = setInterval(() => {
     res.write(': ping\n\n');
   }, 10000);
 
   req.on('close', () => {
     clearInterval(pollInterval);
-    clearInterval(heartbeat);
+    if (heartbeat) {
+      clearInterval(heartbeat);
+      heartbeat = null;
+    }
   });
 });
