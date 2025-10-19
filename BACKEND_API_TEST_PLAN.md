@@ -694,7 +694,7 @@ Testar validações básicas de mensagens.
 - RoomId validado
 - Timestamp (ts) normalizado (gerado se ausente)
 - Campo roomId injetado na mensagem
-- Erros 400 para dados inválidos
+- HubException (equivalente a HTTP 400) para dados inválidos
 
 **Considerações Adicionais:**
 - ⚠️ Mensagem deve ser clonada/normalizada antes de broadcast
