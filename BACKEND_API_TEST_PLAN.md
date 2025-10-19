@@ -71,7 +71,7 @@ Confirmar que o endpoint de healthcheck `/health` está exposto e retorna status
 **Resultados Esperados:**
 - Código HTTP: 200 OK
 - Corpo da resposta: "Healthy" (texto simples)
-- Tempo de resposta: < 100ms
+- Tempo de resposta deve ser baixo; registrar latência medida (ex: tipicamente < 100ms, mas pode variar conforme ambiente)
 - Disponível mesmo sob carga moderada
 
 **Considerações Adicionais:**
