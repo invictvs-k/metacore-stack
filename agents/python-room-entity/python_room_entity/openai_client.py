@@ -39,10 +39,21 @@ class OpenAIChatClient(OpenAIResponder):
     def respond(self, messages: Iterable[ChatMessage], **kwargs: object) -> str:
         if self.client is None:  # pragma: no cover - defensive guard
             raise RuntimeError("OpenAI client not initialised")
+        # Normalize overrides: if None is passed, use the default
+        model = kwargs.get("model", self.model)
+        if model is None:
+            model = self.model
+        temperature = kwargs.get("temperature", self.temperature)
+        if temperature is None:
+            temperature = self.temperature
+        temperature = float(temperature)
+        max_tokens = kwargs.get("max_tokens", self.max_tokens)
+        if max_tokens is None:
+            max_tokens = self.max_tokens
         response = self.client.chat.completions.create(
-            model=kwargs.get("model", self.model),
-            temperature=float(kwargs.get("temperature", self.temperature)),
-            max_tokens=kwargs.get("max_tokens", self.max_tokens),
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
             messages=list(messages),
         )
         choice = response.choices[0]
