@@ -81,7 +81,7 @@ class RoomClient:
                     "verify_ssl": self._verify_ssl,
                 },
             )
-            .configure_logging(logging.INFO)
+            .configure_logging(self._logger.level)
             .with_automatic_reconnect({"type": "raw", "keep_alive_interval": 10, "reconnect_interval": self._reconnect_delays})
             .build()
         )
