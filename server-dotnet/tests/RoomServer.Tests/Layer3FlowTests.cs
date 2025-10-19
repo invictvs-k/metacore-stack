@@ -315,6 +315,5 @@ public class Layer3FlowTests : IAsyncLifetime
         await _factory.DisposeAsync();
     }
 
-    private sealed record RoomEvent(string Id, string RoomId, string Type, EventPayload Payload, DateTime Ts);
-    private sealed record EventPayload(string Kind, JsonElement Data);
+    // RoomEvent and EventPayload records are now defined in a shared test utility class.
 }
