@@ -111,7 +111,9 @@ export async function runTest(scenarioId: string | 'all'): Promise<string> {
     args = [scenario.path];
   }
 
-  const testClientDir = path.join(ROOT_DIR, 'server-dotnet/operator/test-client');
+  const testClientDir = config.testClientDir
+    ? path.resolve(ROOT_DIR, config.testClientDir)
+    : path.join(ROOT_DIR, 'server-dotnet/operator/test-client');
   const logFile = path.join(artifactsPath, 'test-client.log');
 
   const proc = spawn(command, args, {
