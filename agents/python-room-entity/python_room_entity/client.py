@@ -37,11 +37,17 @@ class RoomClient:
         headers: Optional[Dict[str, str]] = None,
         logger: Optional[logging.Logger] = None,
         reconnect_delays: Iterable[float] | None = None,
+        verify_ssl: Optional[bool] = None,
     ) -> None:
         self._hub_url = hub_url
         self._headers = headers or {}
         self._logger = logger or LOGGER
         self._reconnect_delays = list(reconnect_delays or (0, 2, 5, 10))
+        # Infer verify_ssl from URL scheme if not explicitly provided
+        if verify_ssl is None:
+            self._verify_ssl = hub_url.startswith("https://")
+        else:
+            self._verify_ssl = verify_ssl
         self._hub = None
         self._state = RoomConnectionState()
         self._message_handlers: List[MessageHandler] = []
@@ -66,7 +72,7 @@ class RoomClient:
                 self._hub_url,
                 options={
                     "headers": self._headers,
-                    "verify_ssl": False,
+                    "verify_ssl": self._verify_ssl,
                 },
             )
             .configure_logging(logging.INFO)
