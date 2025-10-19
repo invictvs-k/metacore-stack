@@ -17,6 +17,7 @@ class StressTestScenario {
     this.client = new HttpClient(config, logger);
     this.testsPassed = 0;
     this.testsFailed = 0;
+    this.testsSkipped = 0;
     this.metrics = {
       totalOperations: 0,
       successfulOperations: 0,
@@ -39,13 +40,13 @@ class StressTestScenario {
       this.displayMetrics();
       
       // Summary
-      const success = logger.summary(this.testsPassed, this.testsFailed);
+      const success = logger.summary(this.testsPassed, this.testsFailed, this.testsSkipped);
       process.exit(success ? 0 : 1);
       
     } catch (error) {
       logger.error('Scenario failed with unexpected error', error.message);
       this.displayMetrics();
-      logger.summary(this.testsPassed, this.testsFailed);
+      logger.summary(this.testsPassed, this.testsFailed, this.testsSkipped);
       process.exit(1);
     }
   }
@@ -226,8 +227,8 @@ class StressTestScenario {
       
       if (!converged) {
         logger.warn(`Did not converge within ${maxAttempts} checks`);
-        // Don't fail - convergence might take longer
-        this.testsPassed++;
+        // Mark as skipped rather than passed since we couldn't verify convergence
+        this.testsSkipped++;
       }
     } else {
       this.metrics.failedOperations++;

@@ -40,7 +40,7 @@ class HttpClient {
     // Operator client interceptors
     this.operatorClient.interceptors.request.use(
       (config) => {
-        this.logger.debug(`→ ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+        this.logger.debug(`→ ${(config.method?.toUpperCase() ?? 'UNKNOWN')} ${config.baseURL}${config.url}`);
         return config;
       },
       (error) => {
