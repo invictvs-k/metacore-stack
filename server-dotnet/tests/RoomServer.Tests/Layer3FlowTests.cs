@@ -20,7 +20,7 @@ namespace RoomServer.Tests;
 /// 1. Human creates Room with configuration
 /// 2. System initializes cycle (init)
 /// 3. System waits for entities to connect
-/// 4. System emits ROOM.CREATED event (ROOM.STATE)
+/// 4. System emits ROOM.STATE event
 /// 5. System transitions to active
 /// 
 /// Flow 3.2 – Entity Connection:
