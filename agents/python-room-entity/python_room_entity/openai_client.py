@@ -7,7 +7,7 @@ from typing import Iterable, Optional, Protocol, TypedDict
 
 try:  # pragma: no cover - import guarded for optional dependency resolution
     from openai import OpenAI
-except Exception:  # pragma: no cover
+except ImportError:  # pragma: no cover
     OpenAI = None  # type: ignore[misc, assignment]
 
 
