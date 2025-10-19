@@ -306,7 +306,7 @@ public class McpConnectionManager
     private static int CalculateBackoff(int attempt)
     {
         var baseDelay = Math.Min(500 * Math.Pow(2, attempt - 1), MaxBackoffSeconds * 1000);
-        var jitter = Random.Shared.Next(0, 250);
+        var jitter = Random.Shared.Next(0, (int)baseDelay);
         return (int)baseDelay + jitter;
     }
 
