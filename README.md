@@ -66,6 +66,13 @@ npm run test:all
 * Conventional Commits
 * CI: build + lint + teste + validação de schemas
 
+## Documentação
+
+* [**BACKEND_API_TEST_PLAN.md**](./BACKEND_API_TEST_PLAN.md) — Plano de testes detalhado para Backend/APIs
+* [ROOM_HOST_IMPLEMENTATION.md](./ROOM_HOST_IMPLEMENTATION.md) — Status de implementação do Room Host
+* [ENVIRONMENT_VERIFICATION.md](./ENVIRONMENT_VERIFICATION.md) — Verificação do ambiente de desenvolvimento
+* [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) — Resumo de mudanças de implementação
+
 ## Licença
 
 MIT (ajuste conforme necessidade)
