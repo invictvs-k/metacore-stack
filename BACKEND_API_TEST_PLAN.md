@@ -712,11 +712,11 @@ Validar roteamento de DMs via channel @E-* e via campo `payload.to`, conforme pr
 1. Enviar mensagem com channel: "@E-target01"
 2. Verificar que apenas destinatário recebe
 3. Testar DM para entidade inexistente
-4. Enviar mensagem com campo `payload.to: ["target01"]` (sem channel @E-*)
+4. Enviar mensagem com campo `payload.to: ["E-target01"]` (sem channel @E-*)
 5. Verificar que apenas destinatário recebe
 6. Testar DM para entidade inexistente via `payload.to`
-7. Enviar mensagem com ambos: channel "@E-target01" e `payload.to: ["target02"]`
-8. Verificar que a mensagem é roteada para o destinatário especificado em `payload.to` (target02), conforme precedência
+7. Enviar mensagem com ambos: channel "@E-target01" e `payload.to: ["E-target02"]`
+8. Verificar que a mensagem é roteada para o destinatário especificado em `payload.to` (E-target02), conforme precedência
 
 **Resultados Esperados:**
 - Channel iniciado com @ indica DM
