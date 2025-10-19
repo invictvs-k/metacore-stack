@@ -67,7 +67,10 @@ def test_room_agent_sends_command(room_server: Dict[str, object]) -> None:
     # Drain messages until a 'command' is received
     command = None
     for _ in range(20):  # Try up to 20 times (total timeout up to 20s)
-        msg = human_messages.get(timeout=1)
+        try:
+            msg = human_messages.get(timeout=1)
+        except queue.Empty:
+            continue
         if msg["type"].lower() == "command":
             command = msg
             break
