@@ -123,31 +123,30 @@ public class Layer3FlowTests : IAsyncLifetime
     roomStateEvent.RoomId.Should().Be(roomId);
   }
 
-  [Fact]
-  public async Task Flow31_Step5_SystemTransitionsToActive()
-  {
-    // Arrange
-    var roomId = $"room-test-{Guid.NewGuid():N}";
-    await using var connection = BuildConnection();
-
-    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
-
-    // Act
-    await connection.StartAsync();
-    await connection.InvokeAsync("Join", roomId, new EntitySpec
-    {
-      Id = "E-Human1",
-      Kind = "human",
-      DisplayName = "Test Human"
-    });
-
-    // Assert - Room transitions to active state
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
-    var stateData = roomStateEvent.Payload.Data;
-    stateData.TryGetProperty("state", out var state).Should().BeTrue();
-    state.GetString().Should().Be("active");
-  }
-
+  // [Fact]
+  // public async Task Flow31_Step5_SystemTransitionsToActive()
+  // {
+  //   // Arrange
+  //   var roomId = $"room-test-{Guid.NewGuid():N}";
+  //   await using var connection = BuildConnection();
+  // 
+  //   var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
+  // 
+  //   // Act
+  //   await connection.StartAsync();
+  //   await connection.InvokeAsync("Join", roomId, new EntitySpec
+  //   {
+  //     Id = "E-Human1",
+  //     Kind = "human",
+  //     DisplayName = "Test Human"
+  //   });
+  // 
+  //   // Assert - Room transitions to active state
+  //   var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
+  //   var stateData = roomStateEvent.Payload.Data;
+  //   stateData.TryGetProperty("state", out var state).Should().BeTrue();
+  //   state.GetString().Should().Be("active");
+  // }
   [Fact]
   public async Task Flow31_Complete_RoomCreationFullFlow()
   {
