@@ -369,14 +369,32 @@ Verificar que eventos de mudança de estado são publicados corretamente.
 **Resultados Esperados:**
 - Evento emitido na transição Init → Active
 - Evento emitido na transição Active → Ended
-- Payload contém:
+- Payload contém tipo "event" com kind "ROOM.STATE" e campo state
+- Exemplo de evento Active:
   ```json
   {
     "type": "event",
     "payload": {
       "kind": "ROOM.STATE",
-      "state": "Active|Ended",
-      "entities": [...]
+      "state": "Active",
+      "entities": [
+        {
+          "id": "E-user01",
+          "kind": "human",
+          "displayName": "User 1"
+        }
+      ]
+    }
+  }
+  ```
+- Exemplo de evento Ended:
+  ```json
+  {
+    "type": "event",
+    "payload": {
+      "kind": "ROOM.STATE",
+      "state": "Ended",
+      "entities": []
     }
   }
   ```
