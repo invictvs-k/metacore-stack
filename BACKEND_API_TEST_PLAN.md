@@ -772,8 +772,7 @@ Validar upload de artefato para workspace de sala.
    curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
      -H "X-Entity-Id: E-user01" \
      -F "spec={\"name\":\"document.txt\",\"type\":\"text/plain\"}" \
-     -F "data=@document.txt" \
-     -F "entityId=E-user01"
+     -F "data=@document.txt"
    ```
 2. Verificar resposta e arquivos criados
 
