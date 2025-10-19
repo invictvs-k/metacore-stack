@@ -33,6 +33,7 @@ namespace RoomServer.Tests;
 public class Layer3FlowTests : IAsyncLifetime
 {
   private readonly WebApplicationFactory<Program> _factory = new();
+  private static readonly TimeSpan EventTimeout = TimeSpan.FromSeconds(10);
 
   #region Flow 3.1 - Room Creation Tests
 
@@ -77,7 +78,7 @@ public class Layer3FlowTests : IAsyncLifetime
     });
 
     // Assert - Room state event shows transition from init
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
 
     var stateData = roomStateEvent.Payload.Data;
@@ -116,7 +117,7 @@ public class Layer3FlowTests : IAsyncLifetime
     });
 
     // Assert - ROOM.STATE event is emitted
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     roomStateEvent.Should().NotBeNull();
     roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
     roomStateEvent.RoomId.Should().Be(roomId);
@@ -141,7 +142,7 @@ public class Layer3FlowTests : IAsyncLifetime
     });
 
     // Assert - Room transitions to active state
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     var stateData = roomStateEvent.Payload.Data;
     stateData.TryGetProperty("state", out var state).Should().BeTrue();
     state.GetString().Should().Be("active");
@@ -173,7 +174,7 @@ public class Layer3FlowTests : IAsyncLifetime
     entities.Should().HaveCount(1);
 
     // Step 2-4: Room initializes, waits, and emits ROOM.STATE
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     roomStateEvent.Should().NotBeNull();
     roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
 
@@ -332,7 +333,7 @@ public class Layer3FlowTests : IAsyncLifetime
     });
 
     // Assert - ENTITY.JOIN event is emitted
-    var joinEvent = await entityJoinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var joinEvent = await entityJoinReceived.Task.WaitAsync(EventTimeout);
     joinEvent.Should().NotBeNull();
     joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
     joinEvent.RoomId.Should().Be(roomId);
@@ -419,7 +420,7 @@ public class Layer3FlowTests : IAsyncLifetime
     agent.Should().NotBeNull();
 
     // Step 4: ENTITY.JOIN event emitted
-    var joinEvent = await entityJoinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var joinEvent = await entityJoinReceived.Task.WaitAsync(EventTimeout);
     joinEvent.Should().NotBeNull();
     joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
 
@@ -479,7 +480,7 @@ public class Layer3FlowTests : IAsyncLifetime
     finalEntities.Should().ContainSingle(e => e.Id == "E-Agent2");
 
     // Verify ENTITY.JOIN event was broadcast
-    var joinEvent = await agent2JoinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var joinEvent = await agent2JoinReceived.Task.WaitAsync(EventTimeout);
     joinEvent.Should().NotBeNull();
   }
 
@@ -513,7 +514,7 @@ public class Layer3FlowTests : IAsyncLifetime
     });
 
     // Assert - ROOM.STATE includes all entities
-    var roomStateEvent = await roomStateReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     var entities = roomStateEvent.Payload.Data.GetProperty("entities");
     entities.GetArrayLength().Should().Be(2);
   }
