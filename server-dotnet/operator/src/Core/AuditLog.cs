@@ -13,12 +13,13 @@ public sealed class AuditLog
     private readonly ConcurrentQueue<AuditEntry> _entries = new();
     private readonly int _maxEntries;
     private readonly ILogger<AuditLog> _logger;
-    private readonly ConcurrentDictionary<Guid, ChannelWriter<AuditEntry>> _subscribers = new();
+    private readonly ChannelSubscriptionManager<AuditEntry> _subscriptions;
 
     public AuditLog(ILogger<AuditLog> logger, int maxEntries = 1000)
     {
         _logger = logger;
         _maxEntries = maxEntries;
+        _subscriptions = new ChannelSubscriptionManager<AuditEntry>(() => ChannelSettings.CreateSingleReaderOptions());
     }
 
     public IAsyncEnumerable<AuditEntry> SubscribeAsync(int replayCount = 100, CancellationToken cancellationToken = default)
@@ -30,11 +31,9 @@ public sealed class AuditLog
         int replayCount,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        var channel = Channel.CreateBounded<AuditEntry>(ChannelSettings.CreateSingleReaderOptions());
-        var subscriptionId = Guid.NewGuid();
-        _subscribers[subscriptionId] = channel.Writer;
+        var (subscriptionId, reader, writer) = _subscriptions.CreateSubscription();
 
-        using var registration = cancellationToken.Register(() => CompleteSubscription(subscriptionId));
+        using var registration = cancellationToken.Register(() => _subscriptions.Complete(subscriptionId));
 
         try
         {
@@ -43,7 +42,7 @@ public sealed class AuditLog
                 var snapshot = _entries.TakeLast(replayCount).ToList();
                 foreach (var entry in snapshot)
                 {
-                    var wroteEntry = await TryWriteWithBackpressureAsync(channel.Writer, entry, cancellationToken)
+                    var wroteEntry = await TryWriteWithBackpressureAsync(writer, entry, cancellationToken)
                         .ConfigureAwait(false);
 
                     if (!wroteEntry)
@@ -53,14 +52,14 @@ public sealed class AuditLog
                 }
             }
 
-            await foreach (var item in ReadAllAsync(channel.Reader, cancellationToken).ConfigureAwait(false))
+            await foreach (var item in ReadAllAsync(reader, cancellationToken).ConfigureAwait(false))
             {
                 yield return item;
             }
         }
         finally
         {
-            CompleteSubscription(subscriptionId);
+            _subscriptions.Complete(subscriptionId);
         }
     }
 
@@ -160,23 +159,6 @@ public sealed class AuditLog
 
     private void Broadcast(AuditEntry entry)
     {
-        foreach (var kvp in _subscribers)
-        {
-            var subscriptionId = kvp.Key;
-            var writer = kvp.Value;
-
-            if (!writer.TryWrite(entry))
-            {
-                CompleteSubscription(subscriptionId);
-            }
-        }
-    }
-
-    private void CompleteSubscription(Guid subscriptionId)
-    {
-        if (_subscribers.TryRemove(subscriptionId, out var writer))
-        {
-            writer.TryComplete();
-        }
+        _subscriptions.Broadcast(entry);
     }
 }

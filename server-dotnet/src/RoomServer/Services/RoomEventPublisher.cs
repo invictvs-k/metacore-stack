@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Channels;
 using System.Threading.Tasks;
+using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR;
 using NUlid;
 using RoomServer.Hubs;
@@ -17,24 +16,20 @@ public class RoomEventPublisher
 {
   private readonly IHubContext<RoomHub> _hubContext;
   private readonly RoomObservabilityService _observability;
-  private readonly ConcurrentDictionary<Guid, ChannelWriter<object>> _subscribers = new();
+  private readonly ChannelSubscriptionManager<RoomEventStreamItem> _subscriptions;
 
   public RoomEventPublisher(IHubContext<RoomHub> hubContext, RoomObservabilityService observability)
   {
     _hubContext = hubContext;
     _observability = observability;
+    _subscriptions = new ChannelSubscriptionManager<RoomEventStreamItem>(() => ChannelSettings.CreateSingleReaderOptions());
   }
 
-  public IAsyncEnumerable<object> SubscribeAsync(CancellationToken cancellationToken = default)
+  public IAsyncEnumerable<RoomEventStreamItem> SubscribeAsync(CancellationToken cancellationToken = default)
   {
-    var channel = Channel.CreateBounded<object>(ChannelSettings.CreateSingleReaderOptions());
+    var (subscriptionId, reader, _) = _subscriptions.CreateSubscription();
 
-    var subscriptionId = Guid.NewGuid();
-    _subscribers[subscriptionId] = channel.Writer;
-
-    var registration = cancellationToken.Register(() => CompleteSubscription(subscriptionId));
-
-    return ReadAllAsync(channel.Reader, subscriptionId, registration, cancellationToken);
+    return ReadAllAsync(subscriptionId, reader, cancellationToken);
   }
 
   public async Task PublishAsync(string roomId, string eventType, object data)
@@ -42,13 +37,16 @@ public class RoomEventPublisher
     ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
     ArgumentException.ThrowIfNullOrWhiteSpace(eventType);
 
-    var eventPayload = new
+    var eventPayload = new RoomEventStreamNotification
     {
-      id = Ulid.NewUlid().ToString(),
-      roomId,
-      type = "event",
-      payload = new { kind = eventType, data },
-      ts = DateTime.UtcNow
+      Id = Ulid.NewUlid().ToString(),
+      RoomId = roomId,
+      Timestamp = DateTime.UtcNow,
+      Payload = new RoomEventPayload
+      {
+        Kind = eventType,
+        Data = data
+      }
     };
 
     // Log to events.jsonl
@@ -81,15 +79,23 @@ public class RoomEventPublisher
 
     await _hubContext.Clients.Group(roomId).SendAsync("message", message);
 
-    Broadcast(message);
+    var envelope = new RoomEventStreamMessage
+    {
+      Id = message.Id,
+      RoomId = message.RoomId,
+      Timestamp = message.Ts,
+      Payload = message
+    };
+
+    Broadcast(envelope);
   }
 
-  private async IAsyncEnumerable<object> ReadAllAsync(
-      ChannelReader<object> reader,
+  private async IAsyncEnumerable<RoomEventStreamItem> ReadAllAsync(
       Guid subscriptionId,
-      CancellationTokenRegistration registration,
+      ChannelReader<RoomEventStreamItem> reader,
       [EnumeratorCancellation] CancellationToken cancellationToken)
   {
+    using var registration = cancellationToken.Register(() => _subscriptions.Complete(subscriptionId));
     try
     {
       while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
@@ -102,30 +108,9 @@ public class RoomEventPublisher
     }
     finally
     {
-      registration.Dispose();
-      CompleteSubscription(subscriptionId);
+      _subscriptions.Complete(subscriptionId);
     }
   }
 
-  private void Broadcast(object payload)
-  {
-    foreach (var kvp in _subscribers)
-    {
-      var subscriptionId = kvp.Key;
-      var writer = kvp.Value;
-
-      if (!writer.TryWrite(payload))
-      {
-        CompleteSubscription(subscriptionId);
-      }
-    }
-  }
-
-  private void CompleteSubscription(Guid subscriptionId)
-  {
-    if (_subscribers.TryRemove(subscriptionId, out var writer))
-    {
-      writer.TryComplete();
-    }
-  }
+  private void Broadcast(RoomEventStreamItem payload) => _subscriptions.Broadcast(payload);
 }
