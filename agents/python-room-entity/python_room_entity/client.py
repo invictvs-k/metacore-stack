@@ -154,7 +154,7 @@ class RoomClient:
         payload = MessagePayload(channel=channel, type="chat", payload=ChatPayload(text=text))
         self.send_message(payload)
 
-    def send_command(self, target: str, port: Optional[str], inputs: Optional[Dict[str, Any]] = None, *, channel: str = "room") -> None:
+    def send_command(self, target: str, port: Optional[str] = None, inputs: Optional[Dict[str, Any]] = None, *, channel: str = "room") -> None:
         payload = MessagePayload(
             channel=channel,
             type="command",
