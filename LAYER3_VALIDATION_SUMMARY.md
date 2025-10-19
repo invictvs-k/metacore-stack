@@ -138,4 +138,4 @@ The Layer 3 end-to-end flows have been thoroughly validated and confirmed to be 
 
 *Generated: 2025-10-19*  
 *Validator: GitHub Copilot Agent*  
-*Test Suite: Layer3FlowTests (16 tests)*
+*Test Suite: Layer3FlowTests (15 tests)*
