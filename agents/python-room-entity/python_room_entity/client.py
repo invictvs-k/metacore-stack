@@ -87,13 +87,13 @@ class RoomClient:
         hub.on_close(self._handle_close)
 
         # Only clear disconnected flag and assign to self._hub after successful start
-        self._disconnected.clear()
         try:
             hub.start()
             self._hub = hub
+            self._disconnected.clear()
             self._logger.info("Connected to hub %s", self._hub_url)
         except Exception:
-            # Re-set disconnected flag on failure
+            # Re-set disconnected flag on failure (it was already set, so this is defensive)
             self._disconnected.set()
             raise
 
