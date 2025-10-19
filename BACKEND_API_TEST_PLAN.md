@@ -1122,6 +1122,7 @@ Verificar sumário gravado ao final da sala.
     "roomId": "room-test123",
     "state": "Ended",
     "created_at": "2025-10-19T01:00:00Z",
+    "updated_at": "2025-10-19T01:15:30Z",
     "ended_at": "2025-10-19T01:15:30Z",
     "duration_seconds": 930,
     "entities": [
