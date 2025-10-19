@@ -157,8 +157,8 @@ public class McpConnectionManager
             var status = _providerStates[providerId];
             int attempts = 0;
             
-            while (attempts < MaxRetryAttempts && !_disposed)
-            {
+            while (attempts < MaxRetryAttempts && Volatile.Read(ref _disposed) == 0)
+      {
                 attempts++;
                 status.Attempts = attempts;
                 
@@ -209,13 +209,13 @@ public class McpConnectionManager
     {
         try
         {
-            while (!_disposed && !shutdownToken.IsCancellationRequested)
+            while (Volatile.Read(ref _disposed) == 0 && !shutdownToken.IsCancellationRequested)
             {
                 try
                 {
                     await Task.Delay(5000, shutdownToken);
 
-                    if (!client.IsConnected && !_disposed && !shutdownToken.IsCancellationRequested)
+                    if (!client.IsConnected && Volatile.Read(ref _disposed) == 0 && !shutdownToken.IsCancellationRequested)
                     {
                         _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
                         SetState(providerId, McpState.Connecting);
@@ -298,7 +298,7 @@ public class McpConnectionManager
 
             if (!registration.Task.IsFaulted && !registration.Task.IsCanceled)
             {
-                if (!_disposed && !_shutdownCts.IsCancellationRequested)
+                if (Volatile.Read(ref _disposed) == 0 && !_shutdownCts.IsCancellationRequested)
                 {
                     _logger.LogWarning("[{ProviderId}] Monitor task for provider exited unexpectedly without error", providerId);
                 }
@@ -449,11 +449,10 @@ public class McpConnectionManager
 
     public void Dispose()
     {
-        if (_disposed)
-            return;
+    if (Interlocked.Exchange(ref _disposed, 1) == 1)
+      return;
 
-        _disposed = true;
-        _shutdownCts.Cancel();
+    _shutdownCts.Cancel();
 
         foreach (var client in _clients.Values)
         {
