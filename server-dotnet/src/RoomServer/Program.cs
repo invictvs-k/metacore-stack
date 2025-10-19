@@ -11,12 +11,12 @@ builder.Services.AddSignalR();
 builder.Services.AddHealthChecks();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+  options.AddDefaultPolicy(policy =>
+  {
+    policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+  });
 });
 builder.Services.AddSingleton<RoomObservabilityService>();
 builder.Services.AddSingleton<RoomEventPublisher>();

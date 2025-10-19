@@ -12,199 +12,199 @@ namespace RoomServer.Tests;
 
 public class RoomHub_SmokeTests : IAsyncLifetime
 {
-    private readonly WebApplicationFactory<Program> _factory = new();
-    private const string RoomId = "room-test01";
+  private readonly WebApplicationFactory<Program> _factory = new();
+  private const string RoomId = "room-test01";
 
-    [Fact]
-    public async Task JoinBroadcastsPresence()
+  [Fact]
+  public async Task JoinBroadcastsPresence()
+  {
+    await using var connectionA = BuildConnection();
+    await using var connectionB = BuildConnection();
+
+    var joinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    connectionA.On<RoomEvent>("event", evt =>
     {
-        await using var connectionA = BuildConnection();
-        await using var connectionB = BuildConnection();
+      if (evt.Payload.Kind == "ENTITY.JOIN" &&
+              evt.Payload.Data.TryGetProperty("entity", out var entity) &&
+              entity.GetProperty("id").GetString() == "E-Bob")
+      {
+        joinReceived.TrySetResult(evt);
+      }
+    });
 
-        var joinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        connectionA.On<RoomEvent>("event", evt =>
-        {
-            if (evt.Payload.Kind == "ENTITY.JOIN" &&
-                evt.Payload.Data.TryGetProperty("entity", out var entity) &&
-                entity.GetProperty("id").GetString() == "E-Bob")
-            {
-                joinReceived.TrySetResult(evt);
-            }
-        });
-
-        await connectionA.StartAsync();
-        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Alice",
-            Kind = "human",
-            DisplayName = "Alice"
-        });
-
-        await connectionB.StartAsync();
-        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Bob",
-            Kind = "agent",
-            DisplayName = "Bot"
-        });
-
-        var joinEvent = await joinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
-        joinEvent.RoomId.Should().Be(RoomId);
-    }
-
-    [Fact]
-    public async Task SendMessageIsBroadcastToRoom()
+    await connectionA.StartAsync();
+    await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
     {
-        await using var connectionA = BuildConnection();
-        await using var connectionB = BuildConnection();
+      Id = "E-Alice",
+      Kind = "human",
+      DisplayName = "Alice"
+    });
 
-        var messageReceived = new TaskCompletionSource<MessageModel>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        connectionB.On<MessageModel>("message", message =>
-        {
-            if (message.From == "E-Alice")
-            {
-                messageReceived.TrySetResult(message);
-            }
-        });
-
-        await connectionA.StartAsync();
-        await connectionB.StartAsync();
-
-        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Alice",
-            Kind = "human",
-            DisplayName = "Alice"
-        });
-
-        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Bob",
-            Kind = "agent",
-            DisplayName = "Bot"
-        });
-
-        await connectionA.InvokeAsync("SendToRoom", RoomId, new MessageModel
-        {
-            From = "E-Alice",
-            Channel = "room",
-            Type = "chat",
-            Payload = new { text = "Olá!" }
-        });
-
-        var message = await messageReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        message.RoomId.Should().Be(RoomId);
-        message.Type.Should().Be("chat");
-        message.Payload.Should().NotBeNull();
-    }
-
-    [Fact]
-    public async Task LeaveBroadcastsEvent()
+    await connectionB.StartAsync();
+    await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
     {
-        await using var connectionA = BuildConnection();
-        await using var connectionB = BuildConnection();
+      Id = "E-Bob",
+      Kind = "agent",
+      DisplayName = "Bot"
+    });
 
-        var leaveReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var joinEvent = await joinReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
+    joinEvent.RoomId.Should().Be(RoomId);
+  }
 
-        connectionA.On<RoomEvent>("event", evt =>
-        {
-            if (evt.Payload.Kind == "ENTITY.LEAVE" &&
-                evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
-                entity.GetString() == "E-Bob")
-            {
-                leaveReceived.TrySetResult(evt);
-            }
-        });
+  [Fact]
+  public async Task SendMessageIsBroadcastToRoom()
+  {
+    await using var connectionA = BuildConnection();
+    await using var connectionB = BuildConnection();
 
-        await connectionA.StartAsync();
-        await connectionB.StartAsync();
+    var messageReceived = new TaskCompletionSource<MessageModel>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Alice",
-            Kind = "human",
-            DisplayName = "Alice"
-        });
-
-        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Bob",
-            Kind = "agent",
-            DisplayName = "Bot"
-        });
-
-        await connectionB.InvokeAsync("Leave", RoomId, "E-Bob");
-
-        var leaveEvent = await leaveReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        leaveEvent.Payload.Kind.Should().Be("ENTITY.LEAVE");
-        leaveEvent.RoomId.Should().Be(RoomId);
-    }
-
-    [Fact]
-    public async Task DisconnectPublishesLeaveEvent()
+    connectionB.On<MessageModel>("message", message =>
     {
-        await using var connectionA = BuildConnection();
-        await using var connectionB = BuildConnection();
+      if (message.From == "E-Alice")
+      {
+        messageReceived.TrySetResult(message);
+      }
+    });
 
-        var leaveReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+    await connectionA.StartAsync();
+    await connectionB.StartAsync();
 
-        connectionA.On<RoomEvent>("event", evt =>
-        {
-            if (evt.Payload.Kind == "ENTITY.LEAVE" &&
-                evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
-                entity.GetString() == "E-Bob")
-            {
-                leaveReceived.TrySetResult(evt);
-            }
-        });
-
-        await connectionA.StartAsync();
-        await connectionB.StartAsync();
-
-        await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Alice",
-            Kind = "human",
-            DisplayName = "Alice"
-        });
-
-        await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
-        {
-            Id = "E-Bob",
-            Kind = "agent",
-            DisplayName = "Bot"
-        });
-
-        await connectionB.StopAsync();
-
-        var leaveEvent = await leaveReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        leaveEvent.Payload.Kind.Should().Be("ENTITY.LEAVE");
-        leaveEvent.RoomId.Should().Be(RoomId);
-    }
-
-    private HubConnection BuildConnection()
+    await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
     {
-        return new HubConnectionBuilder()
-            .WithUrl("http://localhost/room", options =>
-            {
-                options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
-                options.Transports = HttpTransportType.LongPolling;
-            })
-            .WithAutomaticReconnect()
-            .Build();
-    }
+      Id = "E-Alice",
+      Kind = "human",
+      DisplayName = "Alice"
+    });
 
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public async Task DisposeAsync()
+    await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
     {
-        await _factory.DisposeAsync();
-    }
+      Id = "E-Bob",
+      Kind = "agent",
+      DisplayName = "Bot"
+    });
 
-    private sealed record RoomEvent(string Id, string RoomId, string Type, EventPayload Payload, DateTime Ts);
+    await connectionA.InvokeAsync("SendToRoom", RoomId, new MessageModel
+    {
+      From = "E-Alice",
+      Channel = "room",
+      Type = "chat",
+      Payload = new { text = "Olá!" }
+    });
 
-    private sealed record EventPayload(string Kind, JsonElement Data);
+    var message = await messageReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    message.RoomId.Should().Be(RoomId);
+    message.Type.Should().Be("chat");
+    message.Payload.Should().NotBeNull();
+  }
+
+  [Fact]
+  public async Task LeaveBroadcastsEvent()
+  {
+    await using var connectionA = BuildConnection();
+    await using var connectionB = BuildConnection();
+
+    var leaveReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    connectionA.On<RoomEvent>("event", evt =>
+    {
+      if (evt.Payload.Kind == "ENTITY.LEAVE" &&
+              evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
+              entity.GetString() == "E-Bob")
+      {
+        leaveReceived.TrySetResult(evt);
+      }
+    });
+
+    await connectionA.StartAsync();
+    await connectionB.StartAsync();
+
+    await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
+    {
+      Id = "E-Alice",
+      Kind = "human",
+      DisplayName = "Alice"
+    });
+
+    await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
+    {
+      Id = "E-Bob",
+      Kind = "agent",
+      DisplayName = "Bot"
+    });
+
+    await connectionB.InvokeAsync("Leave", RoomId, "E-Bob");
+
+    var leaveEvent = await leaveReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    leaveEvent.Payload.Kind.Should().Be("ENTITY.LEAVE");
+    leaveEvent.RoomId.Should().Be(RoomId);
+  }
+
+  [Fact]
+  public async Task DisconnectPublishesLeaveEvent()
+  {
+    await using var connectionA = BuildConnection();
+    await using var connectionB = BuildConnection();
+
+    var leaveReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    connectionA.On<RoomEvent>("event", evt =>
+    {
+      if (evt.Payload.Kind == "ENTITY.LEAVE" &&
+              evt.Payload.Data.TryGetProperty("entityId", out var entity) &&
+              entity.GetString() == "E-Bob")
+      {
+        leaveReceived.TrySetResult(evt);
+      }
+    });
+
+    await connectionA.StartAsync();
+    await connectionB.StartAsync();
+
+    await connectionA.InvokeAsync("Join", RoomId, new EntitySpec
+    {
+      Id = "E-Alice",
+      Kind = "human",
+      DisplayName = "Alice"
+    });
+
+    await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
+    {
+      Id = "E-Bob",
+      Kind = "agent",
+      DisplayName = "Bot"
+    });
+
+    await connectionB.StopAsync();
+
+    var leaveEvent = await leaveReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+    leaveEvent.Payload.Kind.Should().Be("ENTITY.LEAVE");
+    leaveEvent.RoomId.Should().Be(RoomId);
+  }
+
+  private HubConnection BuildConnection()
+  {
+    return new HubConnectionBuilder()
+        .WithUrl("http://localhost/room", options =>
+        {
+          options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
+          options.Transports = HttpTransportType.LongPolling;
+        })
+        .WithAutomaticReconnect()
+        .Build();
+  }
+
+  public Task InitializeAsync() => Task.CompletedTask;
+
+  public async Task DisposeAsync()
+  {
+    await _factory.DisposeAsync();
+  }
+
+  private sealed record RoomEvent(string Id, string RoomId, string Type, EventPayload Payload, DateTime Ts);
+
+  private sealed record EventPayload(string Kind, JsonElement Data);
 }
