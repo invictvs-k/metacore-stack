@@ -365,7 +365,7 @@ Todos os passos especificados estão funcionando corretamente conforme validado 
 
 ```bash
 # Navegar para o diretório do servidor
-cd /home/runner/work/metacore-stack/metacore-stack/server-dotnet
+cd server-dotnet
 
 # Executar todos os testes da Camada 3
 dotnet test --filter "FullyQualifiedName~Layer3FlowTests"
