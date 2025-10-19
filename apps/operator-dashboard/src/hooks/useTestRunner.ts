@@ -16,16 +16,21 @@ export function useTestRunner() {
   const runTest = useCallback(async (scenarioId: string = 'all') => {
     setRunning(true);
     try {
+      const body = scenarioId === 'all' 
+        ? { all: true }
+        : { scenarioId };
+        
       const response = await fetch('/api/tests/run', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ scenarioId }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to start test');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to start test');
       }
 
       const result = await response.json();
@@ -33,6 +38,7 @@ export function useTestRunner() {
       return result.runId;
     } catch (error) {
       console.error('Error running test:', error);
+      setRunning(false);
       throw error;
     } finally {
       setRunning(false);

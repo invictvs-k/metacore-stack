@@ -12,6 +12,7 @@ export default function Tests() {
   const [testStatus, setTestStatus] = useState<string | null>(null);
   const [exitCode, setExitCode] = useState<number | null>(null);
   const [artifactsDir, setArtifactsDir] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogMessage = useCallback((data: any) => {
     if (data.runId && data.chunk) {
@@ -49,10 +50,13 @@ export default function Tests() {
     setTestStatus(null);
     setExitCode(null);
     setArtifactsDir(null);
+    setError(null);
     try {
       await runTest(selectedScenario);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to run test:', error);
+      setError(error.message || 'Failed to start test execution');
+      setTestStatus('failed');
     }
   };
 
@@ -107,6 +111,13 @@ export default function Tests() {
         {selectedScenario !== 'all' && (
           <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded">
             {scenarios.find(s => s.id === selectedScenario)?.description || 'No description'}
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded">
+            <strong>Error:</strong> {error}
           </div>
         )}
       </div>
