@@ -378,22 +378,28 @@ run_test_scenarios() {
 
         case "$scenario" in
             basic-flow|basic)
+                errexit_was_set=false
+                [[ $- == *e* ]] && errexit_was_set=true
                 set +e
                 timeout $SCENARIO_TIMEOUT npm run test:basic-enhanced > "$scenario_log" 2>&1
                 exit_code=$?
-                set -e
+                $errexit_was_set && set -e
                 ;;
             error-cases|error)
+                errexit_was_set=false
+                [[ $- == *e* ]] && errexit_was_set=true
                 set +e
                 timeout $SCENARIO_TIMEOUT npm run test:error > "$scenario_log" 2>&1
                 exit_code=$?
-                set -e
+                $errexit_was_set && set -e
                 ;;
             stress-test|stress)
+                errexit_was_set=false
+                [[ $- == *e* ]] && errexit_was_set=true
                 set +e
                 timeout $SCENARIO_TIMEOUT npm run test:stress > "$scenario_log" 2>&1
                 exit_code=$?
-                set -e
+                $errexit_was_set && set -e
                 ;;
             *)
                 log_warn "Unknown scenario: $scenario, skipping"
