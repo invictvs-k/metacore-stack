@@ -82,7 +82,7 @@ private async Task PublishRoomState(string roomId, RoomState? overrideState = nu
 **✅ Funcionamento Correto:**
 
 1. A sala é criada implicitamente quando a primeira entidade se conecta
-2. O estado inicial é `RoomState.Init` (definido em `RoomContext.cs`, linha 9)
+2. O estado inicial é `RoomState.Init` (definido em `RoomContext.cs` no enum `RoomState`)
 3. A transição para `Active` ocorre automaticamente no primeiro `Join`
 4. O evento `ROOM.STATE` é emitido contendo:
    - `state`: "active" (após transição)
@@ -118,16 +118,16 @@ Esta é uma implementação mais flexível, pois o mesmo evento pode comunicar m
 **Validação de Credenciais:**
 
 ```csharp
-// Linha 67-72: Validação de formato do RoomId
+// No método Join(): Validação de formato do RoomId
 if (!ValidationHelper.IsValidRoomId(roomId))
 {
   throw ErrorFactory.HubBadRequest("INVALID_ROOM_ID", 
     "roomId must match pattern: room-[A-Za-z0-9_-]{6,}");
 }
 
-ValidateEntity(entity); // Linha 72
+ValidateEntity(entity);
 
-// Linhas 311-356: Implementação de ValidateEntity
+// Implementação do método ValidateEntity
 private static void ValidateEntity(EntitySpec entity)
 {
   // Valida ID (deve começar com E-)
@@ -216,7 +216,7 @@ return _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
 
 **✅ Funcionamento Correto:**
 
-1. **Conexão:** Entidades se conectam via SignalR (WebSocket)
+1. **Conexão:** Entidades se conectam via SignalR
 2. **Validação de Credenciais:** Sistema valida:
    - Formato do RoomId: `room-[A-Za-z0-9_-]{6,}`
    - Formato do EntityId: `E-[A-Za-z0-9_-]{2,64}`
@@ -264,23 +264,23 @@ A especificação menciona "ENTITY.JOINED", mas a implementação usa `ENTITY.JO
 
 ### 5.1 Fluxo 3.1 - Mapeamento de Código
 
-| Etapa | Descrição | Arquivo | Linhas | Método/Componente |
-|-------|-----------|---------|--------|-------------------|
-| 1 | Criação de Sala | `RoomHub.cs` | 61-134 | `Join()` |
-| 2 | Inicialização (init) | `RoomContext.cs` | 18-21 | `GetOrCreate()` |
-| 3 | Aguarda entidades | `RoomHub.cs` | 113-120 | Lógica de transição de estado |
-| 4 | Emite ROOM.STATE | `RoomHub.cs` | 129, 397-403 | `PublishRoomState()` |
-| 5 | Transição para active | `RoomHub.cs` | 118-120 | `UpdateState()` |
+| Etapa | Descrição | Arquivo | Método/Componente |
+|-------|-----------|---------|-------------------|
+| 1 | Criação de Sala | `RoomHub.cs` | `Join()` |
+| 2 | Inicialização (init) | `RoomContext.cs` | `RoomContextStore.GetOrCreate()` |
+| 3 | Aguarda entidades | `RoomHub.cs` | Lógica de transição de estado no `Join()` |
+| 4 | Emite ROOM.STATE | `RoomHub.cs` | `PublishRoomState()` |
+| 5 | Transição para active | `RoomHub.cs` | `RoomContextStore.UpdateState()` |
 
 ### 5.2 Fluxo 3.2 - Mapeamento de Código
 
-| Etapa | Descrição | Arquivo | Linhas | Método/Componente |
-|-------|-----------|---------|--------|-------------------|
-| 1 | Entidade se conecta | `RoomHub.cs` | 61-134 | `Join()` + SignalR |
-| 2 | Valida credenciais | `RoomHub.cs` | 67-72, 311-356 | `ValidateEntity()` |
-| 3 | Carrega workspace | `FileArtifactStore.cs` | 144-161 | `GetWorkspacePaths()` |
-| 4 | Emite ENTITY.JOIN | `RoomHub.cs` | 124 | `_events.PublishAsync()` |
-| 5 | Retorna lista de recursos | `RoomHub.cs` | 133 | Return statement |
+| Etapa | Descrição | Arquivo | Método/Componente |
+|-------|-----------|---------|-------------------|
+| 1 | Entidade se conecta | `RoomHub.cs` | `Join()` via SignalR |
+| 2 | Valida credenciais | `RoomHub.cs` | `ValidateEntity()` |
+| 3 | Carrega workspace | `FileArtifactStore.cs` | `GetWorkspacePaths()` |
+| 4 | Emite ENTITY.JOIN | `RoomHub.cs` | `_events.PublishAsync()` no `Join()` |
+| 5 | Retorna lista de recursos | `RoomHub.cs` | Retorno do método `Join()` |
 
 ---
 

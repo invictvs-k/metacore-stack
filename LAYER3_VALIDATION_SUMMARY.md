@@ -58,17 +58,17 @@ This document provides a quick summary of the Layer 3 flow validation work compl
 - **Artifact Store:** `server-dotnet/src/RoomServer/Services/ArtifactStore/FileArtifactStore.cs`
 
 ### Flow 3.1 Implementation
-- Room creation: `RoomHub.Join()` (lines 61-134)
-- State initialization: `RoomContextStore.GetOrCreate()` (lines 18-21)
-- State transition: `RoomHub.Join()` (lines 113-120)
-- Event emission: `RoomHub.PublishRoomState()` (lines 397-403)
+- Room creation: `RoomHub.Join()` method
+- State initialization: `RoomContextStore.GetOrCreate()` method
+- State transition: Logic within `RoomHub.Join()`
+- Event emission: `RoomHub.PublishRoomState()` method
 
 ### Flow 3.2 Implementation
 - Connection: `RoomHub.Join()` via SignalR
-- Validation: `RoomHub.ValidateEntity()` (lines 311-356)
-- Workspace: `FileArtifactStore.GetWorkspacePaths()` (lines 144-161)
-- Event emission: `_events.PublishAsync()` (line 124)
-- Resource list: `Join()` return value (line 133)
+- Validation: `RoomHub.ValidateEntity()` method
+- Workspace: `FileArtifactStore.GetWorkspacePaths()` method
+- Event emission: `_events.PublishAsync()` in `Join()`
+- Resource list: Return value of `Join()` method
 
 ---
 
