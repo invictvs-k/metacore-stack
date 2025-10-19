@@ -134,11 +134,16 @@ public class Layer3FlowTests : IAsyncLifetime
         await using var connectionA = BuildConnection();
         await using var connectionB = BuildConnection();
 
+        var roomCreatedReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
         var entityJoinedReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         connectionA.On<RoomEvent>("event", evt =>
         {
-            if (evt.Payload.Kind == "ENTITY.JOINED" &&
+            if (evt.Payload.Kind == "ROOM.CREATED")
+            {
+                roomCreatedReceived.TrySetResult(evt);
+            }
+            else if (evt.Payload.Kind == "ENTITY.JOINED" &&
                 evt.Payload.Data.TryGetProperty("entity", out var entity) &&
                 entity.GetProperty("id").GetString() == "E-Second")
             {
@@ -157,8 +162,8 @@ public class Layer3FlowTests : IAsyncLifetime
             DisplayName = "First Entity"
         });
 
-        // Wait a bit for room to be created
-        await Task.Delay(100);
+        // Wait for room creation to complete
+        await roomCreatedReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         // Second entity joins
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec
@@ -250,6 +255,9 @@ public class Layer3FlowTests : IAsyncLifetime
 
         var joinEventsA = new List<string>();
         var joinEventsB = new List<string>();
+        var betaJoinedA = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var gammaJoinedA = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var gammaJoinedB = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         connectionA.On<RoomEvent>("event", evt =>
         {
@@ -257,7 +265,10 @@ public class Layer3FlowTests : IAsyncLifetime
             {
                 if (evt.Payload.Data.TryGetProperty("entity", out var entity))
                 {
-                    joinEventsA.Add(entity.GetProperty("id").GetString()!);
+                    var entityId = entity.GetProperty("id").GetString()!;
+                    joinEventsA.Add(entityId);
+                    if (entityId == "E-Beta") betaJoinedA.TrySetResult(true);
+                    if (entityId == "E-Gamma") gammaJoinedA.TrySetResult(true);
                 }
             }
         });
@@ -268,7 +279,9 @@ public class Layer3FlowTests : IAsyncLifetime
             {
                 if (evt.Payload.Data.TryGetProperty("entity", out var entity))
                 {
-                    joinEventsB.Add(entity.GetProperty("id").GetString()!);
+                    var entityId = entity.GetProperty("id").GetString()!;
+                    joinEventsB.Add(entityId);
+                    if (entityId == "E-Gamma") gammaJoinedB.TrySetResult(true);
                 }
             }
         });
@@ -278,13 +291,15 @@ public class Layer3FlowTests : IAsyncLifetime
         await connectionC.StartAsync();
 
         await connectionA.InvokeAsync("Join", RoomId, new EntitySpec { Id = "E-Alpha", Kind = "human" });
-        await Task.Delay(100);
-
+        
         await connectionB.InvokeAsync("Join", RoomId, new EntitySpec { Id = "E-Beta", Kind = "agent" });
-        await Task.Delay(100);
+        await betaJoinedA.Task.WaitAsync(TimeSpan.FromSeconds(5));
 
         await connectionC.InvokeAsync("Join", RoomId, new EntitySpec { Id = "E-Gamma", Kind = "npc" });
-        await Task.Delay(200);
+        await Task.WhenAll(
+            gammaJoinedA.Task.WaitAsync(TimeSpan.FromSeconds(5)),
+            gammaJoinedB.Task.WaitAsync(TimeSpan.FromSeconds(5))
+        );
 
         // ConnectionA should have seen Beta and Gamma join
         joinEventsA.Should().Contain("E-Beta");
