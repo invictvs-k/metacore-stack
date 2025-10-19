@@ -237,13 +237,16 @@ public class McpConnectionManager
         {
             if (_monitorTasks.TryGetValue(providerId, out var registration) && registration.Token == registrationToken)
             {
-                _monitorTasks.TryRemove(new KeyValuePair<string, MonitorRegistration>(providerId, registration));
+                _monitorTasks.TryRemove(providerId, out _);
             }
         }
     }
 
     private void EnsureConnectionMonitor(string providerId, IMcpClient client, McpServerConfig config)
     {
+        var retryDelay = TimeSpan.FromMilliseconds(50);
+        var attempts = 0;
+
         while (true)
         {
             var registration = _monitorTasks.AddOrUpdate(
@@ -256,7 +259,20 @@ public class McpConnectionManager
                 return;
             }
 
-            _monitorTasks.TryRemove(new KeyValuePair<string, MonitorRegistration>(providerId, registration));
+            if (_monitorTasks.TryGetValue(providerId, out var current) && current.Token == registration.Token)
+            {
+                _monitorTasks.TryRemove(providerId, out _);
+            }
+
+            attempts++;
+
+            if (attempts >= 5)
+            {
+                _logger.LogWarning("[{ProviderId}] Connection monitor restart attempts exceeded retry limit", providerId);
+                return;
+            }
+
+            Thread.Sleep(retryDelay);
         }
     }
 
