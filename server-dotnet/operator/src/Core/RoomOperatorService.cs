@@ -86,10 +86,7 @@ public sealed class RoomOperatorService
     {
         try
         {
-            await Task.Run(
-                async () => await ApplySpecAsync(request, _serviceCancellationToken).ConfigureAwait(false),
-                _serviceCancellationToken
-            ).ConfigureAwait(false);
+            await ApplySpecAsync(request, _serviceCancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
