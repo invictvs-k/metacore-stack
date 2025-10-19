@@ -13,6 +13,28 @@ import MessageBuilder from '../utils/message-builder.js';
 import TraceLogger from '../utils/trace-logger.js';
 import TracedHttpClient from '../utils/traced-http-client.js';
 
+/**
+ * Integration test scenario for enhanced basic flow with trace logging and metrics.
+ *
+ * This class orchestrates a comprehensive integration test of the operator's basic flow,
+ * including preflight checks, room creation, entity and artifact management, policy updates,
+ * state verification, and cleanup. It leverages trace logging and metrics collection for
+ * detailed analysis of test execution.
+ *
+ * @class EnhancedBasicFlowScenario
+ * @param {string|null} artifactsDir - Optional directory path for storing trace logs and artifacts.
+ *   If provided, trace logs will be written to `${artifactsDir}/results/trace.ndjson`.
+ *
+ * Test flow:
+ *   1. Preflight checks
+ *   2. Create empty room
+ *   3. Add entities
+ *   4. Add artifacts
+ *   5. Update policies
+ *   6. Verify final state
+ *   7. Cleanup
+ *   8. Trace and metrics summary
+ */
 class EnhancedBasicFlowScenario {
   constructor(artifactsDir = null) {
     // Setup trace logging if artifacts directory provided
