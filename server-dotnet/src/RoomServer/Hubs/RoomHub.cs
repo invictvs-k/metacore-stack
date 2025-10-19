@@ -103,18 +103,24 @@ public partial class RoomHub : Hub
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         
-        // Update room state to Active when first entity joins
+        // Update room state when entities join
         var roomContext = _roomContexts.GetOrCreate(roomId);
-        if (roomContext.State == RoomState.Init)
+        var wasInit = roomContext.State == RoomState.Init;
+        var wasEnded = roomContext.State == RoomState.Ended;
+
+        if (wasInit || wasEnded)
         {
             _roomContexts.UpdateState(roomId, RoomState.Active);
-            await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "active", entities = new[] { normalized } });
         }
-        else
+
+        if (!wasInit)
         {
             await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
-            await PublishRoomState(roomId);
         }
+
+        // The initial ROOM.STATE payload now uses the standard schema produced by PublishRoomState,
+        // aligning the first join with subsequent state updates.
+        await PublishRoomState(roomId, wasInit || wasEnded ? RoomState.Active : null);
 
         _logger.LogInformation("[{RoomId}] {EntityId} joined ({Kind})", roomId, normalized.Id, normalized.Kind);
 
@@ -379,11 +385,11 @@ public partial class RoomHub : Hub
         }
     }
 
-    private async Task PublishRoomState(string roomId)
+    private async Task PublishRoomState(string roomId, RoomState? overrideState = null)
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
         var roomContext = _roomContexts.Get(roomId);
-        var state = roomContext?.State.ToString().ToLowerInvariant() ?? "init";
+        var state = (overrideState?.ToString() ?? roomContext?.State?.ToString() ?? "init").ToLowerInvariant();
         await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
     }
 
@@ -396,7 +402,7 @@ public partial class RoomHub : Hub
             if (roomContext?.State == RoomState.Active)
             {
                 _roomContexts.UpdateState(roomId, RoomState.Ended);
-                await _events.PublishAsync(roomId, "ROOM.STATE", new { state = "ended", entities = Array.Empty<EntitySpec>() });
+                await PublishRoomState(roomId, RoomState.Ended);
             }
         }
     }
