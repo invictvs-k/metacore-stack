@@ -27,7 +27,7 @@ Validar que o Hub SignalR está corretamente mapeado no endpoint `/room` e aceit
 2. Usar uma ferramenta de teste SignalR (ex: Postman, ou cliente SignalR):
    ```bash
    # Verificar resposta de negociação SignalR (endpoint recomendado para validação)
-   curl -X POST http://localhost:5000/room/negotiate
+   curl -X POST "http://localhost:5000/room/negotiate?negotiateVersion=1" -H "Accept: application/json"
    ```
 
 **Resultados Esperados:**
