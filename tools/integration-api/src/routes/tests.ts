@@ -80,17 +80,17 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
 
   // Set up polling for new logs
   let lastLogCount = logs.length;
-  let completed = false;
-  let isPolling = false;
+  type StreamState = 'idle' | 'polling' | 'completed';
+  let state: StreamState = 'idle';
   let heartbeat: NodeJS.Timeout | null = null;
   let pollInterval: NodeJS.Timeout | null = null;
 
   const finalizeRun = (exitCode: number) => {
-    if (completed) {
+    if (state === 'completed') {
       return;
     }
 
-    completed = true;
+    state = 'completed';
     res.write(`event: done\n`);
     res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
     if (pollInterval) {
