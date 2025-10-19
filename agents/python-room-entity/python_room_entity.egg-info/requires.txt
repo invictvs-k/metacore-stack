@@ -1,0 +1,9 @@
+signalrcore>=0.9.4
+openai>=1.14.0
+pydantic>=2.7.0
+requests>=2.32.0
+
+[test]
+pytest>=7.4
+pytest-asyncio>=0.23
+pytest-timeout>=2.2
