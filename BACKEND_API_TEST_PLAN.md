@@ -770,7 +770,6 @@ Validar upload de artefato para workspace de sala.
 1. Fazer upload via HTTP POST:
    ```bash
    curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
-     -H "Content-Type: multipart/form-data" \
      -F "name=document.txt" \
      -F "type=text/plain" \
      -F "file=@document.txt" \
@@ -1372,7 +1371,6 @@ curl -v http://localhost:5000/health
 **Upload de Artefato:**
 ```bash
 curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
-  -H "Content-Type: multipart/form-data" \
   -F "name=test.txt" \
   -F "type=text/plain" \
   -F "file=@test.txt" \
