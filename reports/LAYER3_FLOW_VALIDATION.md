@@ -12,8 +12,8 @@ Este relatório documenta a validação completa dos fluxos de ponta a ponta da 
 
 ### Resultados Gerais
 
-- **Total de Testes Criados:** 16
-- **Testes Aprovados:** 16 (100%)
+- **Total de Testes Criados:** 15
+- **Testes Aprovados:** 15 (100%)
 - **Testes Falhados:** 0
 - **Cobertura:** Completa para Fluxo 3.1 e Fluxo 3.2
 
