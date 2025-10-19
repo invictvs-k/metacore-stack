@@ -22,48 +22,22 @@ var baseUrl = config["RoomServer:BaseUrl"] ?? "http://localhost:5000";
 var authToken = Environment.GetEnvironmentVariable("ROOM_AUTH_TOKEN") ?? config["Auth:Token"];
 var mcpEnabled = config.GetValue<bool>("Operator:Features:Resources");
 
+// Helper method to configure HTTP client with authentication
+void ConfigureAuthenticatedClient(HttpClient client)
+{
+    client.BaseAddress = new Uri(baseUrl);
+    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
+    {
+        client.DefaultRequestHeaders.Authorization = 
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
+    }
+}
+
 // Configure HTTP clients
-builder.Services.AddHttpClient<IRoomClient, SignalRClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
-    {
-        client.DefaultRequestHeaders.Authorization = 
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
-    }
-});
-
-builder.Services.AddHttpClient<IArtifactsClient, ArtifactsClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
-    {
-        client.DefaultRequestHeaders.Authorization = 
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
-    }
-});
-
-builder.Services.AddHttpClient<IPoliciesClient, PoliciesClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
-    {
-        client.DefaultRequestHeaders.Authorization = 
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
-    }
-});
-
-builder.Services.AddHttpClient<IMcpClient, McpClient>(client =>
-{
-    client.BaseAddress = new Uri(baseUrl);
-}).ConfigureHttpClient(client =>
-{
-    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
-    {
-        client.DefaultRequestHeaders.Authorization = 
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
-    }
-});
+builder.Services.AddHttpClient<IRoomClient, SignalRClient>(ConfigureAuthenticatedClient);
+builder.Services.AddHttpClient<IArtifactsClient, ArtifactsClient>(ConfigureAuthenticatedClient);
+builder.Services.AddHttpClient<IPoliciesClient, PoliciesClient>(ConfigureAuthenticatedClient);
+builder.Services.AddHttpClient<IMcpClient, McpClient>(ConfigureAuthenticatedClient);
 
 // Configure core services
 builder.Services.AddSingleton(sp => 
