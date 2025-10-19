@@ -64,16 +64,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    // Listen for ROOM.STATE event
-    connection.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ROOM.STATE")
-      {
-        roomStateReceived.TrySetResult(evt);
-      }
-    });
+    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
 
     // Act - First entity joins
     await connection.StartAsync();
@@ -112,15 +103,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connection.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ROOM.STATE")
-      {
-        roomStateReceived.TrySetResult(evt);
-      }
-    });
+    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
 
     // Act
     await connection.StartAsync();
@@ -145,15 +128,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connection.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ROOM.STATE")
-      {
-        roomStateReceived.TrySetResult(evt);
-      }
-    });
+    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
 
     // Act
     await connection.StartAsync();
@@ -180,15 +155,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connection.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ROOM.STATE")
-      {
-        roomStateReceived.TrySetResult(evt);
-      }
-    });
+    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
 
     // Act - Complete flow: Create room by joining
     await connection.StartAsync();
@@ -342,17 +309,9 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
 
-    var entityJoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connectionA.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ENTITY.JOIN" &&
-          evt.Payload.Data.TryGetProperty("entity", out var entity) &&
-          entity.GetProperty("id").GetString() == "E-NewAgent")
-      {
-        entityJoinReceived.TrySetResult(evt);
-      }
-    });
+    var entityJoinReceived = SubscribeForEvent(connectionA, "ENTITY.JOIN", evt =>
+      evt.Payload.Data.TryGetProperty("entity", out var entity) &&
+      entity.GetProperty("id").GetString() == "E-NewAgent");
 
     // Act
     await connectionA.StartAsync();
@@ -422,17 +381,9 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
 
-    var entityJoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connectionA.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ENTITY.JOIN" &&
-          evt.Payload.Data.TryGetProperty("entity", out var entity) &&
-          entity.GetProperty("id").GetString() == "E-CompleteAgent")
-      {
-        entityJoinReceived.TrySetResult(evt);
-      }
-    });
+    var entityJoinReceived = SubscribeForEvent(connectionA, "ENTITY.JOIN", evt =>
+      evt.Payload.Data.TryGetProperty("entity", out var entity) &&
+      entity.GetProperty("id").GetString() == "E-CompleteAgent");
 
     // Act - Complete Flow 3.2
     // First entity joins to create room
@@ -489,17 +440,9 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connAgent1 = BuildConnection();
     await using var connAgent2 = BuildConnection();
 
-    var agent2JoinReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    connHuman.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ENTITY.JOIN" &&
-          evt.Payload.Data.TryGetProperty("entity", out var entity) &&
-          entity.GetProperty("id").GetString() == "E-Agent2")
-      {
-        agent2JoinReceived.TrySetResult(evt);
-      }
-    });
+    var agent2JoinReceived = SubscribeForEvent(connHuman, "ENTITY.JOIN", evt =>
+      evt.Payload.Data.TryGetProperty("entity", out var entity) &&
+      entity.GetProperty("id").GetString() == "E-Agent2");
 
     // Act - Multiple entities join
     await connHuman.StartAsync();
@@ -547,17 +490,9 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var conn1 = BuildConnection();
     await using var conn2 = BuildConnection();
 
-    var roomStateReceived = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-    conn1.On<RoomEvent>("event", evt =>
-    {
-      if (evt.Payload.Kind == "ROOM.STATE" &&
-          evt.Payload.Data.TryGetProperty("entities", out var entities) &&
-          entities.GetArrayLength() == 2)
-      {
-        roomStateReceived.TrySetResult(evt);
-      }
-    });
+    var roomStateReceived = SubscribeForEvent(conn1, "ROOM.STATE", evt =>
+      evt.Payload.Data.TryGetProperty("entities", out var entities) &&
+      entities.GetArrayLength() == 2);
 
     // Act
     await conn1.StartAsync();
@@ -596,6 +531,32 @@ public class Layer3FlowTests : IAsyncLifetime
         })
         .WithAutomaticReconnect()
         .Build();
+  }
+
+  /// <summary>
+  /// Helper method to subscribe to a specific event kind with an optional predicate.
+  /// Reduces duplication of TaskCompletionSource + event subscription pattern.
+  /// </summary>
+  /// <param name="connection">The SignalR hub connection to subscribe on</param>
+  /// <param name="eventKind">The event kind to filter for (e.g., "ROOM.STATE", "ENTITY.JOIN")</param>
+  /// <param name="predicate">Optional predicate for additional filtering of the event</param>
+  /// <returns>A TaskCompletionSource that will be completed when the matching event is received</returns>
+  private TaskCompletionSource<RoomEvent> SubscribeForEvent(
+      HubConnection connection,
+      string eventKind,
+      Func<RoomEvent, bool>? predicate = null)
+  {
+    var completionSource = new TaskCompletionSource<RoomEvent>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    connection.On<RoomEvent>("event", evt =>
+    {
+      if (evt.Payload.Kind == eventKind && (predicate == null || predicate(evt)))
+      {
+        completionSource.TrySetResult(evt);
+      }
+    });
+
+    return completionSource;
   }
 
   public Task InitializeAsync() => Task.CompletedTask;
