@@ -126,21 +126,8 @@ class RoomClient:
         """Send an arbitrary message payload to the room."""
 
         self._ensure_joined()
-        payload_value = message.payload
-        if hasattr(payload_value, "model_dump"):
-            payload_dict = payload_value.model_dump()  # type: ignore[call-arg]
-        elif isinstance(payload_value, Mapping):
-            payload_dict = dict(payload_value)
-        else:
-            payload_dict = dict(payload_value)  # type: ignore[arg-type]
-        data = {
-            "channel": message.channel,
-            "from": self._state.entity.entity_id if self._state.entity else None,
-            "type": message.type,
-            "payload": payload_dict,
-        }
-        if message.correlation_id:
-            data["correlationId"] = message.correlation_id
+        data = message.as_dict()
+        data["from"] = self._state.entity.entity_id if self._state.entity else None
         response = self._hub.invoke("SendToRoom", [self._state.room_id, data])
         self._logger.debug("Sent message response: %s", response)
 
