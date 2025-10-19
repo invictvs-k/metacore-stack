@@ -34,9 +34,9 @@ make schemas-validate
 ## Validação de Fluxos
 
 * **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](LAYER3_VALIDATION_SUMMARY.md))
-  - Fluxo 3.1: Criação de Sala (6 testes)
+  - Fluxo 3.1: Criação de Sala (5 testes)
   - Fluxo 3.2: Entrada de Entidade (8 testes)
-  - 15 testes automatizados, 100% aprovação
+  - 13 testes automatizados, 100% aprovação
 
 ## Licença
 
