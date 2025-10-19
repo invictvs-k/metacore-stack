@@ -190,7 +190,7 @@ Confirmar que entidades contêm todos os campos obrigatórios e tipos válidos.
 **Passos de Execução:**
 1. Executar testes de validação:
    ```bash
-   dotnet test --filter "FullyQualifiedName~EntitySpec|ValidationTests"
+   dotnet test --filter "(FullyQualifiedName~EntitySpec)|(FullyQualifiedName~ValidationTests)"
    ```
 2. Fazer Join com diferentes tipos de entidade:
    ```bash
