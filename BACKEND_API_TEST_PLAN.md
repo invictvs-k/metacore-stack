@@ -803,20 +803,24 @@ Validar publicação de eventos via RoomEventPublisher.
 - Eventos seguem padrão (incluindo envelope obrigatório conforme Seção 2.4):
   ```json
   {
-    "id": "string",
-    "roomId": "string",
-    "channel": "string",
-    "from": "string",
-    "ts": "2023-01-01T00:00:00.000Z",
-    "correlationId": "string",
+    "id": "01JEH7RB2XVMK9PTQC3WYZN5FH",
+    "roomId": "room-test123",
+    "channel": "main",
+    "from": "system",
+    "ts": "2025-10-19T03:00:00Z",
+    "correlationId": null,
     "type": "event",
     "payload": {
-      "kind": "ENTITY.JOIN|ENTITY.LEAVE|ROOM.STATE",
-      ...
+      "kind": "ENTITY.JOIN",
+      "entity": "E-user01"
     }
   }
   ```
 - Kind em SCREAMING_CASE (validação: `^[A-Z]+(\.[A-Z]+)*$`)
+- Exemplos de payloads por tipo de evento:
+  - `ENTITY.JOIN`: `{"kind": "ENTITY.JOIN", "entity": "E-user01"}`
+  - `ENTITY.LEAVE`: `{"kind": "ENTITY.LEAVE", "entity": "E-user01"}`
+  - `ROOM.STATE`: `{"kind": "ROOM.STATE", "state": "Active", "entities": [...]}`
 - Eventos broadcast e registrados em disco
 
 **Considerações Adicionais:**
