@@ -1,6 +1,16 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-export function useSSE(url: string, onMessage: (data: any) => void, enabled: boolean = true) {
+interface UseSSEOptions {
+  reconnectInterval?: number;
+}
+
+export function useSSE(
+  url: string, 
+  onMessage: (data: any) => void, 
+  enabled: boolean = true,
+  options: UseSSEOptions = {}
+) {
+  const { reconnectInterval = 5000 } = options;
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
@@ -25,10 +35,10 @@ export function useSSE(url: string, onMessage: (data: any) => void, enabled: boo
         eventSource.close();
         eventSourceRef.current = null;
         
-        // Reconnect after 5 seconds
+        // Reconnect after configured interval
         reconnectTimeoutRef.current = setTimeout(() => {
           connect();
-        }, 5000);
+        }, reconnectInterval);
       };
 
       eventSource.onopen = () => {
@@ -37,7 +47,7 @@ export function useSSE(url: string, onMessage: (data: any) => void, enabled: boo
     } catch (error) {
       console.error('Error creating EventSource:', error);
     }
-  }, [url, onMessage, enabled]);
+  }, [url, onMessage, enabled, reconnectInterval]);
 
   useEffect(() => {
     connect();

@@ -109,6 +109,7 @@ export default function Settings() {
             <li><strong>testClient.runner:</strong> Path to test runner script</li>
             <li><strong>integrationApi.port:</strong> Port for the Integration API</li>
             <li><strong>ui.theme:</strong> UI theme (light, dark, or system)</li>
+            <li><strong>ui.sseReconnectInterval:</strong> SSE reconnection interval in milliseconds (default: 5000)</li>
           </ul>
         </div>
       </div>

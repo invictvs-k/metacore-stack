@@ -25,6 +25,7 @@
   },
   "ui": {
     "theme": "system",
-    "refreshInterval": 5000
+    "refreshInterval": 5000,
+    "sseReconnectInterval": 5000
   }
 }

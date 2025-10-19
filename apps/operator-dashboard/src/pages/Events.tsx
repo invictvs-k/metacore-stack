@@ -2,10 +2,12 @@ import { useState, useCallback } from 'react';
 import { Server, Terminal } from 'lucide-react';
 import { useSSE } from '../hooks/useSSE';
 import { useAppStore } from '../store/useAppStore';
+import { useConfig } from '../hooks/useConfig';
 
 export default function Events() {
   const [filter, setFilter] = useState<'all' | 'roomserver' | 'roomoperator'>('all');
   const { events, addEvent, clearEvents } = useAppStore();
+  const { config } = useConfig();
 
   const handleMessage = useCallback((data: any) => {
     addEvent({
@@ -15,10 +17,14 @@ export default function Events() {
     });
   }, [addEvent]);
 
+  const sseOptions = {
+    reconnectInterval: config?.ui?.sseReconnectInterval || 5000
+  };
+
   // Subscribe to combined events
-  useSSE('/api/events/combined', handleMessage, filter === 'all');
-  useSSE('/api/events/roomserver', handleMessage, filter === 'roomserver');
-  useSSE('/api/events/roomoperator', handleMessage, filter === 'roomoperator');
+  useSSE('/api/events/combined', handleMessage, filter === 'all', sseOptions);
+  useSSE('/api/events/roomserver', handleMessage, filter === 'roomserver', sseOptions);
+  useSSE('/api/events/roomoperator', handleMessage, filter === 'roomoperator', sseOptions);
 
   const filteredEvents = filter === 'all' 
     ? events 

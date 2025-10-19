@@ -41,7 +41,8 @@ export async function loadConfig(): Promise<DashboardSettings> {
         logLevel: 'info'
       },
       ui: {
-        theme: 'system'
+        theme: 'system',
+        sseReconnectInterval: 5000
       }
     };
     return cachedConfig;

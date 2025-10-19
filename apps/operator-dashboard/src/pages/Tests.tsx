@@ -2,9 +2,11 @@ import { useState, useCallback } from 'react';
 import { Play, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useTestRunner } from '../hooks/useTestRunner';
 import { useSSE } from '../hooks/useSSE';
+import { useConfig } from '../hooks/useConfig';
 
 export default function Tests() {
   const { scenarios, running, currentRunId, runTest } = useTestRunner();
+  const { config } = useConfig();
   const [selectedScenario, setSelectedScenario] = useState<string>('all');
   const [logs, setLogs] = useState<string[]>([]);
   const [testStatus, setTestStatus] = useState<string | null>(null);
@@ -17,10 +19,15 @@ export default function Tests() {
     }
   }, []);
 
+  const sseOptions = {
+    reconnectInterval: config?.ui?.sseReconnectInterval || 5000
+  };
+
   useSSE(
     currentRunId ? `/api/tests/stream/${currentRunId}` : '',
     handleLogMessage,
-    !!currentRunId
+    !!currentRunId,
+    sseOptions
   );
 
   const handleRunTest = async () => {

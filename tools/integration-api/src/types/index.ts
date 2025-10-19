@@ -26,6 +26,7 @@ export interface DashboardSettings {
   ui: {
     theme: string;
     refreshInterval?: number;
+    sseReconnectInterval?: number;
   };
 }
 
