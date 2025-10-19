@@ -114,7 +114,7 @@ Verificar que o CORS está configurado corretamente para permitir conexões de d
 **Passos de Execução:**
 1. Fazer requisição OPTIONS preflight:
    ```bash
-   curl -X OPTIONS http://localhost:5000/health \
+   curl -X OPTIONS http://localhost:5000/rooms/123/artifacts \
      -H "Origin: http://localhost:3000" \
      -H "Access-Control-Request-Method: POST" \
      -v
