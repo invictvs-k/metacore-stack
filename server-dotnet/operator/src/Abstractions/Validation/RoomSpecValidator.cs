@@ -67,7 +67,7 @@ public sealed class RoomSpecValidator
         // Validate mandatory policies
         if (string.IsNullOrWhiteSpace(spec.Spec.Policies.DmVisibilityDefault))
         {
-            result.AddWarning("dmVisibilityDefault not set, will default to 'team'");
+            result.AddWarning($"dmVisibilityDefault not set, will default to '{Constants.DefaultDmVisibility}'");
         }
         
         return result;

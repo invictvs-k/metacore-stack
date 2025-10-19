@@ -247,9 +247,9 @@ public sealed class ReconcilePhases
         }
         
         // 6. Apply policies
-        // Always apply dmVisibilityDefault policy, using default value 'team' if null or empty
+        // Always apply dmVisibilityDefault policy, using default value if null or empty
         var dmVisibilityDefaultValue = string.IsNullOrEmpty(spec.Spec.Policies.DmVisibilityDefault)
-            ? "team"
+            ? Constants.DefaultDmVisibility
             : spec.Spec.Policies.DmVisibilityDefault;
         try
         {

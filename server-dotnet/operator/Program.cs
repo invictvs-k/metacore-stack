@@ -26,7 +26,7 @@ var mcpEnabled = config.GetValue<bool>("Operator:Features:Resources");
 void ConfigureAuthenticatedClient(HttpClient client)
 {
     client.BaseAddress = new Uri(baseUrl);
-    if (!string.IsNullOrEmpty(authToken) && authToken != "${ROOM_AUTH_TOKEN}")
+    if (!string.IsNullOrEmpty(authToken) && authToken != Constants.AuthTokenPlaceholder)
     {
         client.DefaultRequestHeaders.Authorization = 
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
