@@ -770,15 +770,15 @@ Validar upload de artefato para workspace de sala.
 1. Fazer upload via HTTP POST:
    ```bash
    curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
-     -F "name=document.txt" \
-     -F "type=text/plain" \
-     -F "file=@document.txt" \
+     -H "X-Entity-Id: E-user01" \
+     -F "spec={\"name\":\"document.txt\",\"type\":\"text/plain\"}" \
+     -F "data=@document.txt" \
      -F "entityId=E-user01"
    ```
 2. Verificar resposta e arquivos criados
 
 **Resultados Esperados:**
-- Código HTTP: 200 OK
+- Código HTTP: 201 Created
 - Resposta contém manifest completo:
   ```json
   {
@@ -805,7 +805,7 @@ Validar upload de artefato para workspace de sala.
 
 ---
 
-### 6.2 REST Endpoint - POST /entities/{entityId}/artifacts
+### 6.2 REST Endpoint - POST /rooms/{roomId}/entities/{entityId}/artifacts
 
 **Objetivo do Teste:**
 Validar upload de artefato para workspace privado de entidade.
@@ -813,17 +813,17 @@ Validar upload de artefato para workspace privado de entidade.
 **Passos de Execução:**
 1. Fazer upload para workspace privado:
    ```bash
-   curl -X POST http://localhost:5000/entities/E-agent01/artifacts \
-     -F "name=analysis.json" \
-     -F "type=application/json" \
-     -F "file=@analysis.json"
+   curl -X POST http://localhost:5000/rooms/room-test123/entities/E-agent01/artifacts \
+     -H "X-Entity-Id: E-agent01" \
+     -F "spec={\"name\":\"analysis.json\",\"type\":\"application/json\"}" \
+     -F "data=@analysis.json"
    ```
 2. Verificar permissões aplicadas
 
 **Resultados Esperados:**
-- Código 200 se owner ou orchestrator
+- Código 201 Created se owner ou orchestrator
 - Código 403 se não autorizado
-- Workspace separado: `.ai-flow/runs/{room}/artifacts/E-agent01/`
+- Workspace separado: `.ai-flow/runs/room-test123/artifacts/E-agent01/`
 
 **Considerações Adicionais:**
 - ⚠️ Apenas owner e orchestrator podem acessar workspace privado
@@ -1372,9 +1372,9 @@ curl -v http://localhost:5000/health
 **Upload de Artefato:**
 ```bash
 curl -X POST http://localhost:5000/rooms/room-test123/artifacts \
-  -F "name=test.txt" \
-  -F "type=text/plain" \
-  -F "file=@test.txt" \
+  -H "X-Entity-Id: E-test01" \
+  -F "spec={\"name\":\"test.txt\",\"type\":\"text/plain\"}" \
+  -F "data=@test.txt" \
   -F "entityId=E-test01"
 ```
 
