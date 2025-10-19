@@ -91,7 +91,7 @@ class StressTestScenario {
     const totalTime = Date.now() - startTime;
     this.metrics.totalDuration += totalTime;
     
-    const successCount = results.filter(r => r.success).length;
+    const successCount = results.filter(r => r.result.success).length;
     logger.success(`Completed ${successCount}/${iterations} operations in ${totalTime}ms`);
     logger.info(`Average duration: ${(totalTime / iterations).toFixed(2)}ms per operation`);
     
