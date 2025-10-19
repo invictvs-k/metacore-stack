@@ -1,5 +1,6 @@
-using RoomOperator.Abstractions;
 using System.Collections.Concurrent;
+using Microsoft.Extensions.Hosting;
+using RoomOperator.Abstractions;
 
 namespace RoomOperator.Core;
 
@@ -7,16 +8,19 @@ public sealed class RoomOperatorService
 {
     private readonly ReconcilePhases _reconcilePhases;
     private readonly ILogger<RoomOperatorService> _logger;
+    private readonly CancellationToken _serviceCancellationToken;
     private readonly SemaphoreSlim _reconcileLock = new(1, 1);
     private readonly ConcurrentQueue<ApplyRequest> _requestQueue = new();
     private readonly ConcurrentDictionary<string, RoomStatus> _roomStatuses = new();
     
     public RoomOperatorService(
         ReconcilePhases reconcilePhases,
-        ILogger<RoomOperatorService> logger)
+        ILogger<RoomOperatorService> logger,
+        IHostApplicationLifetime hostApplicationLifetime)
     {
         _reconcilePhases = reconcilePhases;
         _logger = logger;
+        _serviceCancellationToken = hostApplicationLifetime.ApplicationStopping;
     }
     
     public async Task<ReconcileResult> ApplySpecAsync(ApplyRequest request, CancellationToken ct)
@@ -73,7 +77,9 @@ public sealed class RoomOperatorService
             // Process next queued request
             if (_requestQueue.TryDequeue(out var nextRequest))
             {
-                _ = Task.Run(async () => await ApplySpecAsync(nextRequest, CancellationToken.None));
+                _ = Task.Run(
+                    async () => await ApplySpecAsync(nextRequest, _serviceCancellationToken),
+                    _serviceCancellationToken);
             }
         }
     }
