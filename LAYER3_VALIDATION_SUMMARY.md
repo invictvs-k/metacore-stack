@@ -26,7 +26,7 @@ This document provides a quick summary of the Layer 3 flow validation work compl
 
 ## Flows Validated
 
-### Flow 3.1 – Room Creation (6 tests)
+### Flow 3.1 – Room Creation (5 tests)
 ✅ All steps validated and working:
 1. Human creates Room with configuration
 2. System initializes cycle (init)
