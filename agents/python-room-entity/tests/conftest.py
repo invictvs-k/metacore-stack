@@ -43,7 +43,8 @@ def room_server() -> Iterator[Dict[str, object]]:
         ],
         cwd=str(ROOT),
         env=env,
-        stdout=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
         bufsize=1,
     )
