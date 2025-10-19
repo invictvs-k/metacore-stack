@@ -1546,7 +1546,7 @@ pnpm validate
 
 - [ ] Revisar logs de erros (se houver)
 - [ ] Validar completude dos arquivos de observabilidade
-- [ ] Verificar que não há processos zumbis ou connections abertas
+- [ ] Verificar que não há processos zumbis ou conexões abertas
 - [ ] Limpar dados de teste (se necessário)
 
 ### Relatório de Testes
