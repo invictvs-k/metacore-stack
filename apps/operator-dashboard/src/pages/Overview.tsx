@@ -3,6 +3,9 @@ import { Activity, Server, Terminal, CheckCircle, XCircle, RefreshCw, Play, Tras
 import { useConfig } from '../hooks/useConfig';
 import { useAppStore } from '../store/useAppStore';
 
+// Timeout for health check requests in milliseconds
+const HEALTH_CHECK_TIMEOUT_MS = 5000;
+
 export default function Overview() {
   const { config, isLoading } = useConfig();
   const { events } = useAppStore();
@@ -23,7 +26,7 @@ export default function Overview() {
     // Check RoomServer via Integration API proxy
     try {
       const response = await fetch('/api/health/roomserver', {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
       });
       
       if (response.ok) {
@@ -49,7 +52,7 @@ export default function Overview() {
     // Check RoomOperator via Integration API proxy
     try {
       const response = await fetch('/api/health/roomoperator', {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
       });
       
       if (response.ok) {

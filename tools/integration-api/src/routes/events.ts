@@ -93,7 +93,8 @@ async function proxyEventStream(
   source: 'roomserver' | 'roomoperator'
 ) {
   const controller = new AbortController();
-  let isConnected = false;
+  // Track if we successfully connected to prevent duplicate error messages
+  let hasAttemptedConnection = false;
 
   try {
     const upstreamResponse = await fetch(eventUrl, {
@@ -103,7 +104,7 @@ async function proxyEventStream(
 
     if (!upstreamResponse.ok || !upstreamResponse.body) {
       // Only send error once when connection fails
-      if (!isConnected) {
+      if (!hasAttemptedConnection) {
         sendSSEMessage(res, {
           source,
           type: 'error',
@@ -114,7 +115,7 @@ async function proxyEventStream(
       return () => controller.abort();
     }
 
-    isConnected = true;
+    hasAttemptedConnection = true;
 
     // Use the body as an async iterable
     (async () => {
@@ -123,7 +124,7 @@ async function proxyEventStream(
           parseAndForwardChunk(chunk.toString(), res, source);
         }
         // Connection ended normally
-        if (isConnected) {
+        if (hasAttemptedConnection) {
           sendSSEMessage(res, {
             source,
             type: 'disconnected',
@@ -132,7 +133,7 @@ async function proxyEventStream(
           });
         }
       } catch (error: any) {
-        if (!controller.signal.aborted && isConnected) {
+        if (!controller.signal.aborted && hasAttemptedConnection) {
           sendSSEMessage(res, {
             source,
             type: 'error',
@@ -150,7 +151,7 @@ async function proxyEventStream(
     return cleanup;
   } catch (error: any) {
     // Only send connection error once
-    if (!isConnected) {
+    if (!hasAttemptedConnection) {
       const message = error instanceof AbortError ? 'Connection aborted' : `Cannot connect: ${error.message}`;
       sendSSEMessage(res, {
         source,

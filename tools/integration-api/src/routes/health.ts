@@ -4,6 +4,9 @@ import { getConfig } from '../services/config.js';
 
 export const healthRouter = Router();
 
+// Timeout for health check requests in milliseconds
+const HEALTH_CHECK_TIMEOUT_MS = 5000;
+
 // GET /api/health/roomserver - Check RoomServer health
 healthRouter.get('/roomserver', async (req, res) => {
   try {
@@ -15,14 +18,14 @@ healthRouter.get('/roomserver', async (req, res) => {
       // Try /health endpoint first
       response = await fetch(`${baseUrl}/health`, {
         method: 'GET',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
       });
     } catch {
       // Fallback to base URL
       try {
         response = await fetch(baseUrl, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       } catch (error: any) {
         return res.status(503).json({
@@ -78,14 +81,14 @@ healthRouter.get('/roomoperator', async (req, res) => {
       // Try /health endpoint first
       response = await fetch(`${baseUrl}/health`, {
         method: 'GET',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
       });
     } catch {
       // Fallback to base URL
       try {
         response = await fetch(baseUrl, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       } catch (error: any) {
         return res.status(503).json({
@@ -148,12 +151,12 @@ healthRouter.get('/all', async (req, res) => {
       try {
         rsResponse = await fetch(`${rsUrl}/health`, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       } catch {
         rsResponse = await fetch(rsUrl, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       }
       
@@ -177,12 +180,12 @@ healthRouter.get('/all', async (req, res) => {
       try {
         roResponse = await fetch(`${roUrl}/health`, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       } catch {
         roResponse = await fetch(roUrl, {
           method: 'GET',
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
         });
       }
       
@@ -204,7 +207,7 @@ healthRouter.get('/all', async (req, res) => {
       const mcpUrl = `${config.roomServer.baseUrl}/status/mcp`;
       const mcpResponse = await fetch(mcpUrl, {
         method: 'GET',
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(HEALTH_CHECK_TIMEOUT_MS)
       });
       
       results.mcp = {

@@ -2,6 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Save, RefreshCw, CheckCircle, XCircle, Loader } from 'lucide-react';
 import { useConfig } from '../hooks/useConfig';
 
+// Timeout for connection tests and config checks in milliseconds
+const CONNECTION_TIMEOUT_MS = 5000;
+const CONFIG_CHECK_INTERVAL_MS = 5000;
+
 export default function Settings() {
   const { config, isLoading, updateConfig } = useConfig();
   const [editedConfig, setEditedConfig] = useState<string>('');
@@ -40,7 +44,7 @@ export default function Settings() {
       }
     };
 
-    const interval = setInterval(checkConfigVersion, 5000);
+    const interval = setInterval(checkConfigVersion, CONFIG_CHECK_INTERVAL_MS);
     checkConfigVersion(); // Check immediately
 
     return () => clearInterval(interval);
@@ -84,7 +88,7 @@ export default function Settings() {
       // Test RoomServer via Integration API proxy
       try {
         const rsResponse = await fetch('/api/health/roomserver', {
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(CONNECTION_TIMEOUT_MS)
         });
         
         if (rsResponse.ok) {
@@ -110,7 +114,7 @@ export default function Settings() {
       // Test RoomOperator via Integration API proxy
       try {
         const roResponse = await fetch('/api/health/roomoperator', {
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(CONNECTION_TIMEOUT_MS)
         });
         
         if (roResponse.ok) {
@@ -136,7 +140,7 @@ export default function Settings() {
       // Test MCP Status
       try {
         const mcpResponse = await fetch('/api/mcp/status', {
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(CONNECTION_TIMEOUT_MS)
         });
         results.mcp = {
           status: mcpResponse.ok ? 'success' : 'warning',
