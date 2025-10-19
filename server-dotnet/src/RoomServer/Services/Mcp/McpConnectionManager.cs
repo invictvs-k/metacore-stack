@@ -252,10 +252,9 @@ public class McpConnectionManager
 
     private async Task EnsureConnectionMonitorAsync(string providerId, IMcpClient client, McpServerConfig config)
     {
-        var attempts = 0;
         var monitorLock = GetMonitorLock(providerId);
 
-        while (true)
+        for (var attempts = 0; attempts < MonitorRegistrationRetryLimit; attempts++)
         {
             MonitorRegistration registration;
 
@@ -275,9 +274,14 @@ public class McpConnectionManager
                 return;
             }
 
-            attempts++;
+            if (!registration.Task.IsFaulted && !registration.Task.IsCanceled)
+            {
+                // A successfully completed monitor indicates the loop exited gracefully (e.g. during shutdown),
+                // so avoid respawning another watcher and just return.
+                return;
+            }
 
-            if (attempts >= MonitorRegistrationRetryLimit)
+            if (attempts + 1 >= MonitorRegistrationRetryLimit)
             {
                 _logger.LogWarning("[{ProviderId}] Connection monitor restart attempts exceeded retry limit", providerId);
                 return;
@@ -290,7 +294,12 @@ public class McpConnectionManager
     private MonitorRegistration StartMonitorTask(string providerId, IMcpClient client, McpServerConfig config)
     {
         var token = Guid.NewGuid();
-        var monitorTask = Task.Run(() => MonitorConnectionAsync(providerId, client, config, token));
+        var monitorTask = Task.Factory.StartNew(
+                () => MonitorConnectionAsync(providerId, client, config, token),
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default)
+            .Unwrap();
         return new MonitorRegistration(monitorTask, token);
     }
 
