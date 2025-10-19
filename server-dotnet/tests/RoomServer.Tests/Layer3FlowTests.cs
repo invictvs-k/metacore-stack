@@ -525,7 +525,7 @@ public class Layer3FlowTests : IAsyncLifetime
   private HubConnection BuildConnection()
   {
     return new HubConnectionBuilder()
-        .WithUrl("http://localhost/room", options =>
+        .WithUrl(new Uri(_factory.Server.BaseAddress, "/room"), options =>
         {
           options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
           options.Transports = HttpTransportType.LongPolling;
