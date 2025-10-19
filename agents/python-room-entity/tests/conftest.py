@@ -43,17 +43,15 @@ def room_server() -> Iterator[Dict[str, object]]:
         ],
         cwd=str(ROOT),
         env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     try:
         _wait_for_health()
     except Exception:
         process.terminate()
-        stdout, _ = process.communicate(timeout=5)
-        raise RuntimeError(f"RoomServer failed to start:\n{stdout}") from None
+        process.wait(timeout=5)
+        raise RuntimeError("RoomServer failed to start (check logs for details)") from None
 
     yield {"base_url": SERVER_URL, "process": process}
 
