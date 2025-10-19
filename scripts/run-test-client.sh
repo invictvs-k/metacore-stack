@@ -32,7 +32,7 @@ export OPERATOR_URL="http://localhost:40802"
 export ROOMSERVER_URL="http://localhost:40801"
 export VERBOSE="true"
 
-node scenarios/mcp/run-mcp-tests.js > "$ARTIFACTS_DIR/logs/test-client.log" 2>&1
+node scenarios/mcp/run-mcp-tests.js > "$ARTIFACTS_DIR/logs/test-client.log" 2> "$ARTIFACTS_DIR/logs/test-client-error.log"
 TEST_EXIT=$?
 
 echo "Test client finished with exit code: $TEST_EXIT"
