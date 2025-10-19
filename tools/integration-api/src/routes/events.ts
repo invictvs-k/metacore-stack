@@ -107,32 +107,47 @@ async function proxyEventStream(
       return () => controller.abort();
     }
 
-    const readable = Readable.fromWeb(upstreamResponse.body as any);
-    readable.on('data', (chunk: Buffer) => {
-      parseAndForwardChunk(chunk.toString(), res, source);
-    });
-    readable.on('error', (error: Error) => {
+    if (
+      typeof upstreamResponse.body === 'object' &&
+      upstreamResponse.body !== null &&
+      typeof (upstreamResponse.body as ReadableStream).getReader === 'function'
+    ) {
+      const readable = Readable.fromWeb(upstreamResponse.body as ReadableStream);
+      readable.on('data', (chunk: Buffer) => {
+        parseAndForwardChunk(chunk.toString(), res, source);
+      });
+      readable.on('error', (error: Error) => {
+        sendSSEMessage(res, {
+          source,
+          type: 'error',
+          timestamp: new Date().toISOString(),
+          error: error.message
+        });
+      });
+      readable.on('end', () => {
+        sendSSEMessage(res, {
+          source,
+          type: 'disconnected',
+          timestamp: new Date().toISOString()
+        });
+      });
+
+      const cleanup = () => {
+        controller.abort();
+        readable.destroy();
+      };
+
+      return cleanup;
+    } else {
       sendSSEMessage(res, {
         source,
         type: 'error',
         timestamp: new Date().toISOString(),
-        error: error.message
+        error: 'Upstream response body is not a ReadableStream'
       });
-    });
-    readable.on('end', () => {
-      sendSSEMessage(res, {
-        source,
-        type: 'disconnected',
-        timestamp: new Date().toISOString()
-      });
-    });
-
-    const cleanup = () => {
       controller.abort();
-      readable.destroy();
-    };
-
-    return cleanup;
+      return () => {};
+    }
   } catch (error: any) {
     const message = error instanceof AbortError ? 'Connection closed' : error.message;
     sendSSEMessage(res, {
