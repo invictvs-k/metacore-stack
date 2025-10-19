@@ -50,12 +50,14 @@ class OpenAIChatClient(OpenAIResponder):
         max_tokens = kwargs.get("max_tokens", self.max_tokens)
         if max_tokens is None:
             max_tokens = self.max_tokens
-        response = self.client.chat.completions.create(
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            messages=list(messages),
-        )
+        params = {
+            "model": model,
+            "temperature": temperature,
+            "messages": list(messages),
+        }
+        if max_tokens is not None:
+            params["max_tokens"] = int(max_tokens)
+        response = self.client.chat.completions.create(**params)
         choice = response.choices[0]
         message = choice.message
         if message is None or message.content is None:
