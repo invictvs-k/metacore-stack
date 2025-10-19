@@ -34,8 +34,20 @@ cleanup() {
     fi
     
     # Clean up any lingering processes on ports
-    lsof -ti:5000 | xargs kill -9 2>/dev/null || true
-    lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+    for PORT in 5000 8080; do
+        PIDS=$(lsof -ti:$PORT)
+        if [ ! -z "$PIDS" ]; then
+            echo "Attempting graceful shutdown of processes on port $PORT..."
+            echo "$PIDS" | xargs kill 2>/dev/null || true
+            sleep 2
+            # Check if any processes are still running, then force kill
+            REMAINING_PIDS=$(lsof -ti:$PORT)
+            if [ ! -z "$REMAINING_PIDS" ]; then
+                echo "Force killing remaining processes on port $PORT..."
+                echo "$REMAINING_PIDS" | xargs kill -9 2>/dev/null || true
+            fi
+        fi
+    done
     
     echo "Cleanup complete"
 }
