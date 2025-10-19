@@ -29,7 +29,7 @@ public sealed class SseStreamWriter : IAsyncDisposable
 
     public static void ConfigureResponse(HttpResponse response)
     {
-        response.Headers["Content-Type"] = "text/event-stream";
+        response.ContentType = "text/event-stream; charset=utf-8";
         response.Headers["Cache-Control"] = "no-cache";
         response.Headers["Connection"] = "keep-alive";
         response.Headers["X-Accel-Buffering"] = "no";
