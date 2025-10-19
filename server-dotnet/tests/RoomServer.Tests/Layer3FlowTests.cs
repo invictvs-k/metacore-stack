@@ -34,6 +34,8 @@ public class Layer3FlowTests : IAsyncLifetime
 {
   private readonly WebApplicationFactory<Program> _factory = new();
   private static readonly TimeSpan EventTimeout = TimeSpan.FromSeconds(10);
+  private const string EventKindRoomState = "ROOM.STATE";
+  private const string EventKindEntityJoin = "ENTITY.JOIN";
 
   #region Flow 3.1 - Room Creation Tests
 
@@ -66,7 +68,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
+    var roomStateReceived = SubscribeForEvent(connection, EventKindRoomState);
 
     // Act - First entity joins
     await connection.StartAsync();
@@ -79,7 +81,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
     // Assert - Room state event shows transition from init
     var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
-    roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
+    roomStateEvent.Payload.Kind.Should().Be(EventKindRoomState);
 
     var stateData = roomStateEvent.Payload.Data;
     stateData.TryGetProperty("state", out var state).Should().BeTrue();
@@ -105,7 +107,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
+    var roomStateReceived = SubscribeForEvent(connection, EventKindRoomState);
 
     // Act
     await connection.StartAsync();
@@ -119,7 +121,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - ROOM.STATE event is emitted
     var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     roomStateEvent.Should().NotBeNull();
-    roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
+    roomStateEvent.Payload.Kind.Should().Be(EventKindRoomState);
     roomStateEvent.RoomId.Should().Be(roomId);
   }
 
@@ -132,7 +134,7 @@ public class Layer3FlowTests : IAsyncLifetime
     var roomId = $"room-test-{Guid.NewGuid():N}";
     await using var connection = BuildConnection();
 
-    var roomStateReceived = SubscribeForEvent(connection, "ROOM.STATE");
+    var roomStateReceived = SubscribeForEvent(connection, EventKindRoomState);
 
     // Act - Complete flow: Create room by joining
     await connection.StartAsync();
@@ -151,7 +153,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Step 2-4: Room initializes, waits, and emits ROOM.STATE
     var roomStateEvent = await roomStateReceived.Task.WaitAsync(EventTimeout);
     roomStateEvent.Should().NotBeNull();
-    roomStateEvent.Payload.Kind.Should().Be("ROOM.STATE");
+    roomStateEvent.Payload.Kind.Should().Be(EventKindRoomState);
 
     // Step 5: Room transitions to active
     var stateData = roomStateEvent.Payload.Data;
@@ -286,7 +288,7 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
 
-    var entityJoinReceived = SubscribeForEvent(connectionA, "ENTITY.JOIN", evt =>
+    var entityJoinReceived = SubscribeForEvent(connectionA, EventKindEntityJoin, evt =>
       evt.Payload.Data.TryGetProperty("entity", out var entity) &&
       entity.GetProperty("id").GetString() == "E-NewAgent");
 
@@ -310,7 +312,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Assert - ENTITY.JOIN event is emitted
     var joinEvent = await entityJoinReceived.Task.WaitAsync(EventTimeout);
     joinEvent.Should().NotBeNull();
-    joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
+    joinEvent.Payload.Kind.Should().Be(EventKindEntityJoin);
     joinEvent.RoomId.Should().Be(roomId);
 
     // Verify entity data in event
@@ -358,7 +360,7 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connectionA = BuildConnection();
     await using var connectionB = BuildConnection();
 
-    var entityJoinReceived = SubscribeForEvent(connectionA, "ENTITY.JOIN", evt =>
+    var entityJoinReceived = SubscribeForEvent(connectionA, EventKindEntityJoin, evt =>
       evt.Payload.Data.TryGetProperty("entity", out var entity) &&
       entity.GetProperty("id").GetString() == "E-CompleteAgent");
 
@@ -397,7 +399,7 @@ public class Layer3FlowTests : IAsyncLifetime
     // Step 4: ENTITY.JOIN event emitted
     var joinEvent = await entityJoinReceived.Task.WaitAsync(EventTimeout);
     joinEvent.Should().NotBeNull();
-    joinEvent.Payload.Kind.Should().Be("ENTITY.JOIN");
+    joinEvent.Payload.Kind.Should().Be(EventKindEntityJoin);
 
     // Step 5: Entity receives list of resources
     agent.Capabilities.Should().Contain("text.generate");
@@ -417,7 +419,7 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var connAgent1 = BuildConnection();
     await using var connAgent2 = BuildConnection();
 
-    var agent2JoinReceived = SubscribeForEvent(connHuman, "ENTITY.JOIN", evt =>
+    var agent2JoinReceived = SubscribeForEvent(connHuman, EventKindEntityJoin, evt =>
       evt.Payload.Data.TryGetProperty("entity", out var entity) &&
       entity.GetProperty("id").GetString() == "E-Agent2");
 
@@ -467,7 +469,7 @@ public class Layer3FlowTests : IAsyncLifetime
     await using var conn1 = BuildConnection();
     await using var conn2 = BuildConnection();
 
-    var roomStateReceived = SubscribeForEvent(conn1, "ROOM.STATE", evt =>
+    var roomStateReceived = SubscribeForEvent(conn1, EventKindRoomState, evt =>
       evt.Payload.Data.TryGetProperty("entities", out var entities) &&
       entities.GetArrayLength() == 2);
 
@@ -515,7 +517,7 @@ public class Layer3FlowTests : IAsyncLifetime
   /// Reduces duplication of TaskCompletionSource + event subscription pattern.
   /// </summary>
   /// <param name="connection">The SignalR hub connection to subscribe on</param>
-  /// <param name="eventKind">The event kind to filter for (e.g., "ROOM.STATE", "ENTITY.JOIN")</param>
+  /// <param name="eventKind">The event kind to filter for (e.g., EventKindRoomState, EventKindEntityJoin)</param>
   /// <param name="predicate">Optional predicate for additional filtering of the event</param>
   /// <returns>A TaskCompletionSource that will be completed when the matching event is received</returns>
   private TaskCompletionSource<RoomEvent> SubscribeForEvent(
