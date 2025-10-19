@@ -825,7 +825,6 @@ Validar upload de artefato para workspace privado de entidade.
 1. Fazer upload para workspace privado:
    ```bash
    curl -X POST http://localhost:5000/entities/E-agent01/artifacts \
-     -H "Content-Type: multipart/form-data" \
      -F "name=analysis.json" \
      -F "type=application/json" \
      -F "file=@analysis.json"
