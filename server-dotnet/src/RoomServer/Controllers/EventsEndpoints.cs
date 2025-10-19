@@ -9,6 +9,8 @@ namespace RoomServer.Controllers;
 
 public static class EventsEndpoints
 {
+    private const int DefaultHeartbeatIntervalMs = 10000;
+
     public static void MapEventsEndpoints(this WebApplication app)
     {
         // GET /events - Server-Sent Events endpoint
