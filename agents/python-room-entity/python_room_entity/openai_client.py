@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Optional, Protocol
+from typing import Dict, Iterable, Optional, Protocol, TypedDict
 
 try:  # pragma: no cover - import guarded for optional dependency resolution
     from openai import OpenAI
@@ -11,7 +11,11 @@ except Exception:  # pragma: no cover
     OpenAI = None  # type: ignore[misc, assignment]
 
 
-ChatMessage = Dict[str, str]
+class ChatMessage(TypedDict):
+    """A chat message with a role (e.g., 'user', 'assistant', 'system') and content."""
+
+    role: str
+    content: str
 
 
 class OpenAIResponder(Protocol):
