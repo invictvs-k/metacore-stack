@@ -111,11 +111,13 @@ public partial class RoomHub : Hub
         if (wasInit || wasEnded)
         {
             _roomContexts.UpdateState(roomId, RoomState.Active);
+            // Emit ROOM.CREATED event as per Flow 3.1 specification
+            await _events.PublishAsync(roomId, "ROOM.CREATED", new { state = "active", entities = new[] { normalized } });
         }
-
-        if (!wasInit)
+        else
         {
-            await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
+            // Emit ENTITY.JOINED event as per Flow 3.2 specification
+            await _events.PublishAsync(roomId, "ENTITY.JOINED", new { entity = normalized });
         }
 
         // The initial ROOM.STATE payload now uses the standard schema produced by PublishRoomState,
@@ -389,7 +391,7 @@ public partial class RoomHub : Hub
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
         var roomContext = _roomContexts.Get(roomId);
-        var state = (overrideState?.ToString() ?? roomContext?.State?.ToString() ?? "init").ToLowerInvariant();
+        var state = (overrideState?.ToString() ?? roomContext?.State.ToString() ?? "init").ToLowerInvariant();
         await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
     }
 

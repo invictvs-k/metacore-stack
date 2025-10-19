@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -50,12 +51,13 @@ public class McpRegistryHostedService : IHostedService
     {
         _logger.LogInformation("Stopping MCP Registry");
 
-        // Cancel any ongoing initialization (check if not already disposed)
-        if (_cancellationTokenSource != null)
+        // Atomically exchange and dispose the cancellation token source to avoid race conditions
+        var cts = Interlocked.Exchange(ref _cancellationTokenSource, null);
+        if (cts != null)
         {
             try
             {
-                _cancellationTokenSource.Cancel();
+                cts.Cancel();
             }
             catch (ObjectDisposedException)
             {
@@ -76,13 +78,12 @@ public class McpRegistryHostedService : IHostedService
             }
         }
 
-        // Dispose the cancellation token source (check if not already disposed)
-        if (_cancellationTokenSource != null)
+        // Dispose the cancellation token source safely
+        if (cts != null)
         {
             try
             {
-                _cancellationTokenSource.Dispose();
-                _cancellationTokenSource = null;
+                cts.Dispose();
             }
             catch (ObjectDisposedException)
             {
