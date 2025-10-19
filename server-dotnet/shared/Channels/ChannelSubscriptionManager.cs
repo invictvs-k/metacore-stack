@@ -17,21 +17,21 @@ public sealed class ChannelSubscriptionManager<T>
         _optionsFactory = optionsFactory ?? throw new ArgumentNullException(nameof(optionsFactory));
     }
 
-    public (Guid SubscriptionId, ChannelReader<T> Reader, ChannelWriter<T> Writer) CreateSubscription()
+    private (Guid SubscriptionId, ChannelReader<T> Reader) CreateSubscription()
     {
         var channel = Channel.CreateBounded<T>(_optionsFactory());
         var subscriptionId = Guid.NewGuid();
 
         _subscribers[subscriptionId] = channel.Writer;
 
-        return (subscriptionId, channel.Reader, channel.Writer);
+        return (subscriptionId, channel.Reader);
     }
 
     public IAsyncEnumerable<T> SubscribeAsync(
         Func<CancellationToken, IAsyncEnumerable<T>>? replayFactory = null,
         CancellationToken cancellationToken = default)
     {
-        var (subscriptionId, reader, _) = CreateSubscription();
+        var (subscriptionId, reader) = CreateSubscription();
 
         return ReadAllAsync(subscriptionId, reader, replayFactory, cancellationToken);
     }
