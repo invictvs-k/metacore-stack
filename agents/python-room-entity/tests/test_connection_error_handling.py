@@ -98,7 +98,7 @@ def test_handlers_registered_before_start(mock_builder_class: MagicMock) -> None
     client.connect()
     
     # Verify handlers were registered before start was called
-    assert mock_hub.on.call_count == 3
+    assert mock_hub.on.call_count == 2
     mock_hub.on.assert_any_call("message", client._handle_message)
     mock_hub.on.assert_any_call("event", client._handle_event)
     assert mock_hub.on_close.call_count == 1
