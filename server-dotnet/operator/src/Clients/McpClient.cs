@@ -87,8 +87,8 @@ public sealed class McpClient : IMcpClient
     {
         if (!_enabled)
         {
-            _logger.LogWarning("MCP is disabled, returning empty status");
-            return new McpStatusResponse { Providers = new List<McpProviderStatus>() };
+            _logger.LogDebug("MCP is disabled");
+            return new McpStatusResponse { Enabled = false, Providers = new List<McpProviderStatus>() };
         }
         
         _logger.LogDebug("Fetching MCP status");
@@ -97,6 +97,6 @@ public sealed class McpClient : IMcpClient
         response.EnsureSuccessStatusCode();
         
         var result = await response.Content.ReadFromJsonAsync<McpStatusResponse>(ct);
-        return result ?? new McpStatusResponse { Providers = new List<McpProviderStatus>() };
+        return result ?? new McpStatusResponse { Enabled = true, Providers = new List<McpProviderStatus>() };
     }
 }

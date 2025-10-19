@@ -157,5 +157,5 @@ public sealed class ApplyRequestDto
 
 public sealed class LoadMcpProvidersRequestDto
 {
-    public McpProviderConfig[] Providers { get; set; } = Array.Empty<McpProviderConfig>();
+    public required McpProviderConfig[] Providers { get; set; }
 }
