@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using RoomServer.Services;
 using System.Text;
 using System.Text.Json;
@@ -8,10 +10,16 @@ namespace RoomServer.Controllers;
 
 public static class EventsEndpoints
 {
+    private const int DefaultHeartbeatIntervalMs = 10000;
+
     public static void MapEventsEndpoints(this WebApplication app)
     {
         // GET /events - Server-Sent Events endpoint
-        app.MapGet("/events", async (HttpContext context, RoomEventPublisher eventPublisher) =>
+        app.MapGet("/events", async (
+            HttpContext context, 
+            RoomEventPublisher eventPublisher,
+            IConfiguration configuration,
+            ILogger<Program> logger) =>
         {
             context.Response.Headers["Content-Type"] = "text/event-stream";
             context.Response.Headers["Cache-Control"] = "no-cache";
@@ -30,6 +38,9 @@ public static class EventsEndpoints
             await SendSseEventAsync(context.Response, connectedEvent);
             await context.Response.Body.FlushAsync();
 
+            // Get configurable heartbeat interval
+            var heartbeatIntervalMs = configuration.GetValue<int?>("Events:HeartbeatIntervalMs") ?? DefaultHeartbeatIntervalMs;
+            
             // Keep connection alive with periodic heartbeats
             var cancellationToken = context.RequestAborted;
             
@@ -41,8 +52,8 @@ public static class EventsEndpoints
                     await context.Response.WriteAsync(": ping\n\n");
                     await context.Response.Body.FlushAsync();
                     
-                    // Wait 10 seconds before next heartbeat
-                    await Task.Delay(10000, cancellationToken);
+                    // Wait before next heartbeat
+                    await Task.Delay(heartbeatIntervalMs, cancellationToken);
                 }
             }
             catch (OperationCanceledException)
@@ -51,8 +62,7 @@ public static class EventsEndpoints
             }
             catch (Exception ex)
             {
-                // Log error but don't throw
-                Console.WriteLine($"Error in SSE stream: {ex.Message}");
+                logger.LogError(ex, "Error in SSE stream");
             }
         });
     }
