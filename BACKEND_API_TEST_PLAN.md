@@ -370,11 +370,17 @@ Verificar que eventos de mudança de estado são publicados corretamente.
 **Resultados Esperados:**
 - Evento emitido na transição Init → Active
 - Evento emitido na transição Active → Ended
-- Payload contém tipo "event" com kind "ROOM.STATE" e campo state
-- Exemplo de evento Active:
+- Mensagem completa inclui envelope com campos obrigatórios (id, roomId, from, ts, etc.)
+- Exemplo completo de mensagem de evento Active:
   ```json
   {
+    "id": "01HQNXYZ9ABCDEFGHIJK1234",
+    "roomId": "room-test123",
+    "channel": "main",
+    "from": "system",
     "type": "event",
+    "ts": "2025-10-19T02:00:00Z",
+    "correlationId": null,
     "payload": {
       "kind": "ROOM.STATE",
       "state": "Active",
@@ -388,10 +394,16 @@ Verificar que eventos de mudança de estado são publicados corretamente.
     }
   }
   ```
-- Exemplo de evento Ended:
+- Exemplo completo de mensagem de evento Ended:
   ```json
   {
+    "id": "01HQNXYZ9ABCDEFGHIJK5678",
+    "roomId": "room-test123",
+    "channel": "main",
+    "from": "system",
     "type": "event",
+    "ts": "2025-10-19T02:15:00Z",
+    "correlationId": null,
     "payload": {
       "kind": "ROOM.STATE",
       "state": "Ended",
