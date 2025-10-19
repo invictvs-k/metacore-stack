@@ -38,7 +38,7 @@ Este relatório documenta a validação completa dos fluxos de ponta a ponta da 
 **Fluxo de Código:**
 
 ```csharp
-// Linha 113-120: Criação implícita da sala
+// RoomHub.Join: Criação implícita da sala
 var roomContext = _roomContexts.GetOrCreate(roomId);
 var wasInit = roomContext.State == RoomState.Init;
 var wasEnded = roomContext.State == RoomState.Ended;
