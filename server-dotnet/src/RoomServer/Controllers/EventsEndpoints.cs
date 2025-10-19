@@ -1,27 +1,27 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using RoomServer.Services;
-using System.Text.Json;
-using System.Threading;
+using Metacore.Shared.Sse;
 
 namespace RoomServer.Controllers;
 
 public static class EventsEndpoints
 {
-    private static readonly JsonSerializerOptions SseSerializerOptions = new(JsonSerializerDefaults.Web);
-
     public static void MapEventsEndpoints(this WebApplication app)
     {
         // GET /events - Server-Sent Events endpoint
-        app.MapGet("/events", async (HttpContext context, RoomEventPublisher eventPublisher) =>
+        app.MapGet("/events", async (
+            HttpContext context,
+            RoomEventPublisher eventPublisher,
+            ILogger<EventsEndpoints> logger) =>
         {
-            context.Response.Headers["Content-Type"] = "text/event-stream";
-            context.Response.Headers["Cache-Control"] = "no-cache";
-            context.Response.Headers["Connection"] = "keep-alive";
-            context.Response.Headers["X-Accel-Buffering"] = "no";
-
+            SseStreamWriter.ConfigureResponse(context.Response);
             var cancellationToken = context.RequestAborted;
-            await context.Response.StartAsync(cancellationToken);
+
+            await using var sse = new SseStreamWriter(context.Response, logger);
+            await sse.StartAsync(cancellationToken);
 
             var connectedEvent = new
             {
@@ -31,36 +31,13 @@ public static class EventsEndpoints
                 message = "Connected to RoomServer events"
             };
 
-            using var writeLock = new SemaphoreSlim(1, 1);
-
-            await writeLock.WaitAsync(cancellationToken);
-            try
-            {
-                await SendSseEventAsync(context.Response, connectedEvent, cancellationToken);
-                await context.Response.Body.FlushAsync(cancellationToken);
-            }
-            finally
-            {
-                writeLock.Release();
-            }
-
-            using var heartbeatCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var heartbeatTask = RunHeartbeatAsync(context.Response, writeLock, heartbeatCts.Token);
+            await sse.WriteEventAsync(connectedEvent, cancellationToken);
 
             try
             {
                 await foreach (var evt in eventPublisher.SubscribeAsync(cancellationToken))
                 {
-                    await writeLock.WaitAsync(cancellationToken);
-                    try
-                    {
-                        await SendSseEventAsync(context.Response, evt, cancellationToken);
-                        await context.Response.Body.FlushAsync(cancellationToken);
-                    }
-                    finally
-                    {
-                        writeLock.Release();
-                    }
+                    await sse.WriteEventAsync(evt, cancellationToken);
                 }
             }
             catch (OperationCanceledException)
@@ -69,52 +46,8 @@ public static class EventsEndpoints
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in RoomServer SSE stream: {ex.Message}");
-            }
-            finally
-            {
-                heartbeatCts.Cancel();
-                try
-                {
-                    await heartbeatTask.ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                    // Expected when the client disconnects
-                }
+                logger.LogError(ex, "Error streaming RoomServer events.");
             }
         });
-    }
-
-    private static async Task SendSseEventAsync(HttpResponse response, object data, CancellationToken cancellationToken)
-    {
-        var json = JsonSerializer.Serialize(data, SseSerializerOptions);
-        await response.WriteAsync($"data: {json}\n\n", cancellationToken);
-    }
-
-    private static async Task RunHeartbeatAsync(HttpResponse response, SemaphoreSlim writeLock, CancellationToken cancellationToken)
-    {
-        try
-        {
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
-
-                await writeLock.WaitAsync(cancellationToken);
-                try
-                {
-                    await response.WriteAsync(": ping\n\n", cancellationToken);
-                    await response.Body.FlushAsync(cancellationToken);
-                }
-                finally
-                {
-                    writeLock.Release();
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Expected when the client disconnects
-        }
     }
 }

@@ -9,6 +9,7 @@ using NUlid;
 using RoomServer.Hubs;
 using RoomServer.Models;
 using RoomServer.Services.ArtifactStore;
+using Metacore.Shared.Channels;
 
 namespace RoomServer.Services;
 
@@ -16,14 +17,6 @@ public class RoomEventPublisher
 {
   private readonly IHubContext<RoomHub> _hubContext;
   private readonly RoomObservabilityService _observability;
-  private const int ChannelCapacity = 256;
-  private static readonly BoundedChannelOptions SubscriberChannelOptions = new(ChannelCapacity)
-  {
-    SingleReader = true,
-    AllowSynchronousContinuations = false,
-    FullMode = BoundedChannelFullMode.DropOldest
-  };
-
   private readonly ConcurrentDictionary<Guid, ChannelWriter<object>> _subscribers = new();
 
   public RoomEventPublisher(IHubContext<RoomHub> hubContext, RoomObservabilityService observability)
@@ -34,7 +27,7 @@ public class RoomEventPublisher
 
   public IAsyncEnumerable<object> SubscribeAsync(CancellationToken cancellationToken = default)
   {
-    var channel = Channel.CreateBounded<object>(SubscriberChannelOptions);
+    var channel = Channel.CreateBounded<object>(ChannelSettings.CreateSingleReaderOptions());
 
     var subscriptionId = Guid.NewGuid();
     _subscribers[subscriptionId] = channel.Writer;

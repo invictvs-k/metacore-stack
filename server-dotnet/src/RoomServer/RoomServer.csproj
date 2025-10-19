@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.8" />
     <PackageReference Include="NUlid" Version="1.7.3" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\shared\Channels\ChannelSettings.cs" />
+    <Compile Include="..\shared\Sse\SseStreamWriter.cs" />
+  </ItemGroup>
 </Project>

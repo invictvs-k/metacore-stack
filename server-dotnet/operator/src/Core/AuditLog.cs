@@ -4,19 +4,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Channels;
+using Metacore.Shared.Channels;
 
 namespace RoomOperator.Core;
 
 public sealed class AuditLog
 {
-    private const int ChannelCapacity = 256;
-    private static readonly BoundedChannelOptions SubscriberChannelOptions = new(ChannelCapacity)
-    {
-        SingleReader = true,
-        AllowSynchronousContinuations = false,
-        FullMode = BoundedChannelFullMode.DropOldest
-    };
-
     private readonly ConcurrentQueue<AuditEntry> _entries = new();
     private readonly int _maxEntries;
     private readonly ILogger<AuditLog> _logger;
@@ -30,27 +23,45 @@ public sealed class AuditLog
 
     public IAsyncEnumerable<AuditEntry> SubscribeAsync(int replayCount = 100, CancellationToken cancellationToken = default)
     {
-        var channel = Channel.CreateBounded<AuditEntry>(SubscriberChannelOptions);
+        return SubscribeAsyncCore(replayCount, cancellationToken);
+    }
 
+    private async IAsyncEnumerable<AuditEntry> SubscribeAsyncCore(
+        int replayCount,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var channel = Channel.CreateBounded<AuditEntry>(ChannelSettings.CreateSingleReaderOptions());
         var subscriptionId = Guid.NewGuid();
         _subscribers[subscriptionId] = channel.Writer;
 
-        if (replayCount > 0)
+        using var registration = cancellationToken.Register(() => CompleteSubscription(subscriptionId));
+
+        try
         {
-            var snapshot = _entries.TakeLast(replayCount).ToList();
-            foreach (var entry in snapshot)
+            if (replayCount > 0)
             {
-                if (!channel.Writer.TryWrite(entry))
+                var snapshot = _entries.TakeLast(replayCount).ToList();
+                foreach (var entry in snapshot)
                 {
-                    CompleteSubscription(subscriptionId);
-                    return ReadAllAsync(channel.Reader, subscriptionId, default, cancellationToken);
+                    var wroteEntry = await TryWriteWithBackpressureAsync(channel.Writer, entry, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    if (!wroteEntry)
+                    {
+                        yield break;
+                    }
                 }
             }
+
+            await foreach (var item in ReadAllAsync(channel.Reader, cancellationToken).ConfigureAwait(false))
+            {
+                yield return item;
+            }
         }
-
-        var registration = cancellationToken.Register(() => CompleteSubscription(subscriptionId));
-
-        return ReadAllAsync(channel.Reader, subscriptionId, registration, cancellationToken);
+        finally
+        {
+            CompleteSubscription(subscriptionId);
+        }
     }
 
     public void LogEvent(string action, string correlationId, string operatorVersion, int specVersion, Dictionary<string, object>? metadata = null)
@@ -118,26 +129,32 @@ public sealed class AuditLog
         return _entries.Where(e => e.CorrelationId == correlationId).ToList();
     }
 
-    private async IAsyncEnumerable<AuditEntry> ReadAllAsync(
-        ChannelReader<AuditEntry> reader,
-        Guid subscriptionId,
-        CancellationTokenRegistration registration,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+    private static async ValueTask<bool> TryWriteWithBackpressureAsync(
+        ChannelWriter<AuditEntry> writer,
+        AuditEntry entry,
+        CancellationToken cancellationToken)
     {
-        try
+        while (await writer.WaitToWriteAsync(cancellationToken).ConfigureAwait(false))
         {
-            while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+            if (writer.TryWrite(entry))
             {
-                while (reader.TryRead(out var item))
-                {
-                    yield return item;
-                }
+                return true;
             }
         }
-        finally
+
+        return false;
+    }
+
+    private static async IAsyncEnumerable<AuditEntry> ReadAllAsync(
+        ChannelReader<AuditEntry> reader,
+        [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            registration.Dispose();
-            CompleteSubscription(subscriptionId);
+            while (reader.TryRead(out var item))
+            {
+                yield return item;
+            }
         }
     }
 
