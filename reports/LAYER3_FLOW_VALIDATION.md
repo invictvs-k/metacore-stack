@@ -52,10 +52,10 @@ if (wasInit || wasEnded)
 **Emissão de Eventos:**
 
 ```csharp
-// Linha 129: Emite evento ROOM.STATE
+// No método Join(): Emite evento ROOM.STATE
 await PublishRoomState(roomId, wasInit || wasEnded ? RoomState.Active : null);
 
-// Linha 397-403: Implementação do PublishRoomState
+// Implementação do método PublishRoomState
 private async Task PublishRoomState(string roomId, RoomState? overrideState = null)
 {
   var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
@@ -164,7 +164,7 @@ private static void ValidateEntity(EntitySpec entity)
 // O workspace é gerenciado pelo FileArtifactStore
 // Arquivo: /server-dotnet/src/RoomServer/Services/ArtifactStore/FileArtifactStore.cs
 
-// Linha 144-161: Método GetWorkspacePaths
+// Método GetWorkspacePaths em FileArtifactStore
 private (string relativeDir, string physicalDir) GetWorkspacePaths(
   string roomId, string workspace, string? entityId)
 {
@@ -188,13 +188,13 @@ private (string relativeDir, string physicalDir) GetWorkspacePaths(
 **Emissão de Eventos:**
 
 ```csharp
-// Linha 124: Emite evento ENTITY.JOIN (para entidades após a primeira)
+// No método Join(): Emite evento ENTITY.JOIN (para entidades após a primeira)
 if (!wasInit)
 {
   await _events.PublishAsync(roomId, "ENTITY.JOIN", new { entity = normalized });
 }
 
-// Linha 133: Retorna lista de entidades/recursos
+// Retorna lista de entidades/recursos no final do método Join()
 return _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
 ```
 
