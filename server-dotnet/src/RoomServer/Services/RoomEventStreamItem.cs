@@ -13,7 +13,7 @@ public abstract record RoomEventStreamItem
     public required string RoomId { get; init; }
 
     [JsonPropertyName("ts")]
-    public required DateTime Timestamp { get; init; }
+    public required DateTimeOffset Timestamp { get; init; }
 
     [JsonPropertyName("type")]
     public abstract string Type { get; }

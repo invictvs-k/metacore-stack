@@ -31,13 +31,20 @@ public static class EventsEndpoints
                 message = "Connected to RoomServer events"
             };
 
-            await sse.WriteEventAsync(connectedEvent, cancellationToken);
+            await sse.WriteEventAsync(
+                connectedEvent,
+                eventName: "connected",
+                cancellationToken: cancellationToken);
 
             try
             {
                 await foreach (var evt in eventPublisher.SubscribeAsync(cancellationToken))
                 {
-                    await sse.WriteEventAsync(evt, cancellationToken);
+                    await sse.WriteEventAsync(
+                        evt,
+                        eventName: evt.Type,
+                        eventId: evt.Id,
+                        cancellationToken: cancellationToken);
                 }
             }
             catch (OperationCanceledException)

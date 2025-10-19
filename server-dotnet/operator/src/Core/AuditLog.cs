@@ -1,10 +1,12 @@
-using RoomOperator.Abstractions;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Channels;
+using Microsoft.Extensions.Logging;
 using Metacore.Shared.Channels;
+using RoomOperator.Abstractions;
 
 namespace RoomOperator.Core;
 
@@ -24,38 +26,11 @@ public sealed class AuditLog
 
     public IAsyncEnumerable<AuditEntry> SubscribeAsync(int replayCount = 100, CancellationToken cancellationToken = default)
     {
-        return SubscribeAsyncCore(replayCount, cancellationToken);
-    }
+        Func<CancellationToken, IAsyncEnumerable<AuditEntry>>? replayFactory = replayCount > 0
+            ? ct => ReplayEntriesAsync(replayCount, ct)
+            : null;
 
-    private async IAsyncEnumerable<AuditEntry> SubscribeAsyncCore(
-        int replayCount,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        var (subscriptionId, reader, _) = _subscriptions.CreateSubscription();
-
-        using var registration = cancellationToken.Register(() => _subscriptions.Complete(subscriptionId));
-
-        try
-        {
-            if (replayCount > 0)
-            {
-                var snapshot = _entries.TakeLast(replayCount).ToList();
-                foreach (var entry in snapshot)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    yield return entry;
-                }
-            }
-
-            await foreach (var item in ReadAllAsync(reader, cancellationToken).ConfigureAwait(false))
-            {
-                yield return item;
-            }
-        }
-        finally
-        {
-            _subscriptions.Complete(subscriptionId);
-        }
+        return _subscriptions.SubscribeAsync(replayFactory, cancellationToken);
     }
 
     public void LogEvent(string action, string correlationId, string operatorVersion, int specVersion, Dictionary<string, object>? metadata = null)
@@ -123,16 +98,16 @@ public sealed class AuditLog
         return _entries.Where(e => e.CorrelationId == correlationId).ToList();
     }
 
-    private static async IAsyncEnumerable<AuditEntry> ReadAllAsync(
-        ChannelReader<AuditEntry> reader,
+    private async IAsyncEnumerable<AuditEntry> ReplayEntriesAsync(
+        int replayCount,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
+        var snapshot = _entries.TakeLast(replayCount).ToList();
+
+        foreach (var entry in snapshot)
         {
-            while (reader.TryRead(out var item))
-            {
-                yield return item;
-            }
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return entry;
         }
     }
 

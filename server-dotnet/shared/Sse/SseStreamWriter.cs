@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,10 +43,28 @@ public sealed class SseStreamWriter : IAsyncDisposable
         _heartbeatTask = RunHeartbeatAsync(_heartbeatCts.Token);
     }
 
-    public Task WriteEventAsync(object payload, CancellationToken cancellationToken)
+    public Task WriteEventAsync(
+        object payload,
+        string? eventName = null,
+        string? eventId = null,
+        CancellationToken cancellationToken = default)
     {
         var json = JsonSerializer.Serialize(payload, SerializerOptions);
-        return WriteRawAsync($"data: {json}\n\n", cancellationToken);
+        var builder = new StringBuilder();
+
+        if (!string.IsNullOrWhiteSpace(eventId))
+        {
+            builder.Append("id: ").Append(eventId).Append('\n');
+        }
+
+        if (!string.IsNullOrWhiteSpace(eventName))
+        {
+            builder.Append("event: ").Append(eventName).Append('\n');
+        }
+
+        builder.Append("data: ").Append(json).Append("\n\n");
+
+        return WriteRawAsync(builder.ToString(), cancellationToken);
     }
 
     private async Task WriteRawAsync(string payload, CancellationToken cancellationToken)

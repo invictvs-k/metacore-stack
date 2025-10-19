@@ -31,13 +31,20 @@ public static class EventsEndpoints
                 message = "Connected to RoomOperator events"
             };
 
-            await sse.WriteEventAsync(connectedEvent, cancellationToken);
+            await sse.WriteEventAsync(
+                connectedEvent,
+                eventName: "connected",
+                cancellationToken: cancellationToken);
 
             try
             {
                 await foreach (var entry in auditLog.SubscribeAsync(cancellationToken: cancellationToken))
                 {
-                    await sse.WriteEventAsync(entry, cancellationToken);
+                    await sse.WriteEventAsync(
+                        entry,
+                        eventName: entry.Type,
+                        eventId: string.IsNullOrWhiteSpace(entry.CorrelationId) ? null : entry.CorrelationId,
+                        cancellationToken: cancellationToken);
                 }
             }
             catch (OperationCanceledException)

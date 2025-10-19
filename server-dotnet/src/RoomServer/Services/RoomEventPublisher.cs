@@ -1,8 +1,7 @@
 using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Channels;
 using Microsoft.AspNetCore.SignalR;
 using NUlid;
 using RoomServer.Hubs;
@@ -27,9 +26,7 @@ public class RoomEventPublisher
 
   public IAsyncEnumerable<RoomEventStreamItem> SubscribeAsync(CancellationToken cancellationToken = default)
   {
-    var (subscriptionId, reader, _) = _subscriptions.CreateSubscription();
-
-    return ReadAllAsync(subscriptionId, reader, cancellationToken);
+    return _subscriptions.SubscribeAsync(cancellationToken: cancellationToken);
   }
 
   public async Task PublishAsync(string roomId, string eventType, object data)
@@ -41,7 +38,7 @@ public class RoomEventPublisher
     {
       Id = Ulid.NewUlid().ToString(),
       RoomId = roomId,
-      Timestamp = DateTime.UtcNow,
+      Timestamp = DateTimeOffset.UtcNow,
       Payload = new RoomEventPayload
       {
         Kind = eventType,
@@ -83,34 +80,23 @@ public class RoomEventPublisher
     {
       Id = message.Id,
       RoomId = message.RoomId,
-      Timestamp = message.Ts,
+      Timestamp = NormalizeTimestamp(message.Ts),
       Payload = message
     };
 
     Broadcast(envelope);
   }
 
-  private async IAsyncEnumerable<RoomEventStreamItem> ReadAllAsync(
-      Guid subscriptionId,
-      ChannelReader<RoomEventStreamItem> reader,
-      [EnumeratorCancellation] CancellationToken cancellationToken)
-  {
-    using var registration = cancellationToken.Register(() => _subscriptions.Complete(subscriptionId));
-    try
-    {
-      while (await reader.WaitToReadAsync(cancellationToken).ConfigureAwait(false))
-      {
-        while (reader.TryRead(out var item))
-        {
-          yield return item;
-        }
-      }
-    }
-    finally
-    {
-      _subscriptions.Complete(subscriptionId);
-    }
-  }
-
   private void Broadcast(RoomEventStreamItem payload) => _subscriptions.Broadcast(payload);
+
+  private static DateTimeOffset NormalizeTimestamp(DateTime timestamp)
+  {
+    return timestamp.Kind switch
+    {
+      DateTimeKind.Unspecified => new DateTimeOffset(DateTime.SpecifyKind(timestamp, DateTimeKind.Utc)),
+      DateTimeKind.Utc => new DateTimeOffset(timestamp, TimeSpan.Zero),
+      DateTimeKind.Local => new DateTimeOffset(timestamp),
+      _ => new DateTimeOffset(timestamp)
+    };
+  }
 }
