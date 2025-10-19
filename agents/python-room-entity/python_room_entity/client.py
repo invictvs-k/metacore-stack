@@ -64,6 +64,7 @@ class RoomClient:
     def verify_ssl(self) -> bool:
         """Whether SSL verification is enabled for the hub connection."""
         return self._verify_ssl
+
     def connect(self) -> None:
         """Initialise the SignalR hub connection."""
 
