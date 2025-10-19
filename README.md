@@ -7,6 +7,16 @@ Mono-repo com:
 - `schemas/` — JSON Schemas base + exemplos + validação AJV
 - `infra/` — docker-compose para ambiente local
 
+## Port Configuration
+
+All components use standardized ports for easy integration:
+- **RoomServer**: 40801
+- **RoomOperator**: 40802
+- **Integration API**: 40901
+- **Dashboard UI**: 5173
+
+See [PORT_CONFIGURATION.md](PORT_CONFIGURATION.md) for detailed setup and configuration.
+
 ## Quickstart
 ```bash
 # 0) verify environment (optional but recommended)
