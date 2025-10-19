@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,8 @@ public class McpConnectionManager
     private readonly ConcurrentDictionary<string, ProviderStatus> _providerStates = new();
     private readonly ConcurrentDictionary<string, McpServerConfig> _providerConfigs = new();
     private readonly ConcurrentDictionary<string, IMcpClient> _clients = new();
+    private readonly ConcurrentDictionary<string, MonitorRegistration> _monitorTasks = new();
+    private readonly ConcurrentDictionary<string, object> _monitorLocks = new();
     private readonly ConcurrentDictionary<string, long> _logRateLimitGate = new();
     private readonly ResourceCatalog _catalog;
     private readonly McpDefaultsConfig? _defaults;
@@ -52,10 +55,26 @@ public class McpConnectionManager
     private const int MaxRetryAttempts = 5;
     private const int MaxBackoffSeconds = 60;
     private const int LogRateLimitWindowMs = 60000; // 1 minute
+    private const int MonitorRegistrationRetryLimit = 5;
+    private static readonly TimeSpan MonitorRegistrationRetryDelay = TimeSpan.FromMilliseconds(50);
     
-    private volatile bool _disposed = false;
+    private readonly CancellationTokenSource _shutdownCts = new();
+    private bool _disposed = false;
 
     public ResourceCatalog Catalog => _catalog;
+
+    private sealed class MonitorRegistration
+    {
+        public MonitorRegistration(Task task, Guid token)
+        {
+            Task = task;
+            Token = token;
+        }
+
+        public Task Task { get; }
+
+        public Guid Token { get; }
+    }
 
     public McpConnectionManager(IConfiguration configuration, ILoggerFactory loggerFactory)
     {
@@ -115,6 +134,11 @@ public class McpConnectionManager
             return;
         }
 
+        await ConnectProviderAsync(providerId, config);
+    }
+
+    private async Task ConnectProviderAsync(string providerId, McpServerConfig config)
+    {
         await _connectionLock.WaitAsync();
         try
         {
@@ -146,9 +170,9 @@ public class McpConnectionManager
                     {
                         SetState(providerId, McpState.Connected);
                         await LoadAndRegisterToolsAsync(providerId, client, config);
-                        
+
                         // Start monitoring for reconnection in background
-                        _ = Task.Run(() => MonitorConnectionAsync(providerId, client, config));
+                        await EnsureConnectionMonitorAsync(providerId, client, config);
                         return;
                     }
                 }
@@ -181,35 +205,135 @@ public class McpConnectionManager
     /// <summary>
     /// Monitors connection and attempts reconnection if disconnected.
     /// </summary>
-    private async Task MonitorConnectionAsync(string providerId, IMcpClient client, McpServerConfig config)
+    private async Task MonitorConnectionAsync(string providerId, IMcpClient client, McpServerConfig config, Guid registrationToken, CancellationToken shutdownToken)
     {
-        while (!_disposed)
+        try
         {
-            try
+            while (!_disposed && !shutdownToken.IsCancellationRequested)
             {
-                await Task.Delay(5000);
-                
-                if (!client.IsConnected && !_disposed)
+                try
                 {
-                    _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
-                    SetState(providerId, McpState.Connecting);
-                    await ConnectProviderAsync(providerId);
-                    
-                    if (client.IsConnected)
+                    await Task.Delay(5000, shutdownToken);
+
+                    if (!client.IsConnected && !_disposed && !shutdownToken.IsCancellationRequested)
                     {
-                        SetState(providerId, McpState.Connected);
+                        _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
+                        SetState(providerId, McpState.Connecting);
+                        await ConnectProviderAsync(providerId, config);
+
+                        if (client.IsConnected)
+                        {
+                            SetState(providerId, McpState.Connected);
+                        }
+                    }
+                }
+                catch (OperationCanceledException) when (shutdownToken.IsCancellationRequested)
+                {
+                    // Shutdown was requested, exit gracefully.
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (ShouldLogError(providerId))
+                    {
+                        _logger.LogError(ex, "[{ProviderId}] Error in connection monitor", providerId);
+                    }
+                    try
+                    {
+                        await Task.Delay(10000, shutdownToken);
+                    }
+                    catch (OperationCanceledException) when (shutdownToken.IsCancellationRequested)
+                    {
+                        break;
                     }
                 }
             }
-            catch (Exception ex)
+        }
+        finally
+        {
+            var monitorLock = GetMonitorLock(providerId);
+
+            lock (monitorLock)
             {
-                if (ShouldLogError(providerId))
+                if (_monitorTasks.TryGetValue(providerId, out var registration) && registration.Token == registrationToken)
                 {
-                    _logger.LogError(ex, "[{ProviderId}] Error in connection monitor", providerId);
+                    _monitorTasks.TryRemove(providerId, out _);
+                    if (_monitorLocks.TryGetValue(providerId, out var currentLock) && ReferenceEquals(currentLock, monitorLock))
+                    {
+                        _monitorLocks.TryRemove(providerId, out _);
+                    }
                 }
-                await Task.Delay(10000);
             }
         }
+    }
+
+    private async Task EnsureConnectionMonitorAsync(string providerId, IMcpClient client, McpServerConfig config)
+    {
+        if (_shutdownCts.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var monitorLock = GetMonitorLock(providerId);
+
+        for (var attempts = 0; attempts < MonitorRegistrationRetryLimit; attempts++)
+        {
+            MonitorRegistration registration;
+
+            lock (monitorLock)
+            {
+                if (_monitorTasks.TryGetValue(providerId, out var existing) && !existing.Task.IsCompleted)
+                {
+                    return;
+                }
+
+                registration = StartMonitorTask(providerId, client, config);
+                _monitorTasks[providerId] = registration;
+            }
+
+            if (!registration.Task.IsCompleted)
+            {
+                return;
+            }
+
+            if (!registration.Task.IsFaulted && !registration.Task.IsCanceled)
+            {
+                if (!_disposed && !_shutdownCts.IsCancellationRequested)
+                {
+                    _logger.LogWarning("[{ProviderId}] Monitor task for provider exited unexpectedly without error", providerId);
+                }
+
+                // A successfully completed monitor indicates the loop exited gracefully (e.g. during shutdown),
+                // so avoid respawning another watcher and just return.
+                return;
+            }
+
+            if (attempts + 1 >= MonitorRegistrationRetryLimit)
+            {
+                _logger.LogWarning("[{ProviderId}] Connection monitor restart attempts exceeded retry limit", providerId);
+                return;
+            }
+
+            await Task.Delay(MonitorRegistrationRetryDelay);
+        }
+    }
+
+    private MonitorRegistration StartMonitorTask(string providerId, IMcpClient client, McpServerConfig config)
+    {
+        var token = Guid.NewGuid();
+        var shutdownToken = _shutdownCts.Token;
+        var monitorTask = Task.Factory.StartNew(
+                () => MonitorConnectionAsync(providerId, client, config, token, shutdownToken),
+                shutdownToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default)
+            .Unwrap();
+        return new MonitorRegistration(monitorTask, token);
+    }
+
+    private object GetMonitorLock(string providerId)
+    {
+        return _monitorLocks.GetOrAdd(providerId, _ => new object());
     }
 
     /// <summary>
@@ -329,6 +453,7 @@ public class McpConnectionManager
             return;
 
         _disposed = true;
+        _shutdownCts.Cancel();
 
         foreach (var client in _clients.Values)
         {
@@ -337,8 +462,30 @@ public class McpConnectionManager
                 disposable.Dispose();
             }
         }
-        
+
         _clients.Clear();
+        var monitorTasks = _monitorTasks.Values.Select(registration => registration.Task).ToArray();
+        if (monitorTasks.Length > 0)
+        {
+            try
+            {
+                Task.WaitAll(monitorTasks, TimeSpan.FromSeconds(5));
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var inner in ex.InnerExceptions)
+                {
+                    if (inner is not OperationCanceledException && inner is not TaskCanceledException)
+                    {
+                        _logger.LogDebug(inner, "Error while waiting for monitor tasks to shut down");
+                    }
+                }
+            }
+        }
+
+        _monitorTasks.Clear();
+        _monitorLocks.Clear();
+        _shutdownCts.Dispose();
         _connectionLock.Dispose();
     }
 }
