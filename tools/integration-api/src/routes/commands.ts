@@ -141,7 +141,17 @@ commandsRouter.post('/execute', async (req, res) => {
       const urlObj = new URL(url);
       const search = new URLSearchParams();
       for (const [key, value] of Object.entries(params)) {
-        search.append(key, typeof value === 'string' ? value : JSON.stringify(value));
+        if (
+          typeof value === 'string' ||
+          typeof value === 'number' ||
+          typeof value === 'boolean'
+        ) {
+          search.append(key, String(value));
+        } else {
+          throw new Error(
+            `Query parameter "${key}" must be a primitive (string, number, boolean), got ${typeof value}`
+          );
+        }
       }
       urlObj.search = search.toString();
       finalUrl = urlObj.toString();
