@@ -81,9 +81,22 @@ export default function Settings() {
         mcp: { status: 'pending' }
       };
 
-      // Test RoomServer
+      // Test RoomServer - try health endpoint first, then fallback to base URL
       try {
-        const rsResponse = await fetch(parsedConfig.roomServer.baseUrl, { method: 'HEAD' });
+        let rsResponse;
+        try {
+          rsResponse = await fetch(`${parsedConfig.roomServer.baseUrl}/health`, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(5000) 
+          });
+        } catch {
+          // Fallback to base URL if /health doesn't exist
+          rsResponse = await fetch(parsedConfig.roomServer.baseUrl, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(5000) 
+          });
+        }
+        
         results.roomServer = {
           status: rsResponse.ok ? 'success' : 'warning',
           message: rsResponse.ok ? 'Connected' : `HTTP ${rsResponse.status}`
@@ -91,13 +104,26 @@ export default function Settings() {
       } catch (error: any) {
         results.roomServer = {
           status: 'error',
-          message: error.message
+          message: error.name === 'TimeoutError' ? 'Connection timeout' : (error.message || 'Connection failed')
         };
       }
 
-      // Test RoomOperator
+      // Test RoomOperator - try health endpoint first, then fallback to base URL
       try {
-        const roResponse = await fetch(parsedConfig.roomOperator.baseUrl, { method: 'HEAD' });
+        let roResponse;
+        try {
+          roResponse = await fetch(`${parsedConfig.roomOperator.baseUrl}/health`, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(5000) 
+          });
+        } catch {
+          // Fallback to base URL if /health doesn't exist
+          roResponse = await fetch(parsedConfig.roomOperator.baseUrl, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(5000) 
+          });
+        }
+        
         results.roomOperator = {
           status: roResponse.ok ? 'success' : 'warning',
           message: roResponse.ok ? 'Connected' : `HTTP ${roResponse.status}`
@@ -105,13 +131,15 @@ export default function Settings() {
       } catch (error: any) {
         results.roomOperator = {
           status: 'error',
-          message: error.message
+          message: error.name === 'TimeoutError' ? 'Connection timeout' : (error.message || 'Connection failed')
         };
       }
 
       // Test MCP Status
       try {
-        const mcpResponse = await fetch('/api/mcp/status');
+        const mcpResponse = await fetch('/api/mcp/status', {
+          signal: AbortSignal.timeout(5000)
+        });
         results.mcp = {
           status: mcpResponse.ok ? 'success' : 'warning',
           message: mcpResponse.ok ? 'Accessible' : `HTTP ${mcpResponse.status}`,
@@ -120,7 +148,7 @@ export default function Settings() {
       } catch (error: any) {
         results.mcp = {
           status: 'error',
-          message: error.message
+          message: error.name === 'TimeoutError' ? 'Connection timeout' : (error.message || 'Connection failed')
         };
       }
 
