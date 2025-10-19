@@ -69,7 +69,7 @@ class HttpClient {
     // RoomServer client interceptors
     this.roomServerClient.interceptors.request.use(
       (config) => {
-        this.logger.debug(`→ ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
+        this.logger.debug(`→ ${(config.method?.toUpperCase() ?? 'UNKNOWN')} ${config.baseURL}${config.url}`);
         return config;
       },
       (error) => Promise.reject(error)
