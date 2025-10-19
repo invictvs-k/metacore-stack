@@ -78,7 +78,17 @@ public sealed class RoomOperatorService
             if (_requestQueue.TryDequeue(out var nextRequest))
             {
                 _ = Task.Run(
-                    async () => await ApplySpecAsync(nextRequest, _serviceCancellationToken),
+                    async () =>
+                    {
+                        try
+                        {
+                            await ApplySpecAsync(nextRequest, _serviceCancellationToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Unhandled exception in fire-and-forget ApplySpecAsync for room {RoomId}", nextRequest.Spec.Spec.RoomId);
+                        }
+                    },
                     _serviceCancellationToken);
             }
         }
