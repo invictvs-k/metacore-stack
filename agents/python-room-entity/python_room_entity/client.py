@@ -188,6 +188,8 @@ class RoomClient:
                 self._logger.exception("event handler raised")
 
     def _handle_close(self, *args: Any) -> None:
+        with self._lock:
+            self._hub = None
         self._disconnected.set()
         self._logger.warning("SignalR connection closed")
 
