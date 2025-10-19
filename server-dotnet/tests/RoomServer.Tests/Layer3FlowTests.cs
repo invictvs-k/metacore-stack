@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.Mvc.Testing;
 using RoomServer.Models;
@@ -242,7 +243,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
     // Act & Assert - Join with invalid entity ID should fail
     await connection.StartAsync();
-    var exception = await Assert.ThrowsAnyAsync<Exception>(async () =>
+    var exception = await Assert.ThrowsAsync<HubException>(async () =>
     {
       await connection.InvokeAsync("Join", roomId, new EntitySpec
       {
@@ -252,7 +253,7 @@ public class Layer3FlowTests : IAsyncLifetime
       });
     });
 
-    exception.Should().NotBeNull();
+    exception.Message.Should().Contain("INVALID_ENTITY_ID");
   }
 
   [Fact]
@@ -264,7 +265,7 @@ public class Layer3FlowTests : IAsyncLifetime
 
     // Act & Assert - Join with invalid entity kind should fail
     await connection.StartAsync();
-    var exception = await Assert.ThrowsAnyAsync<Exception>(async () =>
+    var exception = await Assert.ThrowsAsync<HubException>(async () =>
     {
       await connection.InvokeAsync("Join", roomId, new EntitySpec
       {
@@ -274,7 +275,7 @@ public class Layer3FlowTests : IAsyncLifetime
       });
     });
 
-    exception.Should().NotBeNull();
+    exception.Message.Should().Contain("INVALID_ENTITY_KIND");
   }
 
   [Fact]
