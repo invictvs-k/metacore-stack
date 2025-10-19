@@ -716,7 +716,7 @@ Validar roteamento de DMs via channel @E-*.
 - EntityId do destinatário resolvido
 - Permissão CanDirectMessage aplicada
 - Mensagem enviada apenas para conexões do destinatário
-- DM para entidade inexistente: Erro `TARGET_NOT_FOUND`
+- DM para entidade inexistente: Erro `NOT_FOUND` ("Target not found")
 
 **Considerações Adicionais:**
 - ⚠️ DM pode ter múltiplos destinatários (múltiplas conexões)
