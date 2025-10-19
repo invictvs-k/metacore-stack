@@ -248,9 +248,9 @@ public sealed class ReconcilePhases
         
         // 6. Apply policies
         // Always apply dmVisibilityDefault policy, using default value if null or empty
-        var dmVisibilityDefaultValue = string.IsNullOrEmpty(spec.Spec.Policies.DmVisibilityDefault)
-            ? Constants.DefaultDmVisibility
-            : spec.Spec.Policies.DmVisibilityDefault;
+        var dmVisibilityDefaultValue = ResolvePolicyDefault(
+            spec.Spec.Policies.DmVisibilityDefault, 
+            Constants.DefaultDmVisibility);
         try
         {
             await _retryPolicy.ExecuteAsync(async () =>
@@ -295,5 +295,16 @@ public sealed class ReconcilePhases
             _logger.LogWarning(ex, "Failed to verify final state");
             result.Warnings.Add("Verification failed");
         }
+    }
+    
+    /// <summary>
+    /// Resolves a policy value by using the specified value if non-empty, otherwise falling back to a default.
+    /// </summary>
+    /// <param name="specifiedValue">The value specified in the spec.</param>
+    /// <param name="defaultValue">The default value to use if specified value is null or empty.</param>
+    /// <returns>The resolved policy value.</returns>
+    private static string ResolvePolicyDefault(string? specifiedValue, string defaultValue)
+    {
+        return string.IsNullOrEmpty(specifiedValue) ? defaultValue : specifiedValue;
     }
 }
