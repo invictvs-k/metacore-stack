@@ -27,7 +27,7 @@ export ROOM_AUTH_TOKEN="your-token-here"
 dotnet run
 ```
 
-The operator will start on `http://localhost:8080` by default.
+The operator will start on `http://localhost:40802` by default.
 
 ### Configuration
 

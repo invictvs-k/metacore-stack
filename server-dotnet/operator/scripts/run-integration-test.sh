@@ -34,7 +34,7 @@ cleanup() {
     fi
     
     # Clean up any lingering processes on ports
-    for PORT in 5000 8080; do
+    for PORT in 40801 40802; do
         PIDS=$(lsof -ti:$PORT)
         if [ ! -z "$PIDS" ]; then
             echo "Attempting graceful shutdown of processes on port $PORT..."
@@ -73,8 +73,8 @@ echo "RoomServer started (PID: $ROOMSERVER_PID)"
 # Wait for RoomServer to be ready
 echo "Waiting for RoomServer to be ready..."
 for i in {1..30}; do
-    if curl -s http://localhost:5000/health > /dev/null 2>&1 || \
-       curl -s http://localhost:5000/ > /dev/null 2>&1; then
+    if curl -s http://localhost:40801/health > /dev/null 2>&1 || \
+       curl -s http://localhost:40801/ > /dev/null 2>&1; then
         echo -e "${GREEN}✓ RoomServer is ready${NC}"
         break
     fi
@@ -99,7 +99,7 @@ echo "RoomOperator started (PID: $OPERATOR_PID)"
 # Wait for RoomOperator to be ready
 echo "Waiting for RoomOperator to be ready..."
 for i in {1..30}; do
-    if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+    if curl -s http://localhost:40802/health > /dev/null 2>&1; then
         echo -e "${GREEN}✓ RoomOperator is ready${NC}"
         break
     fi
@@ -124,8 +124,8 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Set environment variables
-export OPERATOR_URL=http://localhost:8080
-export ROOMSERVER_URL=http://localhost:5000
+export OPERATOR_URL=http://localhost:40802
+export ROOMSERVER_URL=http://localhost:40801
 export TEST_ROOM_ID=room-test-integration
 export VERBOSE=true
 

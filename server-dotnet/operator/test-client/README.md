@@ -13,8 +13,8 @@ A comprehensive test client for validating RoomOperator-RoomServer integration. 
 ## Prerequisites
 
 - Node.js 20+ (ESM support required)
-- Running RoomOperator instance (default: http://localhost:8080)
-- Running RoomServer instance (default: http://localhost:5000)
+- Running RoomOperator instance (default: http://localhost:40802)
+- Running RoomServer instance (default: http://localhost:40801)
 - Optional: Authentication token for secured endpoints
 
 ## Installation
@@ -30,10 +30,10 @@ Configure via environment variables:
 
 ```bash
 # RoomOperator URL
-export OPERATOR_URL=http://localhost:8080
+export OPERATOR_URL=http://localhost:40802
 
 # RoomServer URL
-export ROOMSERVER_URL=http://localhost:5000
+export ROOMSERVER_URL=http://localhost:40801
 
 # Authentication token (if required)
 export ROOM_AUTH_TOKEN=your-token-here
@@ -75,8 +75,8 @@ npm run test:stress
 ### Run with Custom Configuration
 
 ```bash
-OPERATOR_URL=http://localhost:8080 \
-ROOMSERVER_URL=http://localhost:5000 \
+OPERATOR_URL=http://localhost:40802 \
+ROOMSERVER_URL=http://localhost:40801 \
 VERBOSE=true \
 npm run test:basic
 ```
@@ -283,11 +283,11 @@ Edit `config.js` to customize:
 
 **Problem:**
 ```
-ERROR   Request error: connect ECONNREFUSED 127.0.0.1:8080
+ERROR   Request error: connect ECONNREFUSED 127.0.0.1:40802
 ```
 
 **Solution:**
-1. Verify RoomOperator is running: `curl http://localhost:8080/health`
+1. Verify RoomOperator is running: `curl http://localhost:40802/health`
 2. Check OPERATOR_URL environment variable
 3. Ensure correct port number
 

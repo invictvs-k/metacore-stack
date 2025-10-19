@@ -28,8 +28,8 @@ if [ ! -d "node_modules" ]; then
 fi
 
 # Set default environment variables if not set
-export OPERATOR_URL="${OPERATOR_URL:-http://localhost:8080}"
-export ROOMSERVER_URL="${ROOMSERVER_URL:-http://localhost:5000}"
+export OPERATOR_URL="${OPERATOR_URL:-http://localhost:40802}"
+export ROOMSERVER_URL="${ROOMSERVER_URL:-http://localhost:40801}"
 export TEST_ROOM_ID="${TEST_ROOM_ID:-room-test-integration}"
 
 echo "Configuration:"
