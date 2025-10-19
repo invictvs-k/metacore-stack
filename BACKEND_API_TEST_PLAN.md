@@ -26,18 +26,8 @@ Validar que o Hub SignalR está corretamente mapeado no endpoint `/room` e aceit
    ```
 2. Usar uma ferramenta de teste SignalR (ex: Postman, ou cliente SignalR):
    ```bash
-   # Usando curl para verificar se o endpoint está acessível
-   curl -I http://localhost:5000/room
-   ```
-3. Verificar resposta de negociação SignalR:
-   ```bash
+   # Verificar resposta de negociação SignalR (endpoint recomendado para validação)
    curl -X POST http://localhost:5000/room/negotiate
-   ```
-
-**Resultados Esperados:**
-- Servidor iniciado sem erros na porta 5000 (HTTP) ou 5001 (HTTPS)
-- Endpoint `/room` retorna código 200 ou 426 (Upgrade Required para WebSocket)
-- Endpoint `/room/negotiate` retorna JSON com connectionId e disponibilidade de transporte WebSocket
 - Logs do console mostram: "Now listening on: http://localhost:5000"
 
 **Considerações Adicionais:**
