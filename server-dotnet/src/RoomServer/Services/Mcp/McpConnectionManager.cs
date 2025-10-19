@@ -59,7 +59,7 @@ public class McpConnectionManager
     private static readonly TimeSpan MonitorRegistrationRetryDelay = TimeSpan.FromMilliseconds(50);
     
     private readonly CancellationTokenSource _shutdownCts = new();
-    private bool _disposed = false;
+    private volatile bool _disposed = false;
 
     public ResourceCatalog Catalog => _catalog;
 
