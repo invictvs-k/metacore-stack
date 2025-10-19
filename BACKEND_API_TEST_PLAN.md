@@ -1069,17 +1069,18 @@ Validar que eventos são gravados em arquivo linha a linha.
 - Arquivo criado no primeiro evento
 - Uma linha por evento (JSON válido por linha)
 - Eventos incluem: ENTITY.JOIN, ENTITY.LEAVE, ROOM.STATE, ARTIFACT.*, RESOURCE.*, COMMAND.*
-- Cada linha contém timestamp, tipo, payload
-- Exemplo:
+- Cada linha contém o envelope completo da mensagem (conforme Seção 1.1 e 5.7)
+- Exemplo com envelope completo:
   ```json
-  {"ts":"2025-10-19T01:00:00Z","type":"event","payload":{"kind":"ENTITY.JOIN","entity":"E-user01"}}
-  {"ts":"2025-10-19T01:00:05Z","type":"event","payload":{"kind":"ROOM.STATE","state":"Active"}}
+  {"id":"01JEH7QR8STNM5PQHX9YKW2V3Z","roomId":"room-test123","channel":"main","from":"system","type":"event","ts":"2025-10-19T01:00:00Z","correlationId":null,"payload":{"kind":"ENTITY.JOIN","entity":"E-user01"}}
+  {"id":"01JEH7QS4BVCX7NPTK2LWM8D9Q","roomId":"room-test123","channel":"main","from":"system","type":"event","ts":"2025-10-19T01:00:05Z","correlationId":null,"payload":{"kind":"ROOM.STATE","state":"Active"}}
   ```
 
 **Considerações Adicionais:**
 - ⚠️ Arquivo pode crescer rapidamente em salas ativas
 - Verificar que writes são atômicos e thread-safe (SemaphoreSlim)
 - Considerar rotação de logs no futuro
+- **Formato**: events.jsonl persiste mensagens completas com todos os campos do envelope (id, roomId, channel, from, type, ts, correlationId, payload) para auditoria completa
 
 ---
 
