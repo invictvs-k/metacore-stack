@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 using Microsoft.Extensions.Logging;
 using Metacore.Shared.Channels;
 using RoomOperator.Abstractions;
@@ -21,7 +22,9 @@ public sealed class AuditLog
     {
         _logger = logger;
         _maxEntries = maxEntries;
-        _subscriptions = new ChannelSubscriptionManager<AuditEntry>(() => ChannelSettings.CreateSingleReaderOptions());
+        _subscriptions = new ChannelSubscriptionManager<AuditEntry>(
+            () => ChannelSettings.CreateSingleReaderOptions(
+                fullMode: BoundedChannelFullMode.DropOldest));
     }
 
     public IAsyncEnumerable<AuditEntry> SubscribeAsync(int replayCount = 100, CancellationToken cancellationToken = default)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using NUlid;
@@ -21,7 +22,9 @@ public class RoomEventPublisher
   {
     _hubContext = hubContext;
     _observability = observability;
-    _subscriptions = new ChannelSubscriptionManager<RoomEventStreamItem>(() => ChannelSettings.CreateSingleReaderOptions());
+    _subscriptions = new ChannelSubscriptionManager<RoomEventStreamItem>(
+      () => ChannelSettings.CreateSingleReaderOptions(
+        fullMode: BoundedChannelFullMode.DropOldest));
   }
 
   public IAsyncEnumerable<RoomEventStreamItem> SubscribeAsync(CancellationToken cancellationToken = default)
