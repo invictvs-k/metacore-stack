@@ -44,6 +44,7 @@ public class McpConnectionManager
     private readonly ConcurrentDictionary<string, ProviderStatus> _providerStates = new();
     private readonly ConcurrentDictionary<string, McpServerConfig> _providerConfigs = new();
     private readonly ConcurrentDictionary<string, IMcpClient> _clients = new();
+    private readonly ConcurrentDictionary<string, Task> _monitorTasks = new();
     private readonly ConcurrentDictionary<string, long> _logRateLimitGate = new();
     private readonly ResourceCatalog _catalog;
     private readonly McpDefaultsConfig? _defaults;
@@ -146,9 +147,9 @@ public class McpConnectionManager
                     {
                         SetState(providerId, McpState.Connected);
                         await LoadAndRegisterToolsAsync(providerId, client, config);
-                        
+
                         // Start monitoring for reconnection in background
-                        _ = Task.Run(() => MonitorConnectionAsync(providerId, client, config));
+                        EnsureConnectionMonitor(providerId, client);
                         return;
                     }
                 }
@@ -181,35 +182,55 @@ public class McpConnectionManager
     /// <summary>
     /// Monitors connection and attempts reconnection if disconnected.
     /// </summary>
-    private async Task MonitorConnectionAsync(string providerId, IMcpClient client, McpServerConfig config)
+    private async Task MonitorConnectionAsync(string providerId, IMcpClient client)
     {
-        while (!_disposed)
+        try
         {
-            try
+            while (!_disposed)
             {
-                await Task.Delay(5000);
-                
-                if (!client.IsConnected && !_disposed)
+                try
                 {
-                    _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
-                    SetState(providerId, McpState.Connecting);
-                    await ConnectProviderAsync(providerId);
-                    
-                    if (client.IsConnected)
+                    await Task.Delay(5000);
+
+                    if (!client.IsConnected && !_disposed)
                     {
-                        SetState(providerId, McpState.Connected);
+                        _logger.LogInformation("[{ProviderId}] Connection lost, attempting to reconnect", providerId);
+                        SetState(providerId, McpState.Connecting);
+                        await ConnectProviderAsync(providerId);
+
+                        if (client.IsConnected)
+                        {
+                            SetState(providerId, McpState.Connected);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (ShouldLogError(providerId))
+                catch (Exception ex)
                 {
-                    _logger.LogError(ex, "[{ProviderId}] Error in connection monitor", providerId);
+                    if (ShouldLogError(providerId))
+                    {
+                        _logger.LogError(ex, "[{ProviderId}] Error in connection monitor", providerId);
+                    }
+                    await Task.Delay(10000);
                 }
-                await Task.Delay(10000);
             }
         }
+        finally
+        {
+            _monitorTasks.TryRemove(providerId, out _);
+        }
+    }
+
+    private void EnsureConnectionMonitor(string providerId, IMcpClient client)
+    {
+        _monitorTasks.AddOrUpdate(
+            providerId,
+            _ => StartMonitorTask(providerId, client),
+            (_, existing) => existing.IsCompleted ? StartMonitorTask(providerId, client) : existing);
+    }
+
+    private Task StartMonitorTask(string providerId, IMcpClient client)
+    {
+        return Task.Run(() => MonitorConnectionAsync(providerId, client));
     }
 
     /// <summary>
