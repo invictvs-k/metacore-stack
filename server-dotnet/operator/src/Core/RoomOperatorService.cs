@@ -77,7 +77,7 @@ public sealed class RoomOperatorService
             // Process next queued request in the background
             if (_requestQueue.TryDequeue(out var nextRequest))
             {
-                _ = ProcessQueuedRequestAsync(nextRequest);
+                _ = Task.Run(() => ProcessQueuedRequestAsync(nextRequest));
             }
         }
     }
