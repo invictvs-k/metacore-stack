@@ -1,0 +1,28 @@
+{
+  "name": "metacore-stack-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dashboard and Integration API for Metacore Stack",
+  "scripts": {
+    "api:dev": "cd tools/integration-api && npm run dev",
+    "dashboard:dev": "cd apps/operator-dashboard && npm run dev",
+    "dev:parallel": "npm-run-all --parallel api:dev dashboard:dev",
+    "install:all": "npm install && cd tools/integration-api && npm install && cd ../../apps/operator-dashboard && npm install",
+    "build:api": "cd tools/integration-api && npm run build",
+    "build:dashboard": "cd apps/operator-dashboard && npm run build",
+    "build:all": "npm run build:api && npm run build:dashboard",
+    "typecheck:api": "cd tools/integration-api && npm run type-check",
+    "typecheck:dashboard": "cd apps/operator-dashboard && npm run type-check",
+    "typecheck:all": "npm run typecheck:api && npm run typecheck:dashboard"
+  },
+  "keywords": [
+    "dashboard",
+    "integration",
+    "monitoring",
+    "observability"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
