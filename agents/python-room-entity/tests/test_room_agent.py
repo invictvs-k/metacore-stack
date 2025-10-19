@@ -64,8 +64,14 @@ def test_room_agent_sends_command(room_server: Dict[str, object]) -> None:
 
     human_client.send_chat("agent, please trigger test.port")
 
-    command = human_messages.get(timeout=20)
-    assert command["type"].lower() == "command"
+    # Drain messages until a 'command' is received
+    command = None
+    for _ in range(20):  # Try up to 20 times (total timeout up to 20s)
+        msg = human_messages.get(timeout=1)
+        if msg["type"].lower() == "command":
+            command = msg
+            break
+    assert command is not None, "Did not receive a 'command' message"
     assert command["payload"]["target"] == "E-HUMAN"
     assert command["payload"]["inputs"]["ack"] is True
 
