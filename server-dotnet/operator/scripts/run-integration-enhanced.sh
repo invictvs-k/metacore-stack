@@ -200,17 +200,35 @@ initialize_metrics() {
 EOF
 }
 
+update_metrics_json() {
+    local jq_expression=$1
+    local tmp_file="${METRICS_FILE}.tmp"
+    
+    if [ -f "$METRICS_FILE" ]; then
+        jq "$jq_expression" "$METRICS_FILE" > "$tmp_file" && mv "$tmp_file" "$METRICS_FILE"
+    fi
+}
+
+parse_test_results() {
+    local log_file=$1
+    local default_failed=${2:-0}
+    
+    local passed=$(grep -oP '✓ Passed: \K\d+' "$log_file" 2>/dev/null | tail -1)
+    local failed=$(grep -oP '✗ Failed: \K\d+' "$log_file" 2>/dev/null | tail -1)
+    
+    # Use defaults if grep found nothing
+    passed=${passed:-0}
+    failed=${failed:-$default_failed}
+    
+    echo "$passed $failed"
+}
+
 record_service_metric() {
     local service=$1
     local metric=$2
     local value=$3
     
-    # Use a temporary file to avoid concurrent write issues
-    local tmp_file="${METRICS_FILE}.tmp"
-    
-    if [ -f "$METRICS_FILE" ]; then
-        jq ".services.\"$service\".\"$metric\" = $value" "$METRICS_FILE" > "$tmp_file" && mv "$tmp_file" "$METRICS_FILE"
-    fi
+    update_metrics_json ".services.\"$service\".\"$metric\" = $value"
 }
 
 record_scenario_result() {
@@ -219,11 +237,7 @@ record_scenario_result() {
     local failed=$3
     local duration=$4
     
-    local tmp_file="${METRICS_FILE}.tmp"
-    
-    if [ -f "$METRICS_FILE" ]; then
-        jq ".scenarios.\"$scenario\" = {\"passed\": $passed, \"failed\": $failed, \"duration_ms\": $duration}" "$METRICS_FILE" > "$tmp_file" && mv "$tmp_file" "$METRICS_FILE"
-    fi
+    update_metrics_json ".scenarios.\"$scenario\" = {\"passed\": $passed, \"failed\": $failed, \"duration_ms\": $duration}"
 }
 
 build_projects() {
@@ -398,8 +412,7 @@ run_test_scenarios() {
             log_success "Scenario '$scenario' passed (${duration}ms)"
             
             # Parse test results from log
-            local passed=$(grep -oP '✓ Passed: \K\d+' "$scenario_log" | tail -1 || echo "0")
-            local failed=$(grep -oP '✗ Failed: \K\d+' "$scenario_log" | tail -1 || echo "0")
+            read passed failed <<< $(parse_test_results "$scenario_log" 0)
             
             all_passed=$(($all_passed + $passed))
             all_failed=$(($all_failed + $failed))
@@ -409,8 +422,8 @@ run_test_scenarios() {
         else
             log_error "Scenario '$scenario' failed (exit code: $exit_code)"
             
-            local passed=$(grep -oP '✓ Passed: \K\d+' "$scenario_log" | tail -1 || echo "0")
-            local failed=$(grep -oP '✗ Failed: \K\d+' "$scenario_log" | tail -1 || echo "1")
+            # Parse test results from log (default to 1 failure if no results found)
+            read passed failed <<< $(parse_test_results "$scenario_log" 1)
             
             all_passed=$(($all_passed + $passed))
             all_failed=$(($all_failed + $failed))
@@ -446,15 +459,14 @@ generate_report() {
     fi
     
     # Update metrics with summary
-    local tmp_file="${METRICS_FILE}.tmp"
-    jq ".summary = {
+    update_metrics_json ".summary = {
         \"total_duration_s\": $total_duration,
         \"tests_total\": $tests_total,
         \"tests_passed\": $tests_passed,
         \"tests_failed\": $tests_failed,
         \"success_rate\": $success_rate,
         \"status\": \"$([ $tests_failed -eq 0 ] && echo 'SUCCESS' || echo 'FAILED')\"
-    }" "$METRICS_FILE" > "$tmp_file" && mv "$tmp_file" "$METRICS_FILE"
+    }"
     
     # Generate human-readable report
     cat > "${RESULTS_DIR}/report.txt" << EOF

@@ -8,7 +8,63 @@
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * TraceLogger provides structured event logging in NDJSON (Newline Delimited JSON) format
+ * for comprehensive integration test tracing and performance analysis.
+ * 
+ * Features:
+ * - NDJSON format output (one JSON object per line)
+ * - Automatic timestamp and elapsed time tracking
+ * - Multiple event types: operation, http_request, http_response, metric, assertion, checkpoint, error
+ * - Automatic performance statistics calculation (P50/P95 latency, min/max/avg)
+ * - In-memory event buffering with optional file output
+ * 
+ * Event Types:
+ * - `operation`: High-level operation markers
+ * - `http_request`: HTTP request sent
+ * - `http_response`: HTTP response received (includes duration_ms)
+ * - `metric`: Custom metric values
+ * - `assertion`: Test assertion results (passed/failed)
+ * - `checkpoint`: Test phase markers
+ * - `error`: Error occurrences with stack traces
+ * - `summary`: Final summary with statistics (auto-generated on flush)
+ * 
+ * @class TraceLogger
+ * @example
+ * // Create logger with file output
+ * const logger = new TraceLogger('/path/to/trace.ndjson');
+ * 
+ * // Log various events
+ * logger.logOperation('test_startup', { testId: 'test-1' });
+ * logger.logRequest('GET', '/api/health');
+ * logger.logResponse('GET', '/api/health', 200, 45);
+ * logger.logAssertion('health_check', true, 'healthy', 'healthy');
+ * logger.logMetric('response_time', 45, 'ms');
+ * logger.logCheckpoint('test_complete');
+ * 
+ * // Get summary statistics
+ * const summary = logger.getSummary();
+ * console.log(`P50 latency: ${summary.latency.p50_ms}ms`);
+ * 
+ * // Flush and append summary to file
+ * logger.flush();
+ * 
+ * @example
+ * // Create logger without file output (in-memory only)
+ * const logger = new TraceLogger();
+ * logger.logOperation('test_operation');
+ * const events = logger.getEvents();
+ */
 class TraceLogger {
+  /**
+   * Creates a new TraceLogger instance
+   * 
+   * @param {string|null} outputPath - Optional path to NDJSON output file.
+   *                                   If provided, events are written to the file immediately.
+   *                                   The directory will be created if it doesn't exist.
+   *                                   If null, events are only stored in memory.
+   * @constructor
+   */
   constructor(outputPath = null) {
     this.outputPath = outputPath;
     this.events = [];
