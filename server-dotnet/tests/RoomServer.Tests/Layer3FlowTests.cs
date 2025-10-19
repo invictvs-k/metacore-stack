@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http.Connections;
@@ -545,8 +546,16 @@ public class Layer3FlowTests : IAsyncLifetime
     await _factory.DisposeAsync();
   }
 
-  private sealed record RoomEvent(string Id, string RoomId, string Type, EventPayload Payload, DateTime Ts);
-  private sealed record EventPayload(string Kind, JsonElement Data);
+  private sealed record RoomEvent(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("roomId")] string RoomId,
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("payload")] EventPayload Payload,
+    [property: JsonPropertyName("ts")] DateTime Ts);
+
+  private sealed record EventPayload(
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("data")] JsonElement Data);
 
   #endregion
 }
