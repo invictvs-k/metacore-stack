@@ -76,7 +76,7 @@ export async function listScenarios(): Promise<TestScenario[]> {
   }
 }
 
-export async function runTest(scenarioId: string | 'all'): Promise<string> {
+export async function runTest(scenarioId: string | 'all'): Promise<{ runId: string; artifactsDir: string; logPath: string }> {
   const runId = uuidv4();
   const config = getConfig();
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_');
@@ -114,8 +114,11 @@ export async function runTest(scenarioId: string | 'all'): Promise<string> {
   const testClientDir = path.join(ROOT_DIR, 'server-dotnet/operator/test-client');
   const logFile = path.join(artifactsPath, 'test-client.log');
 
+  // Use shell: true for cross-platform compatibility
+  const isWindows = process.platform === 'win32';
   const proc = spawn(command, args, {
     cwd: testClientDir,
+    shell: true,
     env: {
       ...process.env,
       ARTIFACTS_DIR: artifactsPath,
@@ -152,7 +155,11 @@ export async function runTest(scenarioId: string | 'all'): Promise<string> {
 
   activeRuns.set(runId, { process: proc, run, logs });
 
-  return runId;
+  return {
+    runId,
+    artifactsDir: artifactsPath,
+    logPath: logFile
+  };
 }
 
 export function getRun(runId: string): TestRun | null {

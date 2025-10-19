@@ -18,11 +18,15 @@ testsRouter.get('/', async (req, res) => {
 // POST /api/tests/run - Execute a test scenario
 testsRouter.post('/run', async (req, res) => {
   try {
-    const { scenarioId = 'all' } = req.body;
-    const runId = await runTest(scenarioId);
-    res.json({ runId, status: 'started' });
+    const { scenarioId, all } = req.body;
+    const testId = all ? 'all' : (scenarioId || 'all');
+    const result = await runTest(testId);
+    res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: error.message,
+      action: 'Check that the test runner exists and scenarios path is valid'
+    });
   }
 });
 
@@ -55,20 +59,23 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   res.write(`retry: ${retryInterval}\n\n`);
   res.flushHeaders();
 
-  // Send initial connection message
-  res.write(`data: ${JSON.stringify({ type: 'connected', runId })}\n\n`);
-
   // Get the run
-  const run = getRun(runId);
-  if (!run) {
-    res.write(`data: ${JSON.stringify({ type: 'error', message: 'Run not found' })}\n\n`);
+  const runData = getRun(runId);
+  if (!runData) {
+    res.write(`event: error\n`);
+    res.write(`data: ${JSON.stringify({ runId, message: 'Run not found' })}\n\n`);
     return res.end();
   }
+
+  // Send started event
+  res.write(`event: started\n`);
+  res.write(`data: ${JSON.stringify({ runId, artifactsDir: runData.artifactsPath })}\n\n`);
 
   // Stream existing logs
   const logs = getRunLogs(runId);
   for (const log of logs) {
-    res.write(`data: ${JSON.stringify({ type: 'log', data: log })}\n\n`);
+    res.write(`event: log\n`);
+    res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
   }
 
   // Set up polling for new logs
@@ -78,7 +85,8 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     if (currentLogs.length > lastLogCount) {
       const newLogs = currentLogs.slice(lastLogCount);
       for (const log of newLogs) {
-        res.write(`data: ${JSON.stringify({ type: 'log', data: log })}\n\n`);
+        res.write(`event: log\n`);
+        res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
       }
       lastLogCount = currentLogs.length;
     }
@@ -86,11 +94,13 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
     // Check if run is complete
     const currentRun = getRun(runId);
     if (!currentRun || currentRun.status !== 'running') {
-      res.write(`data: ${JSON.stringify({ type: 'complete', status: currentRun?.status })}\n\n`);
+      const exitCode = currentRun?.exitCode ?? -1;
+      res.write(`event: done\n`);
+      res.write(`data: ${JSON.stringify({ runId, exitCode })}\n\n`);
       clearInterval(pollInterval);
       res.end();
     }
-  }, 1000);
+  }, 500); // Poll more frequently for logs (500ms)
 
   // Heartbeat
   const heartbeat = setInterval(() => {

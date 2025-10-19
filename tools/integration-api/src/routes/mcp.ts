@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import fetch from 'node-fetch';
 import { getConfig } from '../services/config.js';
 
 export const mcpRouter = Router();
@@ -9,16 +10,27 @@ mcpRouter.get('/status', async (req, res) => {
     const config = getConfig();
     const statusUrl = `${config.roomServer.baseUrl}/status/mcp`;
 
-    // In a real implementation, we would fetch from RoomServer
-    // For now, return mock data
-    const mockStatus = {
-      connected: false,
-      providers: [],
-      lastCheck: new Date().toISOString()
-    };
+    const response = await fetch(statusUrl, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
 
-    res.json(mockStatus);
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: `Failed to fetch MCP status from RoomServer (${response.status})`,
+        action: 'Check that RoomServer is running and accessible',
+        endpoint: statusUrl
+      });
+    }
+
+    const data = await response.json();
+    res.json(data);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: error.message,
+      action: 'Verify that RoomServer is running and the baseUrl in config is correct',
+      endpoint: `${getConfig().roomServer.baseUrl}/status/mcp`
+    });
   }
 });

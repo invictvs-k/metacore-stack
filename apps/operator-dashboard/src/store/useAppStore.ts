@@ -17,7 +17,7 @@ export const useAppStore = create<AppState>((set) => ({
   setLastRunId: (runId) => set({ lastRunId: runId }),
   events: [],
   addEvent: (event) => set((state) => ({ 
-    events: [...state.events.slice(-99), event] // Keep last 100 events
+    events: [...state.events.slice(-1999), event] // Keep last 2000 events
   })),
   clearEvents: () => set({ events: [] }),
 }));

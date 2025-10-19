@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "commands": [
+    {
+      "id": "mcp.load",
+      "title": "Load MCP Providers",
+      "description": "Load and start connection with configured MCP providers",
+      "paramsSchema": {
+        "type": "object",
+        "properties": {
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "url": { "type": "string" },
+                "token": { "type": "string" }
+              },
+              "required": ["id", "url"]
+            }
+          }
+        },
+        "required": ["providers"]
+      },
+      "usage": "Send list of providers to initiate connection",
+      "method": "POST",
+      "endpoint": "/mcp/load"
+    },
+    {
+      "id": "mcp.status",
+      "title": "Query MCP Status",
+      "description": "Query the status of MCP connections in RoomServer",
+      "paramsSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "usage": "Returns states per provider",
+      "method": "GET",
+      "endpoint": "/status/mcp"
+    },
+    {
+      "id": "operator.reconcile",
+      "title": "Trigger Reconciliation",
+      "description": "Manually trigger a reconciliation cycle",
+      "paramsSchema": {
+        "type": "object",
+        "properties": {
+          "force": { "type": "boolean" }
+        }
+      },
+      "usage": "Triggers immediate reconciliation",
+      "method": "POST",
+      "endpoint": "/apply"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
+import Ajv from 'ajv';
 import type { CommandCatalog, Command } from '../types/index.js';
 import { getConfig } from '../services/config.js';
 
@@ -13,6 +14,8 @@ const ROOT_DIR = path.resolve(__dirname, '../../../..');
 export const commandsRouter = Router();
 
 const CATALOG_PATH = path.join(ROOT_DIR, 'server-dotnet/operator/commands/commands.catalog.json');
+
+const ajv = new Ajv({ allErrors: true });
 
 const defaultCatalog: CommandCatalog = {
   version: 1,
@@ -115,14 +118,38 @@ commandsRouter.post('/execute', async (req, res) => {
     const { commandId, params } = req.body;
 
     if (!commandId) {
-      return res.status(400).json({ error: 'commandId is required' });
+      return res.status(400).json({ 
+        error: 'commandId is required',
+        action: 'Please provide a valid commandId'
+      });
     }
 
     const catalog = await loadCatalog();
     const command = resolveCommandMetadata(catalog, commandId);
 
     if (!command) {
-      return res.status(404).json({ error: `Command ${commandId} not found` });
+      return res.status(404).json({ 
+        error: `Command ${commandId} not found`,
+        action: 'Check the available commands in the catalog'
+      });
+    }
+
+    // Validate params against schema if present
+    if (command.paramsSchema) {
+      const validate = ajv.compile(command.paramsSchema);
+      const valid = validate(params || {});
+      
+      if (!valid) {
+        const errors = validate.errors?.map(err => 
+          `${err.instancePath || 'params'} ${err.message}`
+        ).join(', ');
+        
+        return res.status(400).json({ 
+          error: 'Parameter validation failed',
+          details: errors,
+          action: 'Check that all required parameters are provided and have the correct types'
+        });
+      }
     }
 
     const config = getConfig();
@@ -174,7 +201,10 @@ commandsRouter.post('/execute', async (req, res) => {
       if (isJson) {
         return res.status(response.status).json(responseBody);
       }
-      return res.status(response.status).json({ error: responseBody });
+      return res.status(response.status).json({ 
+        error: responseBody,
+        action: 'Check that the RoomOperator service is running and the endpoint is correct'
+      });
     }
 
     if (isJson) {
@@ -183,6 +213,9 @@ commandsRouter.post('/execute', async (req, res) => {
 
     return res.status(response.status).json({ result: responseBody });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ 
+      error: error.message,
+      action: 'Check that the RoomOperator service is accessible'
+    });
   }
 });

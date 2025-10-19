@@ -4,12 +4,13 @@ Web-based control and observability dashboard for RoomServer, RoomOperator, and 
 
 ## Features
 
-- **System Overview**: Real-time health checks and status monitoring
-- **Event Streaming**: Live SSE streams from RoomServer and RoomOperator
-- **Test Execution**: Run integration tests with live logs and artifact collection
-- **Command Orchestration**: Execute RoomOperator commands with dynamic parameters
-- **Configuration Management**: Edit and persist dashboard settings
+- **System Overview**: Real-time health checks and status monitoring with quick actions
+- **Event Streaming**: Live SSE streams from RoomServer and RoomOperator with pause/resume and auto-scroll
+- **Test Execution**: Run integration tests with live log streaming per runId and artifact links
+- **Command Orchestration**: Execute RoomOperator commands with JSON Schema validation
+- **Configuration Management**: Edit, validate, and hot-reload dashboard settings with connection testing
 - **Responsive UI**: Built with React, TypeScript, and TailwindCSS
+- **SSE Resilience**: Exponential backoff reconnection with heartbeat monitoring
 
 ## Prerequisites
 
@@ -52,11 +53,11 @@ Serves the production build for testing.
 
 ### Pages
 
-- **Overview** (`/`) - System health and quick stats
-- **Events** (`/events`) - Real-time event streaming with filtering
-- **Tests** (`/tests`) - Test scenario execution and results
-- **Commands** (`/commands`) - Command catalog and execution
-- **Settings** (`/settings`) - Configuration editor
+- **Overview** (`/`) - System health with live checks, quick stats, and actions (Run All Tests, Clean Artifacts)
+- **Events** (`/events`) - Real-time event streaming with filtering, pause/resume, auto-scroll toggle, and windowing (2000 events)
+- **Tests** (`/tests`) - Test scenario execution with SSE log streaming, exit codes, and artifact directory links
+- **Commands** (`/commands`) - Command catalog and execution with parameter validation
+- **Settings** (`/settings`) - Configuration editor with validation, hot reload detection, and connection testing
 - **About** (`/about`) - Documentation and version info
 
 ### Key Components
@@ -73,21 +74,31 @@ src/
 
 ### Hooks
 
-#### `useSSE(url, onMessage, enabled)`
-Manages Server-Sent Events connections with automatic reconnection.
+#### `useSSE(url, onMessage, enabled, options)`
+Manages Server-Sent Events connections with:
+- Automatic reconnection with exponential backoff
+- Support for multiple event types (started, log, done, error, etc.)
+- Heartbeat monitoring
+- Configurable retry intervals and backoff multipliers
 
 #### `useConfig()`
-Provides access to dashboard configuration with update capabilities.
+Provides access to dashboard configuration with:
+- Automatic refresh every 10 seconds
+- Update capabilities with validation
+- Mutation tracking
 
 #### `useTestRunner()`
-Manages test scenario execution and result streaming.
+Manages test scenario execution and result streaming with:
+- Scenario listing via SWR
+- Test execution with runId tracking
+- Run metadata retrieval
 
 ### State Management
 
 Uses Zustand for lightweight global state:
-- Theme preference
-- Current run ID
-- Event history
+- Theme preference (light/dark/system)
+- Current run ID for test execution tracking
+- Event history with windowing (keeps last 2000 events)
 
 ## Configuration
 
@@ -158,19 +169,36 @@ Modern browsers with EventSource (SSE) support:
 
 ## Development Tips
 
-### Hot Reload
-The dashboard automatically reloads when:
-- Source files change (Vite HMR)
-- Configuration is updated (via Settings page)
+### SSE Resilience
+The dashboard implements robust SSE handling:
+- Exponential backoff reconnection (1.5x multiplier, max 30s)
+- Multiple event type support
+- Automatic cleanup on unmount
+- Heartbeat detection
 
-### Event Filtering
-Use the filter buttons on the Events page to focus on specific sources.
+### Hot Reload Detection
+Configuration changes are detected via checksum polling every 5 seconds. When a change is detected, a notification appears prompting the user to reload.
 
-### Test Logs
-Test logs are streamed in real-time. The terminal view auto-scrolls to show new output.
+### Test Execution
+- Tests run with unique runId for isolation
+- Logs stream in real-time via SSE with typed events
+- Exit codes and artifact directories are displayed on completion
+- Multiple tests can run sequentially without page reload
 
-### Dark Mode
-Theme follows system preference by default. Can be configured in Settings.
+### Event Management
+- **Pause/Resume**: Stop receiving events without closing SSE connection
+- **Auto-scroll**: Toggle automatic scrolling to latest events
+- **Windowing**: Keeps only last 2000 events in memory to prevent performance issues
+- **Filtering**: Filter by source (all/roomserver/roomoperator)
+
+### Command Validation
+Commands use JSON Schema for parameter validation before execution. Validation errors show which parameters are missing or invalid with actionable feedback.
+
+### Connection Testing
+The Settings page includes a "Test Connections" button that:
+- Pings RoomServer and RoomOperator baseUrls
+- Checks MCP status endpoint availability
+- Displays detailed results with error messages
 
 ## Troubleshooting
 

@@ -29,7 +29,8 @@ export function useSSE(
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
-      eventSource.onmessage = (event) => {
+      // Handle different event types
+      const handleEvent = (event: MessageEvent) => {
         try {
           const data = JSON.parse(event.data);
           onMessage(data);
@@ -37,6 +38,15 @@ export function useSSE(
           console.error('Error parsing SSE message:', error);
         }
       };
+
+      // Listen to all standard event types
+      eventSource.addEventListener('message', handleEvent);
+      eventSource.addEventListener('started', handleEvent);
+      eventSource.addEventListener('log', handleEvent);
+      eventSource.addEventListener('done', handleEvent);
+      eventSource.addEventListener('error', handleEvent);
+      eventSource.addEventListener('connected', handleEvent);
+      eventSource.addEventListener('disconnected', handleEvent);
 
       eventSource.onerror = () => {
         console.error('SSE connection error, reconnecting...');
