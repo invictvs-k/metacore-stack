@@ -26,7 +26,7 @@ Este relatório documenta a validação completa dos fluxos de ponta a ponta da 
 1. Humano cria Sala com configuração
 2. Sistema inicializa ciclo (init)
 3. Sistema aguarda entidades se conectarem
-4. Sistema emite evento ROOM.CREATED (ROOM.STATE)
+4. Sistema emite evento ROOM.STATE (*Nota: este evento cumpre o papel de notificação de criação da sala, além de informar o estado atual. Não existe evento separado 'ROOM.CREATED' na implementação ou nos testes.*)
 5. Sistema transiciona para active
 
 ### 2.2 Implementação Identificada
