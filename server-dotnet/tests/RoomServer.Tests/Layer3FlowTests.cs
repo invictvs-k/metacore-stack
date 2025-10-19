@@ -123,12 +123,6 @@ public class Layer3FlowTests : IAsyncLifetime
     roomStateEvent.RoomId.Should().Be(roomId);
   }
 
-  // [Fact]
-  // public async Task Flow31_Step5_SystemTransitionsToActive()
-  // {
-  //   // Arrange
-  //   var roomId = $"room-test-{Guid.NewGuid():N}";
-  //   await using var connection = BuildConnection();
   [Fact]
   public async Task Flow31_Complete_RoomCreationFullFlow()
   {
