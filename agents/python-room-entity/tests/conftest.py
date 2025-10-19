@@ -11,7 +11,7 @@ import requests
 if shutil.which("dotnet") is None:
     pytest.skip("dotnet executable is required for integration tests", allow_module_level=True)
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 SERVER_PROJECT = ROOT / "server-dotnet" / "src" / "RoomServer" / "RoomServer.csproj"
 SERVER_URL = "http://127.0.0.1:5010"
 
