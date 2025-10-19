@@ -7,7 +7,7 @@ import type { DashboardSettings } from '../types/index.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const CONFIG_PATH = path.resolve(__dirname, '../../../configs/dashboard.settings.json');
+const CONFIG_PATH = path.resolve(__dirname, '../../../../configs/dashboard.settings.json');
 
 let cachedConfig: DashboardSettings | null = null;
 let configChecksum: string | null = null;
