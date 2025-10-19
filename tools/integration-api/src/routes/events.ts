@@ -113,7 +113,7 @@ async function proxyEventStream(
     // Use the body as an async iterable
     (async () => {
       try {
-        for await (const chunk of upstreamResponse.body as any) {
+        for await (const chunk of upstreamResponse.body as AsyncIterable<Buffer>) {
           parseAndForwardChunk(chunk.toString(), res, source);
         }
         sendSSEMessage(res, {
