@@ -8,6 +8,7 @@ obj/
 # node
 node_modules/
 pnpm-lock.yaml
+.next/
 
 # env
 .env
