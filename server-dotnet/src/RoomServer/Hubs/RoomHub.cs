@@ -112,7 +112,7 @@ public partial class RoomHub : Hub
         {
             _roomContexts.UpdateState(roomId, RoomState.Active);
             // Emit ROOM.CREATED event as per Flow 3.1 specification
-            await _events.PublishAsync(roomId, "ROOM.CREATED", new { state = "active", entities = new[] { normalized } });
+            await _events.PublishAsync(roomId, "ROOM.CREATED", new { state = "active", entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList() });
         }
         else
         {
