@@ -17,7 +17,7 @@ public static class EventsEndpoints
         app.MapGet("/events", async (
             HttpContext context,
             RoomEventPublisher eventPublisher,
-            ILogger<EventsEndpoints> logger) =>
+            ILogger<RoomEventPublisher> logger) =>
         {
             SseStreamWriter.ConfigureResponse(context.Response);
             var cancellationToken = context.RequestAborted;
