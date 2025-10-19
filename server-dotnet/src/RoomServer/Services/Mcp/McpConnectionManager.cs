@@ -46,6 +46,7 @@ public class McpConnectionManager
     private readonly ConcurrentDictionary<string, McpServerConfig> _providerConfigs = new();
     private readonly ConcurrentDictionary<string, IMcpClient> _clients = new();
     private readonly ConcurrentDictionary<string, MonitorRegistration> _monitorTasks = new();
+    private readonly ConcurrentDictionary<string, object> _monitorLocks = new();
     private readonly ConcurrentDictionary<string, long> _logRateLimitGate = new();
     private readonly ResourceCatalog _catalog;
     private readonly McpDefaultsConfig? _defaults;
@@ -237,9 +238,14 @@ public class McpConnectionManager
         }
         finally
         {
-            if (_monitorTasks.TryGetValue(providerId, out var registration) && registration.Token == registrationToken)
+            var monitorLock = GetMonitorLock(providerId);
+
+            lock (monitorLock)
             {
-                _monitorTasks.TryRemove(providerId, out _);
+                if (_monitorTasks.TryGetValue(providerId, out var registration) && registration.Token == registrationToken)
+                {
+                    _monitorTasks.TryRemove(providerId, out _);
+                }
             }
         }
     }
@@ -247,22 +253,26 @@ public class McpConnectionManager
     private async Task EnsureConnectionMonitorAsync(string providerId, IMcpClient client, McpServerConfig config)
     {
         var attempts = 0;
+        var monitorLock = GetMonitorLock(providerId);
 
         while (true)
         {
-            var registration = _monitorTasks.AddOrUpdate(
-                providerId,
-                _ => StartMonitorTask(providerId, client, config),
-                (_, existing) => existing.Task.IsCompleted ? StartMonitorTask(providerId, client, config) : existing);
+            MonitorRegistration registration;
+
+            lock (monitorLock)
+            {
+                if (_monitorTasks.TryGetValue(providerId, out var existing) && !existing.Task.IsCompleted)
+                {
+                    return;
+                }
+
+                registration = StartMonitorTask(providerId, client, config);
+                _monitorTasks[providerId] = registration;
+            }
 
             if (!registration.Task.IsCompleted)
             {
                 return;
-            }
-
-            if (_monitorTasks.TryGetValue(providerId, out var current) && current.Token == registration.Token)
-            {
-                _monitorTasks.TryRemove(providerId, out _);
             }
 
             attempts++;
@@ -282,6 +292,11 @@ public class McpConnectionManager
         var token = Guid.NewGuid();
         var monitorTask = Task.Run(() => MonitorConnectionAsync(providerId, client, config, token));
         return new MonitorRegistration(monitorTask, token);
+    }
+
+    private object GetMonitorLock(string providerId)
+    {
+        return _monitorLocks.GetOrAdd(providerId, _ => new object());
     }
 
     /// <summary>
