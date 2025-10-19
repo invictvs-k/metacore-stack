@@ -1344,7 +1344,7 @@ Verificar estabilidade de broadcast para grupos.
 3. **CallTool MCP:**
    - Sequência: Resolve catalog → Check permission → Emit RESOURCE.CALLED → Execute → Emit RESOURCE.RESULT
    - Pontos de falha: MCP timeout, MCP disconnect durante execução
-   - Monitorar: Eventos RESOURCE.*, logs de timeout, erro handling
+   - Monitorar: Eventos RESOURCE.*, logs de timeout, tratamento de erros
 
 ### Diferenças entre Dev e Prod
 
