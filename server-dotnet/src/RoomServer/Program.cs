@@ -13,9 +13,24 @@ builder.Services.AddCors(options =>
 {
   options.AddDefaultPolicy(policy =>
   {
-    policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+    if (builder.Environment.IsDevelopment())
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    }
+    else
+    {
+        // Read allowed origins from configuration or environment variable
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+        if (allowedOrigins == null || allowedOrigins.Length == 0)
+        {
+            throw new InvalidOperationException("No allowed CORS origins configured for production.");
+        }
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    }
   });
 });
 builder.Services.AddSingleton<RoomObservabilityService>();
