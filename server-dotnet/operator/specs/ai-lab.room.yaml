@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: RoomSpec
+metadata:
+  name: ai-lab
+  version: 4
+spec:
+  roomId: ai-lab-01
+  entities:
+    - id: E-orchestrator-main
+      kind: orchestrator
+      displayName: Lab Orchestrator
+      visibility: team
+      capabilities:
+        - execute_commands
+        - manage_artifacts
+      policy:
+        allow_commands_from: orchestrator
+        sandbox_mode: true
+        
+    - id: E-agent-researcher
+      kind: agent
+      displayName: Research Agent
+      visibility: team
+      capabilities:
+        - read_artifacts
+        - create_artifacts
+      policy:
+        allow_commands_from: orchestrator
+        sandbox_mode: false
+        
+    - id: E-human-owner
+      kind: human
+      displayName: Lab Owner
+      visibility: owner
+      ownerUserId: user-123
+      capabilities:
+        - full_access
+      policy:
+        allow_commands_from: any
+        
+  artifacts:
+    - name: project-plan
+      type: document
+      workspace: shared
+      tags:
+        - planning
+      seedFrom: ./seeds/project-plan.md
+      
+    - name: research-data
+      type: dataset
+      workspace: analysis
+      tags:
+        - data
+      seedFrom: ./seeds/research-data.json
+      promoteAfterSeed: true
+      
+  policies:
+    dmVisibilityDefault: team
+    allowResourceCreation: false
+    maxArtifactsPerEntity: 100
+    
+  resources:
+    - name: analysis-tool
+      type: mcp-tool
+      config:
+        endpoint: http://mcp-service:8080
+        timeout: 30s
+      dependsOn:
+        - E-orchestrator-main
+      onMissingDependency: skip

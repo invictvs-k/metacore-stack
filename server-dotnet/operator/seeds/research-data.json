@@ -1,0 +1,42 @@
+{
+  "dataset": {
+    "name": "AI Lab Research Data",
+    "version": "1.0.0",
+    "created": "2025-10-19T00:00:00Z",
+    "description": "Initial research dataset for AI lab experiments"
+  },
+  "experiments": [
+    {
+      "id": "exp-001",
+      "name": "Agent Collaboration Study",
+      "status": "planned",
+      "participants": ["E-agent-researcher", "E-orchestrator-main"],
+      "metrics": {
+        "collaboration_score": null,
+        "task_completion_rate": null,
+        "communication_efficiency": null
+      }
+    },
+    {
+      "id": "exp-002",
+      "name": "Artifact Management Analysis",
+      "status": "planned",
+      "focus": "workspace_operations",
+      "metrics": {
+        "artifact_creation_rate": null,
+        "promotion_success_rate": null,
+        "access_control_violations": null
+      }
+    }
+  ],
+  "baseline_metrics": {
+    "system_latency_ms": 50,
+    "throughput_ops_per_sec": 100,
+    "error_rate_percent": 0.1
+  },
+  "notes": [
+    "This is seed data for the AI lab environment",
+    "Metrics will be populated as experiments run",
+    "Update this file to reflect new research directions"
+  ]
+}
