@@ -115,7 +115,6 @@ export async function runTest(scenarioId: string | 'all'): Promise<{ runId: stri
   const logFile = path.join(artifactsPath, 'test-client.log');
 
   // Use shell: true for cross-platform compatibility
-  const isWindows = process.platform === 'win32';
   const proc = spawn(command, args, {
     cwd: testClientDir,
     shell: true,
