@@ -391,7 +391,7 @@ public partial class RoomHub : Hub
     {
         var entities = _sessions.ListByRoom(roomId).Select(s => s.Entity).ToList();
         var roomContext = _roomContexts.Get(roomId);
-        var state = (overrideState?.ToString() ?? roomContext?.State?.ToString() ?? "init").ToLowerInvariant();
+        var state = (overrideState?.ToString() ?? roomContext?.State.ToString() ?? "init").ToLowerInvariant();
         await _events.PublishAsync(roomId, "ROOM.STATE", new { state, entities });
     }
 

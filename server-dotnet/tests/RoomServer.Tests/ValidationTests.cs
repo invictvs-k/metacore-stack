@@ -11,7 +11,7 @@ public class ValidationTests
     [Theory]
     [InlineData("room-abc123", true)]
     [InlineData("room-ABC_XYZ-123", true)]
-    [InlineData("room-12345", false)] // Too short (< 6 chars)
+    [InlineData("room-12345", false)] // Too short (< 6 characters)
     [InlineData("room", false)] // Missing dash and ID
     [InlineData("abc-123456", false)] // Wrong prefix
     public void RoomId_Validation_WorksCorrectly(string roomId, bool shouldBeValid)
@@ -20,8 +20,8 @@ public class ValidationTests
     }
 
     [Theory]
-    [InlineData("E-A", false)] // Too short (only 1 char after prefix, minimum is 2)
-    [InlineData("E-AB", true)] // Minimum valid (2 chars)
+    [InlineData("E-A", false)] // Too short (only 1 character after prefix, minimum is 2)
+    [InlineData("E-AB", true)] // Minimum valid (2 characters)
     [InlineData("E-ABCD1234", true)]
     [InlineData("E-Test_Entity-123", true)]
     [InlineData("E-", false)] // No ID after prefix
