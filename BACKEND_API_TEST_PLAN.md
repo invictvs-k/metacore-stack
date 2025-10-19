@@ -374,7 +374,7 @@ Verificar que eventos de mudança de estado são publicados corretamente.
 - Exemplo completo de mensagem de evento Active:
   ```json
   {
-    "id": "01HQNXYZ9ABCDEFGHIJK1234",
+    "id": "01JEH7P2MRG9ZTKV3D6V8P5W3Q",
     "roomId": "room-test123",
     "channel": "main",
     "from": "system",
