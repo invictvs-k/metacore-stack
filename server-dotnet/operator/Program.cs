@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -120,4 +120,6 @@ logger.LogInformation("Connecting to RoomServer at {BaseUrl}", baseUrl);
 logger.LogInformation("MCP features enabled: {McpEnabled}", mcpEnabled);
 
 var port = config.GetValue<int>("HttpApi:Port", 8080);
-app.Run($"http://0.0.0.0:{port}");
+var operatorUrl = config["HttpApi:OperatorUrl"] ?? "http://localhost";
+
+app.Run($"{operatorUrl}:{port}");
