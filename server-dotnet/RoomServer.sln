@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "operator", "operator", "{C2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomOperator", "operator\RoomOperator.csproj", "{13341E70-15A9-4636-B967-8C5F14AA9B0A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D685C29F-6E31-BF40-7EC3-BACA0ACCC38B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomOperator.Tests", "operator\tests\RoomOperator.Tests.csproj", "{7DE93447-0A9E-45C9-B4BF-568992F4AC25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,11 +61,25 @@ Global
 		{13341E70-15A9-4636-B967-8C5F14AA9B0A}.Release|x64.Build.0 = Release|Any CPU
 		{13341E70-15A9-4636-B967-8C5F14AA9B0A}.Release|x86.ActiveCfg = Release|Any CPU
 		{13341E70-15A9-4636-B967-8C5F14AA9B0A}.Release|x86.Build.0 = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|x64.Build.0 = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Debug|x86.Build.0 = Debug|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|x64.ActiveCfg = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|x64.Build.0 = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|x86.ActiveCfg = Release|Any CPU
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{13341E70-15A9-4636-B967-8C5F14AA9B0A} = {C2499B5C-8630-C51D-34B0-7F1B104C89B0}
+		{D685C29F-6E31-BF40-7EC3-BACA0ACCC38B} = {C2499B5C-8630-C51D-34B0-7F1B104C89B0}
+		{7DE93447-0A9E-45C9-B4BF-568992F4AC25} = {D685C29F-6E31-BF40-7EC3-BACA0ACCC38B}
 	EndGlobalSection
 EndGlobal
