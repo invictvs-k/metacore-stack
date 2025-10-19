@@ -1196,7 +1196,7 @@ Verificar formato de erros em endpoints REST.
    ```bash
    curl -X POST http://localhost:5000/rooms/invalid/artifacts \
      -H "X-Entity-Id: E-test01"
-   curl -X POST http://localhost:5000/rooms/room-test/artifacts/promote \
+   curl -X POST http://localhost:5000/rooms/room-test123/artifacts/promote \
      -H "X-Entity-Id: E-test01" \
      -H "Content-Type: application/json" \
      -d '{"invalid": "data"}'
