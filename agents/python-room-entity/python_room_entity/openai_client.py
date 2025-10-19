@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Optional, Protocol, TypedDict
+from typing import Iterable, Optional, Protocol, TypedDict
 
 try:  # pragma: no cover - import guarded for optional dependency resolution
     from openai import OpenAI
