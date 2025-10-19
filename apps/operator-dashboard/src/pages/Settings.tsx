@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, RefreshCw } from 'lucide-react';
 import { useConfig } from '../hooks/useConfig';
 
@@ -7,6 +7,13 @@ export default function Settings() {
   const [editedConfig, setEditedConfig] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Load config into editor when it becomes available
+  useEffect(() => {
+    if (config && !editedConfig) {
+      setEditedConfig(JSON.stringify(config, null, 2));
+    }
+  }, [config, editedConfig]);
 
   const handleLoad = () => {
     if (config) {
@@ -31,10 +38,6 @@ export default function Settings() {
 
   if (isLoading) {
     return <div className="text-gray-600 dark:text-gray-400">Loading configuration...</div>;
-  }
-
-  if (!editedConfig && config) {
-    setEditedConfig(JSON.stringify(config, null, 2));
   }
 
   return (
