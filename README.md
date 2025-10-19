@@ -29,11 +29,35 @@ make schemas-validate
 
 Test the complete integration between RoomOperator and RoomServer:
 
+### Enhanced Integration Tests (Recommended)
+
+The enhanced integration test system provides comprehensive validation with artifact collection, performance metrics, and detailed tracing:
+
+```bash
+cd server-dotnet/operator/scripts
+./run-integration-enhanced.sh
+```
+
+Features:
+- Automated service orchestration with readiness checks
+- Artifact collection in `.artifacts/integration/{timestamp}/`
+- Performance metrics (P50/P95 latency, success rates)
+- Structured trace logging (NDJSON format)
+- Comprehensive JSON and text reports
+
+See [Enhanced Integration Testing Guide](server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md) for details.
+
+### Quick Automated Test
+
 ```bash
 # Quick automated test (builds, starts services, runs tests)
 cd server-dotnet/operator/scripts
 ./run-integration-test.sh
+```
 
+### Manual Component Testing
+
+```bash
 # Or run components manually:
 # Terminal 1: Start RoomServer
 cd server-dotnet/src/RoomServer
@@ -51,10 +75,12 @@ npm run test:all
 
 **Available test scenarios:**
 - `npm run test:basic` - Complete happy path (entities → artifacts → policies)
+- `npm run test:basic-enhanced` - Enhanced basic flow with trace logging
 - `npm run test:error` - Error handling and validation
 - `npm run test:stress` - Performance and load testing
 
 **Documentation:**
+- [Enhanced Integration Testing](server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md) - Comprehensive test system with artifacts and metrics
 - [Integration Guide](docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md) - Complete API reference, communication flows, and error handling
 - [Testing Guide](docs/TESTING.md) - Detailed testing instructions and troubleshooting
 - [RoomOperator Docs](docs/room-operator.md) - Operator architecture and usage
