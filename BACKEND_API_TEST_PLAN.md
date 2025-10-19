@@ -790,9 +790,15 @@ Validar publicação de eventos via RoomEventPublisher.
 3. Confirmar que eventos são gravados em events.jsonl
 
 **Resultados Esperados:**
-- Eventos seguem padrão:
+- Eventos seguem padrão (incluindo envelope obrigatório conforme Seção 2.4):
   ```json
   {
+    "id": "string",
+    "roomId": "string",
+    "channel": "string",
+    "from": "string",
+    "ts": "2023-01-01T00:00:00.000Z",
+    "correlationId": "string",
     "type": "event",
     "payload": {
       "kind": "ENTITY.JOIN|ENTITY.LEAVE|ROOM.STATE",
