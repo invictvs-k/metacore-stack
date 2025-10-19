@@ -66,7 +66,8 @@ class RoomClient:
         if self._hub is not None:
             raise RuntimeError("room client is already connected")
 
-        self._hub = (
+        # Build hub in a local variable first
+        hub = (
             HubConnectionBuilder()
             .with_url(
                 self._hub_url,
@@ -80,13 +81,21 @@ class RoomClient:
             .build()
         )
 
-        self._hub.on("message", self._handle_message)
-        self._hub.on("event", self._handle_event)
-        self._hub.on_close(self._handle_close)
+        # Register handlers on the local hub
+        hub.on("message", self._handle_message)
+        hub.on("event", self._handle_event)
+        hub.on_close(self._handle_close)
 
+        # Only clear disconnected flag and assign to self._hub after successful start
         self._disconnected.clear()
-        self._hub.start()
-        self._logger.info("Connected to hub %s", self._hub_url)
+        try:
+            hub.start()
+            self._hub = hub
+            self._logger.info("Connected to hub %s", self._hub_url)
+        except Exception:
+            # Re-set disconnected flag on failure
+            self._disconnected.set()
+            raise
 
     def disconnect(self) -> None:
         """Gracefully close the SignalR connection."""
