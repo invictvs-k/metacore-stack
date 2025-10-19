@@ -9,6 +9,7 @@ import { eventsRouter } from './routes/events.js';
 import { testsRouter } from './routes/tests.js';
 import { commandsRouter } from './routes/commands.js';
 import { mcpRouter } from './routes/mcp.js';
+import { healthRouter } from './routes/health.js';
 import { loadConfig } from './services/config.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +39,7 @@ async function main() {
   app.use('/api/tests', testsRouter);
   app.use('/api/commands', commandsRouter);
   app.use('/api/mcp', mcpRouter);
+  app.use('/api/health', healthRouter);
 
   // Error handler
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {

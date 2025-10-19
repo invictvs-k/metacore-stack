@@ -77,6 +77,12 @@ npm start
 
 - `GET /api/mcp/status` - Proxy to RoomServer MCP status endpoint
 
+### Health Checks
+
+- `GET /api/health/roomserver` - Check RoomServer health (proxied)
+- `GET /api/health/roomoperator` - Check RoomOperator health (proxied)
+- `GET /api/health/all` - Check all services health in one request
+
 ### Health
 
 - `GET /health` - Health check endpoint

@@ -81,26 +81,25 @@ export default function Settings() {
         mcp: { status: 'pending' }
       };
 
-      // Test RoomServer - try health endpoint first, then fallback to base URL
+      // Test RoomServer via Integration API proxy
       try {
-        let rsResponse;
-        try {
-          rsResponse = await fetch(`${parsedConfig.roomServer.baseUrl}/health`, { 
-            method: 'GET',
-            signal: AbortSignal.timeout(5000) 
-          });
-        } catch {
-          // Fallback to base URL if /health doesn't exist
-          rsResponse = await fetch(parsedConfig.roomServer.baseUrl, { 
-            method: 'GET',
-            signal: AbortSignal.timeout(5000) 
-          });
-        }
+        const rsResponse = await fetch('/api/health/roomserver', {
+          signal: AbortSignal.timeout(5000)
+        });
         
-        results.roomServer = {
-          status: rsResponse.ok ? 'success' : 'warning',
-          message: rsResponse.ok ? 'Connected' : `HTTP ${rsResponse.status}`
-        };
+        if (rsResponse.ok) {
+          const data = await rsResponse.json();
+          results.roomServer = {
+            status: 'success',
+            message: 'Connected'
+          };
+        } else {
+          const data = await rsResponse.json();
+          results.roomServer = {
+            status: 'error',
+            message: data.error || `HTTP ${rsResponse.status}`
+          };
+        }
       } catch (error: any) {
         results.roomServer = {
           status: 'error',
@@ -108,26 +107,25 @@ export default function Settings() {
         };
       }
 
-      // Test RoomOperator - try health endpoint first, then fallback to base URL
+      // Test RoomOperator via Integration API proxy
       try {
-        let roResponse;
-        try {
-          roResponse = await fetch(`${parsedConfig.roomOperator.baseUrl}/health`, { 
-            method: 'GET',
-            signal: AbortSignal.timeout(5000) 
-          });
-        } catch {
-          // Fallback to base URL if /health doesn't exist
-          roResponse = await fetch(parsedConfig.roomOperator.baseUrl, { 
-            method: 'GET',
-            signal: AbortSignal.timeout(5000) 
-          });
-        }
+        const roResponse = await fetch('/api/health/roomoperator', {
+          signal: AbortSignal.timeout(5000)
+        });
         
-        results.roomOperator = {
-          status: roResponse.ok ? 'success' : 'warning',
-          message: roResponse.ok ? 'Connected' : `HTTP ${roResponse.status}`
-        };
+        if (roResponse.ok) {
+          const data = await roResponse.json();
+          results.roomOperator = {
+            status: 'success',
+            message: 'Connected'
+          };
+        } else {
+          const data = await roResponse.json();
+          results.roomOperator = {
+            status: 'error',
+            message: data.error || `HTTP ${roResponse.status}`
+          };
+        }
       } catch (error: any) {
         results.roomOperator = {
           status: 'error',

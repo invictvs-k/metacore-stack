@@ -20,37 +20,55 @@ export default function Overview() {
       roomOperator: { status: 'checking', error: null }
     };
 
-    // Check RoomServer
+    // Check RoomServer via Integration API proxy
     try {
-      const response = await fetch(`${config?.roomServer.baseUrl}/health`, { 
-        method: 'GET',
+      const response = await fetch('/api/health/roomserver', {
         signal: AbortSignal.timeout(5000)
       });
-      newStatus.roomServer = {
-        status: response.ok ? 'healthy' : 'unhealthy',
-        error: response.ok ? null : `HTTP ${response.status}`
-      };
+      
+      if (response.ok) {
+        const data = await response.json();
+        newStatus.roomServer = {
+          status: 'healthy',
+          error: null
+        };
+      } else {
+        const data = await response.json();
+        newStatus.roomServer = {
+          status: 'error',
+          error: data.error || `HTTP ${response.status}`
+        };
+      }
     } catch (error: any) {
       newStatus.roomServer = {
         status: 'error',
-        error: error.message || 'Connection failed'
+        error: error.name === 'TimeoutError' ? 'Connection timeout' : (error.message || 'Connection failed')
       };
     }
 
-    // Check RoomOperator
+    // Check RoomOperator via Integration API proxy
     try {
-      const response = await fetch(`${config?.roomOperator.baseUrl}/health`, { 
-        method: 'GET',
+      const response = await fetch('/api/health/roomoperator', {
         signal: AbortSignal.timeout(5000)
       });
-      newStatus.roomOperator = {
-        status: response.ok ? 'healthy' : 'unhealthy',
-        error: response.ok ? null : `HTTP ${response.status}`
-      };
+      
+      if (response.ok) {
+        const data = await response.json();
+        newStatus.roomOperator = {
+          status: 'healthy',
+          error: null
+        };
+      } else {
+        const data = await response.json();
+        newStatus.roomOperator = {
+          status: 'error',
+          error: data.error || `HTTP ${response.status}`
+        };
+      }
     } catch (error: any) {
       newStatus.roomOperator = {
         status: 'error',
-        error: error.message || 'Connection failed'
+        error: error.name === 'TimeoutError' ? 'Connection timeout' : (error.message || 'Connection failed')
       };
     }
 
