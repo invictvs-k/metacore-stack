@@ -7,24 +7,24 @@ from python_room_entity.client import RoomClient
 def test_ssl_verification_defaults_to_true_for_https() -> None:
     """Test that SSL verification is enabled by default for HTTPS URLs."""
     client = RoomClient("https://example.com/room")
-    assert client._verify_ssl is True
+    assert client.verify_ssl is True
 
 
 def test_ssl_verification_defaults_to_false_for_http() -> None:
     """Test that SSL verification is disabled by default for HTTP URLs."""
     client = RoomClient("http://example.com/room")
-    assert client._verify_ssl is False
+    assert client.verify_ssl is False
 
 
 def test_ssl_verification_can_be_explicitly_set() -> None:
     """Test that SSL verification can be explicitly configured."""
     # Explicitly disable for HTTPS
     client1 = RoomClient("https://example.com/room", verify_ssl=False)
-    assert client1._verify_ssl is False
+    assert client1.verify_ssl is False
     
     # Explicitly enable for HTTP
     client2 = RoomClient("http://example.com/room", verify_ssl=True)
-    assert client2._verify_ssl is True
+    assert client2.verify_ssl is True
 
 
 @patch("python_room_entity.client.HubConnectionBuilder")
