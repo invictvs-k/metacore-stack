@@ -21,7 +21,6 @@ def test_ssl_verification_can_be_explicitly_set() -> None:
     # Explicitly disable for HTTPS
     client1 = RoomClient("https://example.com/room", verify_ssl=False)
     assert client1.verify_ssl is False
-    
     # Explicitly enable for HTTP
     client2 = RoomClient("http://example.com/room", verify_ssl=True)
     assert client2.verify_ssl is True
