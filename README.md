@@ -118,23 +118,45 @@ npm run test:all
 
 ## Documentação
 
-### 📚 Navigation
+### 📚 Quick Navigation
 
-- **[Table of Contents](docs/TOC.md)** - Complete documentation index
+- **[Table of Contents](docs/TOC.md)** - Complete documentation index organized by category
+- **[Glossary](docs/glossary.md)** - Domain terms and concepts reference
 - **[Getting Started](QUICKSTART.md)** - Quick start guide for the operator dashboard
 - **[Development Setup](DEVELOPMENT_SETUP.md)** - Development environment setup
 - **[Port Configuration](PORT_CONFIGURATION.md)** - Port assignments and configuration
 - **[Testing Guide](docs/TESTING.md)** - Comprehensive testing instructions
 - **[Integration Guide](docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md)** - RoomOperator and RoomServer integration
 
-### 🏗️ Architecture
+### 🏗️ Architecture & Decisions
 
-- **[Architecture Decisions](docs/_adr/)** - Architecture Decision Records (ADRs)
+- **[Architecture Decisions (ADRs)](docs/_adr/)** - Architecture Decision Records
+  - [ADR Template](docs/_adr/000-template.md) - Template for new ADRs
 - **[Concept Definition](CONCEPTDEFINITION.md)** - Core concepts and architecture
 - **[Room Operator](docs/room-operator.md)** - Operator architecture and usage
 - **[MCP Connection Behavior](docs/MCP_CONNECTION_BEHAVIOR.md)** - MCP connection patterns
 
-### 📊 Reports & Summaries
+### 🤖 Agent Resources
+
+Resources for AI coding agents and automation:
+
+- **[Agent Briefs](docs/agent/briefs/)** - Guide for writing focused task briefs
+- **[Agent Playbooks](docs/agent/playbooks/)** - Guide for multi-step workflows
+- **[Templates](docs/agent/templates/)** - Brief, playbook, and context card templates
+
+### 📖 Component Context
+
+Quick-start guides for key components:
+
+- **[Operator Dashboard Context](apps/operator-dashboard/CONTEXT.md)** - Dashboard component guide
+- **[Integration API Context](tools/integration-api/CONTEXT.md)** - API component guide
+
+### 📋 Operational Guides
+
+- **[Runbooks](docs/runbooks/)** - Operational procedures and troubleshooting
+- **[Interfaces](docs/interfaces/)** - Machine-readable API contracts and specifications
+
+### 📊 Reports & Analysis
 
 - **[Layer 3 Flow Validation](reports/LAYER3_FLOW_VALIDATION.md)** - Flow validation results
 - **[Schema-RoomServer Alignment](reports/schema-roomserver-alignment.md)** - Alignment report
@@ -146,20 +168,41 @@ npm run test:all
 metacore-stack/
 ├── apps/
 │   └── operator-dashboard/     # Operator Dashboard (Vite/React)
+│       └── CONTEXT.md          # Component context card
 ├── tools/
 │   └── integration-api/        # Integration API (Express/TypeScript)
+│       └── CONTEXT.md          # Component context card
 ├── server-dotnet/
 │   ├── src/RoomServer/         # Room Server (.NET 8)
 │   └── operator/               # Room Operator
 ├── docs/                       # Active documentation
+│   ├── TOC.md                  # Table of Contents
+│   ├── glossary.md             # Glossary of terms
+│   ├── curation-report.md      # Curation report
+│   ├── docs.manifest.json      # Documentation inventory
 │   ├── _adr/                   # Architecture Decision Records
 │   ├── _deprecated/            # Deprecated docs (historical reference)
-│   └── _archive/               # Archived docs
-├── schemas/                    # JSON Schemas
-├── infra/                      # Infrastructure (docker-compose)
+│   ├── _archive/               # Archived docs
+│   ├── interfaces/             # API contracts and specifications
+│   ├── runbooks/               # Operational runbooks
+│   └── agent/                  # Agent scaffolding
+│       ├── briefs/             # Brief writing guide
+│       ├── playbooks/          # Playbook writing guide
+│       └── templates/          # Document templates
+├── schemas/                    # JSON Schemas (domain objects)
 ├── configs/                    # Configuration files
+│   └── schemas/                # Configuration schemas
+├── infra/                      # Infrastructure (docker-compose)
 └── scripts/                    # Utility scripts
 ```
+
+### 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Commit conventions (Conventional Commits)
+- Pull request requirements
+- Build and test expectations
+- Schema versioning guidelines
 
 ## Licença
 
