@@ -1,5 +1,8 @@
 # Metacore Stack — Metaplataforma (MVP)
 
+[![CI](https://github.com/invictvs-k/metacore-stack/workflows/ci/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/ci.yml)
+[![PR Validation](https://github.com/invictvs-k/metacore-stack/workflows/pr-validation/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/pr-validation.yml)
+
 Mono-repo com:
 - `server-dotnet/` — Room Host (.NET 8 + SignalR) + RoomOperator
 - `mcp-ts/` — MCP servers em TypeScript

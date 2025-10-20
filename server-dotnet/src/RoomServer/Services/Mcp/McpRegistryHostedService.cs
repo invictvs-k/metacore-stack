@@ -17,14 +17,14 @@ public class McpRegistryHostedService : IHostedService
   private readonly bool _lazyLoad;
 
   public McpRegistryHostedService(
-    McpConnectionManager connectionManager, 
+    McpConnectionManager connectionManager,
     IConfiguration configuration,
     ILogger<McpRegistryHostedService> logger)
   {
     _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
     _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    
+
     // Check if MCP should be loaded lazily (default: true in test mode)
     _lazyLoad = _configuration.GetValue<bool>("Mcp:LazyLoad", true);
   }
@@ -35,11 +35,11 @@ public class McpRegistryHostedService : IHostedService
 
     // Load provider configurations but don't connect unless explicitly disabled
     var serversConfig = _configuration.GetSection("McpServers").Get<Models.McpServerConfig[]>();
-    
+
     if (serversConfig != null && serversConfig.Length > 0)
     {
       _connectionManager.LoadProviderConfigs(serversConfig);
-      
+
       if (!_lazyLoad)
       {
         // Legacy behavior: connect immediately

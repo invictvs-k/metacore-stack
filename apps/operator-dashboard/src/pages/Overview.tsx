@@ -30,7 +30,6 @@ export default function Overview() {
       });
       
       if (response.ok) {
-        const data = await response.json();
         newStatus.roomServer = {
           status: 'healthy',
           error: null
@@ -56,7 +55,6 @@ export default function Overview() {
       });
       
       if (response.ok) {
-        const data = await response.json();
         newStatus.roomOperator = {
           status: 'healthy',
           error: null

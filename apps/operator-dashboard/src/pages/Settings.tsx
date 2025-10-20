@@ -78,7 +78,7 @@ export default function Settings() {
     setMessage(null);
 
     try {
-      const parsedConfig = JSON.parse(editedConfig);
+      JSON.parse(editedConfig); // Validate config is valid JSON
       const results: any = {
         roomServer: { status: 'pending' },
         roomOperator: { status: 'pending' },
@@ -92,7 +92,6 @@ export default function Settings() {
         });
         
         if (rsResponse.ok) {
-          const data = await rsResponse.json();
           results.roomServer = {
             status: 'success',
             message: 'Connected'
@@ -118,7 +117,6 @@ export default function Settings() {
         });
         
         if (roResponse.ok) {
-          const data = await roResponse.json();
           results.roomOperator = {
             status: 'success',
             message: 'Connected'
