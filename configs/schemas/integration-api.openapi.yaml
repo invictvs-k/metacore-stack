@@ -1,0 +1,41 @@
+openapi: 3.0.3
+info:
+  title: Integration API
+  version: 1.0.0
+  description: |
+    API de integração para o Operator Dashboard.
+    
+    **PLACEHOLDER** - Este é um esqueleto inicial. Será preenchido no Prompt 3 com:
+    - Endpoints completos (/api/config, /api/events, /api/tests/*, etc.)
+    - Modelos de dados (Room, Entity, Event, TestRun, etc.)
+    - Schemas de request/response
+    - Códigos de erro e validações
+    
+servers:
+  - url: http://localhost:40901
+    description: Development server
+  - url: http://localhost:40901
+    description: Local environment
+
+paths: {}
+  # TODO (Prompt 3): Adicionar endpoints:
+  # - GET /api/config
+  # - GET /api/events (SSE)
+  # - GET /api/rooms
+  # - POST /api/tests/{scenario}/start
+  # - GET /api/tests/runs/{runId}/status
+  # - GET /api/tests/runs/{runId}/logs
+  # - POST /api/commands/{commandId}
+  # etc.
+
+components:
+  schemas: {}
+    # TODO (Prompt 3): Adicionar modelos:
+    # - Config
+    # - Event
+    # - Room
+    # - Entity
+    # - TestRun
+    # - CommandRequest
+    # - CommandResponse
+    # etc.

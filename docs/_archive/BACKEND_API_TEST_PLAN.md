@@ -1,5 +1,7 @@
 # Plano de Testes Detalhado - Backend/APIs do Metacore Stack
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 ## Sumário Executivo
 
 Este documento fornece um plano de testes completo e detalhado para as funcionalidades principais de Backend/APIs do RoomServer, baseado na lista de verificação de implementação do Room Host. O plano está organizado em 10 seções principais, cobrindo desde os fundamentos de execução até observabilidade e tratamento de erros.
@@ -624,7 +626,7 @@ Verificar comportamento com e sem autenticação JWT.
 - Para alternar entre os modos de autenticação, configure a variável de ambiente `AUTH_MODE`:
     - `AUTH_MODE=dev` — desativa autenticação JWT (modo desenvolvimento)
     - `AUTH_MODE=prod` — ativa autenticação JWT obrigatória (modo produção)
-    - Referência: O valor de `AUTH_MODE` é lido no arquivo [`server-dotnet/src/RoomServer/Startup.cs`](server-dotnet/src/RoomServer/Startup.cs) (veja o trecho que lê `Environment.GetEnvironmentVariable("AUTH_MODE")`). Isso determina se a autenticação JWT será aplicada, em conjunto com `ASPNETCORE_ENVIRONMENT`.
+    - Referência: O valor de `AUTH_MODE` era lido no arquivo Startup.cs (arquivo histórico, pode não existir mais). Isso determinava se a autenticação JWT seria aplicada, em conjunto com `ASPNETCORE_ENVIRONMENT`.
 
 ---
 

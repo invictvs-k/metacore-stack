@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://metacore-stack.local/schemas/commands.catalog.schema.json",
+  "title": "Commands Catalog Schema",
+  "description": "Schema para o catálogo de comandos disponíveis no sistema. PLACEHOLDER - será preenchido no Prompt 3 com comandos completos.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Versão do catálogo de comandos",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "commands": {
+      "type": "array",
+      "description": "Lista de comandos disponíveis",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do comando"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome legível do comando"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição do comando"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Schema JSON dos parâmetros aceitos pelo comando"
+          }
+        },
+        "required": ["id", "name", "description"]
+      }
+    }
+  },
+  "required": ["version", "commands"],
+  "_TODO_Prompt3": {
+    "description": "Adicionar comandos reais do sistema",
+    "exampleCommands": [
+      "room.create",
+      "entity.spawn",
+      "entity.move",
+      "entity.attack",
+      "room.reconcile"
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://metacore-stack.local/schemas/sse.events.schema.json",
+  "title": "SSE Event Schema",
+  "description": "Schema para eventos Server-Sent Events (SSE) transmitidos via Integration API. PLACEHOLDER - será preenchido no Prompt 3 com tipos de eventos completos.",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "string",
+      "description": "Tipo do evento SSE"
+    },
+    "data": {
+      "type": "object",
+      "description": "Payload do evento"
+    }
+  },
+  "required": ["event", "data"],
+  "_TODO_Prompt3": {
+    "description": "Adicionar schemas específicos para cada tipo de evento",
+    "eventTypes": [
+      "room.created",
+      "room.updated",
+      "room.deleted",
+      "entity.joined",
+      "entity.left",
+      "entity.updated",
+      "command.executed",
+      "test.started",
+      "test.completed",
+      "heartbeat"
+    ]
+  }
+}

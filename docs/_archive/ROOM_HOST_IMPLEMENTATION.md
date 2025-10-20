@@ -1,5 +1,7 @@
 # Room Host Functionality - Implementation Status
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 ## Summary
 
 This document summarizes the implementation status of the Room Host checklist as defined in the requirements. The RoomServer implementation provides a comprehensive SignalR-based collaborative room system with artifact management, MCP integration, and observability features.

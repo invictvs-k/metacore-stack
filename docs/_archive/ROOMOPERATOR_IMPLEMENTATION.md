@@ -1,5 +1,7 @@
 # RoomOperator Implementation Summary
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 ## Overview
 
 This implementation delivers a complete, production-ready **RoomOperator** system as specified in the requirements. The operator is an external .NET 8 console application that manages declarative room state through continuous, idempotent reconciliation.
