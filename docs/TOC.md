@@ -1,8 +1,8 @@
 # Documentation Table of Contents
 
 **Generated:** 2025-10-20  
-**Total Documents:** 58  
-**Active:** 42 | **Deprecated:** 10 | **Archived:** 6
+**Total Documents:** 61  
+**Active:** 45 | **Deprecated:** 10 | **Archived:** 6
 
 ---
 
@@ -25,11 +25,20 @@
 - **[RoomServer vs. Schemas Canônicos — Relatório de Alinhamento](../reports/schema-roomserver-alignment.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec
 
-- **[Interfaces](./interfaces/README.md)** (1 refs)  
+- **[Interfaces](./interfaces/README.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec
 
 - **[Schemas – Metaplataforma (Sala Viva)](../schemas/README.md)** (1 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec
+
+- **[Integration API OpenAPI Specification](../configs/schemas/integration-api.openapi.yaml)** (2 refs)  
+  _Last updated: 2025-10-20_ | Tags: api, spec, contract | **PLACEHOLDER** - To be filled in Prompt 3
+
+- **[SSE Events JSON Schema](../configs/schemas/sse.events.schema.json)** (2 refs)  
+  _Last updated: 2025-10-20_ | Tags: api, spec, contract | **PLACEHOLDER** - To be filled in Prompt 3
+
+- **[Commands Catalog JSON Schema](../configs/schemas/commands.catalog.schema.json)** (2 refs)  
+  _Last updated: 2025-10-20_ | Tags: api, spec, contract | **PLACEHOLDER** - To be filled in Prompt 3
 
 ## How-To Guides & Operations
 
