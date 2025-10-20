@@ -1,4 +1,9 @@
 # CORS Fix - RoomOperator Connection Issue
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: CORS fix explanation - completed work  
+> Data: 2025-10-20
+
+
 
 ## Problem Statement
 

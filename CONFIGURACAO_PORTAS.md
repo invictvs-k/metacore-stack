@@ -1,4 +1,7 @@
 # Resumo das Configurações de Portas - Metacore Stack
+> 🔁 **DUPLICADO** — este conteúdo foi consolidado em: [PORT_CONFIGURATION.md](/PORT_CONFIGURATION.md)
+
+
 
 ## Objetivo
 

@@ -1,4 +1,9 @@
 # Connection Test Fix - Technical Details
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: Connection test fix explanation - completed work  
+> Data: 2025-10-20
+
+
 
 ## Problem
 

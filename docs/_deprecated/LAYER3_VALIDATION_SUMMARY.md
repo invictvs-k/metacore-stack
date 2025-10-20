@@ -1,4 +1,9 @@
 # Layer 3 Flow Validation - Summary
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: Validation summary - completed work  
+> Data: 2025-10-20
+
+
 
 ## Executive Summary
 

@@ -1,4 +1,9 @@
 # MCP Integration Test Implementation Summary
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: MCP implementation summary - completed work  
+> Data: 2025-10-20
+
+
 
 ## Completion Status: ✅ COMPLETE
 

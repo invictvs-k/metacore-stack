@@ -1,4 +1,10 @@
 # Quick Start Guide - Observability & Execution Fix
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Consulte: [QUICKSTART.md](/QUICKSTART.md)  
+> Motivo: Observability fix implementation summary - historical reference only  
+> Data: 2025-10-20
+
+
 
 ## What Was Fixed
 

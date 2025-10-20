@@ -23,6 +23,7 @@ dist/
 dist/
 coverage/
 .artifacts/
+.repo_fixup_backup/
 
 # verification reports
 environment-validation-report-*.md

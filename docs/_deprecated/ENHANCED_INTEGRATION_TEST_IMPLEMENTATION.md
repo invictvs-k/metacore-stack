@@ -1,4 +1,10 @@
 # Implementation Summary: Enhanced Integration Test System
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Consulte: [docs/TESTING.md](/docs/TESTING.md)  
+> Motivo: Implementation details - superseded by docs/TESTING.md and server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md  
+> Data: 2025-10-20
+
+
 
 ## Overview
 

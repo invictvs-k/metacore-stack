@@ -3,9 +3,12 @@
 Mono-repo com:
 - `server-dotnet/` — Room Host (.NET 8 + SignalR) + RoomOperator
 - `mcp-ts/` — MCP servers em TypeScript
+- `apps/operator-dashboard/` — Operator Dashboard (Vite/React)
+- `tools/integration-api/` — Integration API (Express/TypeScript)
 - `ui/` — UI mínima (Next.js) [opcional neste ciclo]
 - `schemas/` — JSON Schemas base + exemplos + validação AJV
 - `infra/` — docker-compose para ambiente local
+- `docs/` — Documentation (see [Table of Contents](docs/TOC.md))
 
 ## Port Configuration
 
@@ -104,7 +107,7 @@ npm run test:all
 
 ## Validação de Fluxos
 
-* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](LAYER3_VALIDATION_SUMMARY.md))
+* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md))
   - Fluxo 3.1: Criação de Sala (5 testes)
   - Fluxo 3.2: Entrada de Entidade (8 testes)
   - Cenários adicionais: 2 testes
@@ -112,8 +115,49 @@ npm run test:all
 
 ## Documentação
 
-- [Plano de Testes da API Backend](docs/BACKEND_API_TEST_PLAN.md)
-- [Implementação do Room Host](docs/ROOM_HOST_IMPLEMENTATION.md)
+### 📚 Navigation
+
+- **[Table of Contents](docs/TOC.md)** - Complete documentation index
+- **[Getting Started](QUICKSTART.md)** - Quick start guide for the operator dashboard
+- **[Development Setup](DEVELOPMENT_SETUP.md)** - Development environment setup
+- **[Port Configuration](PORT_CONFIGURATION.md)** - Port assignments and configuration
+- **[Testing Guide](docs/TESTING.md)** - Comprehensive testing instructions
+- **[Integration Guide](docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md)** - RoomOperator and RoomServer integration
+
+### 🏗️ Architecture
+
+- **[Architecture Decisions](docs/_adr/)** - Architecture Decision Records (ADRs)
+- **[Concept Definition](CONCEPTDEFINITION.md)** - Core concepts and architecture
+- **[Room Operator](docs/room-operator.md)** - Operator architecture and usage
+- **[MCP Connection Behavior](docs/MCP_CONNECTION_BEHAVIOR.md)** - MCP connection patterns
+
+### 📊 Reports & Summaries
+
+- **[Layer 3 Flow Validation](reports/LAYER3_FLOW_VALIDATION.md)** - Flow validation results
+- **[Schema-RoomServer Alignment](reports/schema-roomserver-alignment.md)** - Alignment report
+- **[Documentation Curation Report](docs/curation-report.md)** - Documentation organization summary
+
+### 🗂️ Repository Structure
+
+```
+metacore-stack/
+├── apps/
+│   └── operator-dashboard/     # Operator Dashboard (Vite/React)
+├── tools/
+│   └── integration-api/        # Integration API (Express/TypeScript)
+├── server-dotnet/
+│   ├── src/RoomServer/         # Room Server (.NET 8)
+│   └── operator/               # Room Operator
+├── docs/                       # Active documentation
+│   ├── _adr/                   # Architecture Decision Records
+│   ├── _deprecated/            # Deprecated docs (historical reference)
+│   └── _archive/               # Archived docs
+├── schemas/                    # JSON Schemas
+├── infra/                      # Infrastructure (docker-compose)
+├── configs/                    # Configuration files
+└── scripts/                    # Utility scripts
+```
+
 ## Licença
 
 MIT (ajuste conforme necessidade)
