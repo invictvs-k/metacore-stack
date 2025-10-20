@@ -1,41 +1,145 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: Integration API
-  version: 1.0.0
+  version: 0.1.0
   description: |
     API de integração para o Operator Dashboard.
     
-    **PLACEHOLDER** - Este é um esqueleto inicial. Será preenchido no Prompt 3 com:
-    - Endpoints completos (/api/config, /api/events, /api/tests/*, etc.)
-    - Modelos de dados (Room, Entity, Event, TestRun, etc.)
-    - Schemas de request/response
-    - Códigos de erro e validações
+    Fornece endpoints para configuração, streaming de eventos SSE, 
+    gerenciamento de comandos e execução de testes.
     
 servers:
   - url: http://localhost:40901
     description: Development server
-  - url: http://localhost:40901
-    description: Local environment
 
-paths: {}
-  # TODO (Prompt 3): Adicionar endpoints:
-  # - GET /api/config
-  # - GET /api/events (SSE)
-  # - GET /api/rooms
-  # - POST /api/tests/{scenario}/start
-  # - GET /api/tests/runs/{runId}/status
-  # - GET /api/tests/runs/{runId}/logs
-  # - POST /api/commands/{commandId}
-  # etc.
+paths:
+  /events/stream:
+    get:
+      summary: Server-Sent Events stream
+      description: Retorna um stream SSE com eventos do sistema em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+              
+  /events/heartbeat:
+    get:
+      summary: SSE heartbeat endpoint
+      description: Retorna pings periódicos para teste de conectividade SSE
+      responses:
+        '200':
+          description: Stream de heartbeat
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                
+  /commands/run:
+    post:
+      summary: Executa um comando
+      description: Envia um comando para execução no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          description: Comando aceito e em execução
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '400':
+          description: Requisição inválida
+        '500':
+          description: Erro interno do servidor
+
+  /api/config:
+    get:
+      summary: Retorna configuração do sistema
+      responses:
+        '200':
+          description: Configuração atual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
 
 components:
-  schemas: {}
-    # TODO (Prompt 3): Adicionar modelos:
-    # - Config
-    # - Event
-    # - Room
-    # - Entity
-    # - TestRun
-    # - CommandRequest
-    # - CommandResponse
-    # etc.
+  schemas:
+    SSEEvent:
+      type: object
+      description: Evento Server-Sent Events
+      required:
+        - event
+        - data
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [log, message, done, error, heartbeat]
+          description: Tipo do evento
+        data:
+          oneOf:
+            - type: object
+            - type: string
+          description: Payload do evento
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp ISO 8601 do evento
+        traceId:
+          type: string
+          description: ID de rastreamento opcional
+          
+    CommandRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nome do comando a executar
+        params:
+          type: object
+          description: Parâmetros do comando
+        runId:
+          type: string
+          description: ID único da execução
+          
+    CommandResponse:
+      type: object
+      required:
+        - success
+        - runId
+      properties:
+        success:
+          type: boolean
+          description: Indica se o comando foi aceito
+        runId:
+          type: string
+          description: ID único da execução
+        message:
+          type: string
+          description: Mensagem de resposta
+        data:
+          type: object
+          description: Dados adicionais da resposta
+          
+    Config:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Versão da API
+        environment:
+          type: string
+          description: Ambiente de execução
+        features:
+          type: object
+          description: Features habilitadas

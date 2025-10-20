@@ -2,50 +2,57 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://metacore-stack.local/schemas/commands.catalog.schema.json",
   "title": "Commands Catalog Schema",
-  "description": "Schema para o catálogo de comandos disponíveis no sistema. PLACEHOLDER - será preenchido no Prompt 3 com comandos completos.",
+  "description": "Schema para o catálogo de comandos disponíveis no sistema",
   "type": "object",
   "properties": {
     "version": {
       "type": "string",
-      "description": "Versão do catálogo de comandos",
+      "description": "Versão do catálogo de comandos (formato semver)",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "commands": {
       "type": "array",
-      "description": "Lista de comandos disponíveis",
+      "description": "Lista de comandos disponíveis no sistema",
       "items": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identificador único do comando"
-          },
           "name": {
             "type": "string",
-            "description": "Nome legível do comando"
+            "description": "Nome do comando",
+            "examples": ["room.create", "entity.spawn", "entity.move"]
           },
           "description": {
             "type": "string",
-            "description": "Descrição do comando"
+            "description": "Descrição do que o comando faz"
           },
-          "parameters": {
+          "params": {
             "type": "object",
-            "description": "Schema JSON dos parâmetros aceitos pelo comando"
+            "description": "Schema JSON dos parâmetros aceitos pelo comando",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["object"]
+              },
+              "properties": {
+                "type": "object"
+              },
+              "required": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "category": {
+            "type": "string",
+            "description": "Categoria do comando",
+            "examples": ["room", "entity", "system"]
           }
         },
-        "required": ["id", "name", "description"]
+        "required": ["name", "description"]
       }
     }
   },
-  "required": ["version", "commands"],
-  "_TODO_Prompt3": {
-    "description": "Adicionar comandos reais do sistema",
-    "exampleCommands": [
-      "room.create",
-      "entity.spawn",
-      "entity.move",
-      "entity.attack",
-      "room.reconcile"
-    ]
-  }
+  "required": ["version", "commands"]
 }
