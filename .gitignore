@@ -35,3 +35,4 @@ environment-validation-report-*.md
 venv/
 __pycache__/
 *.pyc
+*.egg-info/
