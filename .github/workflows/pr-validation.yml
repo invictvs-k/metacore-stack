@@ -2,10 +2,30 @@ name: pr-validation
 on: pull_request
 
 jobs:
-  format-lint:
+  # .NET format check
+  dotnet-format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '8.0.x' }
-      - run: dotnet format server-dotnet/RoomServer.sln --verify-no-changes --severity error || (echo "::error::Run 'dotnet format server-dotnet/RoomServer.sln'" && exit 1)
+      - name: Format check
+        run: dotnet format server-dotnet/RoomServer.sln --verify-no-changes --severity error || (echo "::error::Run 'dotnet format server-dotnet/RoomServer.sln'" && exit 1)
+
+  # Node/TypeScript lint and format
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+      - name: Run Prettier check
+        run: npm run format
+        continue-on-error: true

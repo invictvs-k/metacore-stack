@@ -24,6 +24,9 @@ dist/
 coverage/
 .artifacts/
 .repo_fixup_backup/
+*.log
+*.trx
+TestResults/
 
 # verification reports
 environment-validation-report-*.md

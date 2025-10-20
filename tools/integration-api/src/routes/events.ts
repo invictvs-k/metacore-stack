@@ -226,3 +226,77 @@ eventsRouter.get('/combined', async (req: Request, res: Response) => {
     cleanupRoomOperator?.();
   });
 });
+
+// GET /api/events/heartbeat - Simple heartbeat endpoint for testing SSE
+eventsRouter.get('/heartbeat', (req: Request, res: Response) => {
+  setupSSE(res);
+
+  let count = 0;
+  const traceId = req.traceId || `hb-${Date.now()}`;
+  const runId = req.runId;
+
+  // Get configurable parameters from query string
+  const intervalMs = parseInt(req.query.intervalMs as string) || 1000; // Default 1 second for fast testing
+  const maxCount = parseInt(req.query.max as string) || 3; // Default 3 heartbeats
+
+  // Send initial message
+  sendSSEMessage(res, {
+    event: 'log',
+    data: 'Heartbeat stream started',
+    timestamp: new Date().toISOString(),
+    traceId,
+    runId
+  });
+
+  // Send first heartbeat immediately
+  count++;
+  sendSSEMessage(res, {
+    event: 'heartbeat',
+    data: { count, message: 'ping' },
+    timestamp: new Date().toISOString(),
+    traceId,
+    runId
+  });
+
+  // Check if we're already done after first heartbeat
+  if (count >= maxCount) {
+    sendSSEMessage(res, {
+      event: 'done',
+      data: 'Heartbeat test completed',
+      timestamp: new Date().toISOString(),
+      traceId,
+      runId
+    });
+    res.end();
+    return;
+  }
+
+  // Send subsequent heartbeats at interval
+  const heartbeat = setInterval(() => {
+    count++;
+    sendSSEMessage(res, {
+      event: 'heartbeat',
+      data: { count, message: 'ping' },
+      timestamp: new Date().toISOString(),
+      traceId,
+      runId
+    });
+
+    // Send a done message after max heartbeats
+    if (count >= maxCount) {
+      sendSSEMessage(res, {
+        event: 'done',
+        data: 'Heartbeat test completed',
+        timestamp: new Date().toISOString(),
+        traceId,
+        runId
+      });
+      clearInterval(heartbeat);
+      res.end();
+    }
+  }, intervalMs);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+  });
+});

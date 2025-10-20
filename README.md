@@ -2,6 +2,11 @@
 
 [![CI](https://github.com/invictvs-k/metacore-stack/workflows/ci/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/ci.yml)
 [![PR Validation](https://github.com/invictvs-k/metacore-stack/workflows/pr-validation/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/pr-validation.yml)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?logo=node.js)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+
+> **Technical Report**: See [ci/tech-report.md](ci/tech-report.md) for detailed build status, test results, and pipeline observability.
 
 Mono-repo com:
 - `server-dotnet/` — Room Host (.NET 8 + SignalR) + RoomOperator
@@ -40,6 +45,52 @@ make run-server
 # 4) validar schemas
 make schemas-validate
 ```
+
+## CI/CD Pipeline & Development Workflow
+
+### Local Development Commands
+
+```bash
+# Build all projects
+npm run build        # Node/TypeScript projects
+dotnet build -c Release server-dotnet/RoomServer.sln  # .NET projects
+
+# Run tests
+npm test            # Schemas + contract validation
+dotnet test server-dotnet/RoomServer.sln  # .NET tests
+
+# Code quality
+npm run lint        # ESLint
+npm run format      # Prettier check
+npm run format:fix  # Prettier write
+dotnet format server-dotnet/RoomServer.sln  # .NET format
+
+# Type checking
+npm run typecheck   # TypeScript
+```
+
+### Observability & Testing
+
+```bash
+# Test SSE heartbeat endpoint
+npm run smoke:stream
+
+# Validate contracts
+npm run test:contracts
+
+# Start Integration API with structured logging
+cd tools/integration-api
+npm run dev
+```
+
+**Key Features:**
+- ✅ Structured JSON logging with traceId/runId
+- ✅ SSE endpoints with heartbeat monitoring
+- ✅ OpenAPI 3.1 specification with validation
+- ✅ Contract-based testing for all schemas
+- ✅ Reproducible builds with pinned SDK versions
+
+See [ci/tech-report.md](ci/tech-report.md) for detailed technical documentation.
 
 ## RoomOperator Integration Testing
 

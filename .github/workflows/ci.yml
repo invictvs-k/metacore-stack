@@ -1,24 +1,10 @@
 name: ci
 on:
-  push: { branches: [ main ] }
+  push: 
+    branches: [ main ]
   pull_request:
 
 jobs:
-  # ✅ PASSING - JSON Schema validation
-  schemas:
-    runs-on: ubuntu-latest
-    defaults: { run: { working-directory: schemas } }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with: 
-          node-version: '20'
-      - run: pnpm i
-      - run: pnpm validate
-
   # .NET build and test for RoomServer solution
   dotnet:
     runs-on: ubuntu-latest
@@ -26,12 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: '8.0.x' }
+        with: 
+          dotnet-version: '8.0.x'
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('server-dotnet/**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
       - name: Restore dependencies
@@ -39,8 +26,50 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
       - name: Test
-        run: dotnet test -c Release --no-build --verbosity normal
+        run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
         continue-on-error: true  # Some tests are currently failing - tracked separately
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: server-dotnet/**/TestResults/*.trx
+
+  # Node/TypeScript build for apps and tools
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install root dependencies
+        run: npm ci
+      - name: Install integration-api dependencies
+        run: cd tools/integration-api && npm ci
+      - name: Install dashboard dependencies
+        run: cd apps/operator-dashboard && npm ci
+      - name: Build integration-api
+        run: npm run build:api
+      - name: Type check
+        run: npm run typecheck
+
+  # JSON Schema and OpenAPI validation
+  schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: 
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Validate JSON Schemas
+        run: cd schemas && npm ci && npm run validate
+      - name: Validate OpenAPI spec
+        run: npx spectral lint configs/schemas/integration-api.openapi.yaml
 
   # TypeScript MCP servers build
   mcp-ts:
@@ -53,7 +82,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'mcp-ts/pnpm-lock.yaml'
       - name: Install dependencies
         run: cd mcp-ts && pnpm i
       - name: Build all MCP servers
         run: cd mcp-ts && pnpm -r -F "*" build
+
+  # Observability - SSE stream smoke test (experimental)
+  observability:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: cd tools/integration-api && npm ci
+      - name: Build integration-api
+        run: cd tools/integration-api && npm run build
+      - name: Start integration-api in background
+        run: |
+          cd tools/integration-api
+          timeout 120 npm start &
+          sleep 10
+      - name: Run SSE smoke test
+        run: node scripts/smoke-stream-test.mjs
+        continue-on-error: true
