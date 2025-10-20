@@ -11,6 +11,14 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '../../../..');
 
 const activeRuns = new Map<string, { process: ChildProcess; run: TestRun; logs: string[] }>();
+const completedRuns = new Map<string, { run: TestRun; logs: string[] }>();
+
+// Clean up completed runs after 5 minutes
+function cleanupCompletedRun(runId: string) {
+  setTimeout(() => {
+    completedRuns.delete(runId);
+  }, 5 * 60 * 1000); // 5 minutes
+}
 
 export async function listScenarios(): Promise<TestScenario[]> {
   const config = getConfig();
@@ -76,7 +84,7 @@ export async function listScenarios(): Promise<TestScenario[]> {
   }
 }
 
-export async function runTest(scenarioId: string | 'all'): Promise<string> {
+export async function runTest(scenarioId: string | 'all'): Promise<{ runId: string; artifactsDir: string; logPath: string }> {
   const runId = uuidv4();
   const config = getConfig();
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_');
@@ -114,8 +122,10 @@ export async function runTest(scenarioId: string | 'all'): Promise<string> {
   const testClientDir = path.join(ROOT_DIR, 'server-dotnet/operator/test-client');
   const logFile = path.join(artifactsPath, 'test-client.log');
 
+  // Use shell: true for cross-platform compatibility
   const proc = spawn(command, args, {
     cwd: testClientDir,
+    shell: true,
     env: {
       ...process.env,
       ARTIFACTS_DIR: artifactsPath,
@@ -147,22 +157,39 @@ export async function runTest(scenarioId: string | 'all'): Promise<string> {
     const resultPath = path.join(artifactsPath, 'result.json');
     await fs.writeFile(resultPath, JSON.stringify(run, null, 2));
 
+    // Move to completed runs for brief access before cleanup
+    const runData = activeRuns.get(runId);
+    if (runData) {
+      completedRuns.set(runId, { run, logs: runData.logs });
+      cleanupCompletedRun(runId);
+    }
+    
     activeRuns.delete(runId);
   });
 
   activeRuns.set(runId, { process: proc, run, logs });
 
-  return runId;
+  return {
+    runId,
+    artifactsDir: artifactsPath,
+    logPath: logFile
+  };
 }
 
 export function getRun(runId: string): TestRun | null {
   const active = activeRuns.get(runId);
-  return active ? active.run : null;
+  if (active) return active.run;
+  
+  const completed = completedRuns.get(runId);
+  return completed ? completed.run : null;
 }
 
 export function getRunLogs(runId: string): string[] {
   const active = activeRuns.get(runId);
-  return active ? active.logs : [];
+  if (active) return active.logs;
+  
+  const completed = completedRuns.get(runId);
+  return completed ? completed.logs : [];
 }
 
 export async function getRunMetadata(runId: string): Promise<any> {

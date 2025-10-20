@@ -1,21 +1,26 @@
-import { useState, useCallback } from 'react';
-import { Server, Terminal } from 'lucide-react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Server, Terminal, Pause, Play } from 'lucide-react';
 import { useSSE } from '../hooks/useSSE';
 import { useAppStore } from '../store/useAppStore';
 import { useConfig } from '../hooks/useConfig';
 
 export default function Events() {
   const [filter, setFilter] = useState<'all' | 'roomserver' | 'roomoperator'>('all');
+  const [paused, setPaused] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(true);
   const { events, addEvent, clearEvents } = useAppStore();
   const { config } = useConfig();
+  const eventsEndRef = useRef<HTMLDivElement>(null);
 
   const handleMessage = useCallback((data: any) => {
-    addEvent({
-      ...data,
-      id: Date.now() + Math.random(),
-      receivedAt: new Date().toISOString()
-    });
-  }, [addEvent]);
+    if (!paused) {
+      addEvent({
+        ...data,
+        id: Date.now() + Math.random(),
+        receivedAt: new Date().toISOString()
+      });
+    }
+  }, [addEvent, paused]);
 
   const sseOptions = {
     reconnectInterval: config?.ui?.sseReconnectInterval || 5000,
@@ -24,9 +29,16 @@ export default function Events() {
   };
 
   // Subscribe to combined events
-  useSSE('/api/events/combined', handleMessage, filter === 'all', sseOptions);
-  useSSE('/api/events/roomserver', handleMessage, filter === 'roomserver', sseOptions);
-  useSSE('/api/events/roomoperator', handleMessage, filter === 'roomoperator', sseOptions);
+  useSSE('/api/events/combined', handleMessage, filter === 'all' && !paused, sseOptions);
+  useSSE('/api/events/roomserver', handleMessage, filter === 'roomserver' && !paused, sseOptions);
+  useSSE('/api/events/roomoperator', handleMessage, filter === 'roomoperator' && !paused, sseOptions);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (autoScroll && eventsEndRef.current) {
+      eventsEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [events, autoScroll]);
 
   const filteredEvents = filter === 'all' 
     ? events 
@@ -38,12 +50,35 @@ export default function Events() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Real-time Events
         </h1>
-        <button
-          onClick={clearEvents}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-        >
-          Clear Events
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPaused(!paused)}
+            className={`px-4 py-2 rounded flex items-center gap-2 transition-colors ${
+              paused 
+                ? 'bg-green-600 hover:bg-green-700' 
+                : 'bg-yellow-600 hover:bg-yellow-700'
+            } text-white`}
+          >
+            {paused ? <Play size={16} /> : <Pause size={16} />}
+            {paused ? 'Resume' : 'Pause'}
+          </button>
+          <button
+            onClick={() => setAutoScroll(!autoScroll)}
+            className={`px-4 py-2 rounded transition-colors ${
+              autoScroll 
+                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+            }`}
+          >
+            Auto-scroll: {autoScroll ? 'On' : 'Off'}
+          </button>
+          <button
+            onClick={clearEvents}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            Clear Events
+          </button>
+        </div>
       </div>
 
       {/* Filter Buttons */}
@@ -75,13 +110,16 @@ export default function Events() {
         {filteredEvents.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              No events yet. Events will appear here in real-time.
+              {paused ? 'Events paused. Click Resume to continue.' : 'No events yet. Events will appear here in real-time.'}
             </p>
           </div>
         ) : (
-          filteredEvents.slice().reverse().map((event) => (
-            <EventCard key={event.id} event={event} />
-          ))
+          <>
+            {filteredEvents.slice().reverse().map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+            <div ref={eventsEndRef} />
+          </>
         )}
       </div>
     </div>

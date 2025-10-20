@@ -10,12 +10,29 @@ export default function Tests() {
   const [selectedScenario, setSelectedScenario] = useState<string>('all');
   const [logs, setLogs] = useState<string[]>([]);
   const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [exitCode, setExitCode] = useState<number | null>(null);
+  const [artifactsDir, setArtifactsDir] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [streamActive, setStreamActive] = useState<boolean>(false);
 
   const handleLogMessage = useCallback((data: any) => {
-    if (data.type === 'log') {
-      setLogs(prev => [...prev, data.data]);
-    } else if (data.type === 'complete') {
-      setTestStatus(data.status);
+    if (data.runId && data.chunk) {
+      // Handle 'log' event
+      setLogs(prev => [...prev, data.chunk]);
+    } else if (data.runId && data.artifactsDir !== undefined) {
+      // Handle 'started' event
+      setArtifactsDir(data.artifactsDir);
+      setStreamActive(true);
+    } else if (data.runId && data.exitCode !== undefined) {
+      // Handle 'done' event
+      setExitCode(data.exitCode);
+      setTestStatus(data.exitCode === 0 ? 'completed' : 'failed');
+      setStreamActive(false); // Mark stream as inactive to prevent reconnection
+    } else if (data.message) {
+      // Handle 'error' event
+      setLogs(prev => [...prev, `Error: ${data.message}`]);
+      setTestStatus('failed');
+      setStreamActive(false);
     }
   }, []);
 
@@ -26,19 +43,26 @@ export default function Tests() {
   };
 
   useSSE(
-    currentRunId ? `/api/tests/stream/${currentRunId}` : '',
+    currentRunId && streamActive ? `/api/tests/stream/${currentRunId}` : '',
     handleLogMessage,
-    !!currentRunId,
+    !!currentRunId && streamActive,
     sseOptions
   );
 
   const handleRunTest = async () => {
     setLogs([]);
     setTestStatus(null);
+    setExitCode(null);
+    setArtifactsDir(null);
+    setError(null);
+    setStreamActive(true); // Enable streaming
     try {
       await runTest(selectedScenario);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to run test:', error);
+      setError(error.message || 'Failed to start test execution');
+      setTestStatus('failed');
+      setStreamActive(false);
     }
   };
 
@@ -95,6 +119,13 @@ export default function Tests() {
             {scenarios.find(s => s.id === selectedScenario)?.description || 'No description'}
           </div>
         )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
       </div>
 
       {/* Test Results */}
@@ -121,8 +152,20 @@ export default function Tests() {
           </div>
 
           {/* Run Info */}
-          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            Run ID: <code className="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{currentRunId}</code>
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400 space-y-2">
+            <div>
+              Run ID: <code className="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{currentRunId}</code>
+            </div>
+            {artifactsDir && (
+              <div>
+                Artifacts: <code className="bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">{artifactsDir}</code>
+              </div>
+            )}
+            {exitCode !== null && (
+              <div>
+                Exit Code: <code className={`px-2 py-1 rounded ${exitCode === 0 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>{exitCode}</code>
+              </div>
+            )}
           </div>
         </div>
       )}
