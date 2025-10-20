@@ -1,6 +1,6 @@
 # Documentation Curation Report
 
-**Generated:** 2025-10-20T03:05:17.418Z  
+**Generated:** 2025-10-20T03:23:40.042Z  
 **Repository:** invictvs-k/metacore-stack
 
 ---
@@ -15,10 +15,35 @@ The work was performed following the principle of **Foundation & Discovery** - c
 | Category | Count | Percentage |
 |----------|-------|------------|
 | **Total Documents** | 58 | 100% |
-| Active | 41 | 71% |
-| Deprecated | 11 | 19% |
+| Active | 42 | 72% |
+| Deprecated | 10 | 17% |
 | Archived | 6 | 10% |
-| Files with Broken Links | 6 | 10% |
+| Files with Broken Links | 2 | 3% |
+
+---
+
+## Tag Taxonomy
+
+The documentation uses a two-tier tag system for categorization:
+
+**Core Tags** (original specification):
+- `architecture` - Architectural designs and high-level system views
+- `api` - API documentation and contracts
+- `howto` - How-to guides and tutorials
+- `adr` - Architecture Decision Records
+- `ops` - Operations and deployment guides
+- `design` - Design documents and diagrams
+
+**Extended Tags** (evolved during curation):
+- `testing` - Testing guides and test documentation
+- `implementation` - Implementation summaries and details
+- `runbook` - Operational runbooks
+- `agent` - Agent scaffolding and guides
+- `spec` - Specifications and formal contracts
+- `archive` - Archived documentation
+- `deprecated` - Deprecated documentation
+
+This taxonomy is documented in `docs/docs.manifest.json` under the `tagTaxonomy` field.
 
 ---
 
@@ -66,8 +91,8 @@ These provide quick-start information, architecture overview, and troubleshootin
 
 ### 5. Documentation Artifacts Generated
 
-- **docs/docs.manifest.json** - Complete inventory of 58 documentation files with metadata
-- **docs/TOC.md** - Organized table of contents with sections by category
+- **docs/docs.manifest.json** - Complete inventory of 58 documentation files with metadata and tag taxonomy
+- **docs/TOC.md** - Organized table of contents with sections by category (using relative links)
 - **docs/curation-report.md** - This report
 
 ---
@@ -77,7 +102,7 @@ These provide quick-start information, architecture overview, and troubleshootin
 ### Files by Status
 
 
-#### Active (41)
+#### Active (42)
 - Context Card: Operator Dashboard (`apps/operator-dashboard/CONTEXT.md`)
 - Operator Dashboard (`apps/operator-dashboard/README.md`)
 - CI Analysis Report (`ci/analysis-report.md`)
@@ -89,10 +114,10 @@ These provide quick-start information, architecture overview, and troubleshootin
 - Contribuição (`CONTRIBUTING.md`)
 - Dashboard React for Control and Observability (`DASHBOARD_README.md`)
 
-...and 31 more
+...and 32 more
 
 
-#### Deprecated (11)
+#### Deprecated (10)
 - Connection Test Fix - Technical Details (`docs/_deprecated/CONNECTION_TEST_FIX.md`)
 - Connection Test - Before vs After (`docs/_deprecated/CONNECTION_TEST_VISUAL.md`)
 - CORS Fix - RoomOperator Connection Issue (`docs/_deprecated/CORS_FIX_EXPLAINED.md`)
@@ -104,7 +129,6 @@ These provide quick-start information, architecture overview, and troubleshootin
 - Layer 3 Flow Validation - Summary (`docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md`)
 - Quick Start Guide - Observability & Execution Fix (`docs/_deprecated/QUICKSTART_GUIDE.md`)
 
-...and 1 more
 
 
 #### Archived (6)
@@ -119,12 +143,8 @@ These provide quick-start information, architecture overview, and troubleshootin
 
 ### Files with Broken Links
 
-- **Resumo das Configurações de Portas - Metacore Stack** (`CONFIGURACAO_PORTAS.md`) - 1 broken link(s)
 - **Development Setup Guide** (`DEVELOPMENT_SETUP.md`) - 3 broken link(s)
 - **Plano de Testes Detalhado - Backend/APIs do Metacore Stack** (`docs/_archive/BACKEND_API_TEST_PLAN.md`) - 1 broken link(s)
-- **Implementation Summary: Enhanced Integration Test System** (`docs/_deprecated/ENHANCED_INTEGRATION_TEST_IMPLEMENTATION.md`) - 1 broken link(s)
-- **Quick Start Guide - Observability & Execution Fix** (`docs/_deprecated/QUICKSTART_GUIDE.md`) - 1 broken link(s)
-- **Documentation Table of Contents** (`docs/TOC.md`) - 40 broken link(s)
 
 ### Most Referenced Documents
 
@@ -134,12 +154,33 @@ Top documents by incoming links:
 - **Quick Start Guide - Operator Dashboard** (`QUICKSTART.md`) - 4 references
 - **Operator Dashboard** (`apps/operator-dashboard/README.md`) - 3 references
 - **🧠 Metacore Stack — Especificação Funcional** (`CONCEPTDEFINITION.md`) - 3 references
+- **Contribuição** (`CONTRIBUTING.md`) - 3 references
 - **Dashboard React for Control and Observability** (`DASHBOARD_README.md`) - 3 references
 - **Integration Testing Guide** (`docs/TESTING.md`) - 3 references
 - **Metacore Stack — Metaplataforma (MVP)** (`README.md`) - 3 references
 - **Integration API** (`tools/integration-api/README.md`) - 3 references
-- **Development Setup Guide** (`DEVELOPMENT_SETUP.md`) - 2 references
-- **Layer 3 Flow Validation - Summary** (`docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md`) - 2 references
+- **Context Card: Operator Dashboard** (`apps/operator-dashboard/CONTEXT.md`) - 2 references
+
+---
+
+## Technical Details
+
+### Link Resolution Strategy
+
+The TOC uses **relative links** to avoid false-positive broken link detection:
+- Files within `docs/` use `./` prefix (e.g., `./glossary.md`)
+- Files outside `docs/` use `../` prefix (e.g., `../README.md`)
+- Root-anchored links (starting with `/`) are avoided to ensure proper resolution by static site generators and file browsers
+
+### Manifest Generation
+
+The manifest is generated automatically using Node.js scripts that:
+- Scan all `.md` and `.mdx` files (excluding `node_modules`, `dist`, `.artifacts`)
+- Extract H1 titles and metadata
+- Analyze content for tag classification
+- Track incoming and outgoing links
+- Validate link integrity
+- Determine document status based on location and content
 
 ---
 
@@ -170,12 +211,8 @@ The infrastructure is complete and ready for use. No immediate action required.
 ### Suggested Follow-Up Work
 
 1. **Broken Links** - Review and fix files with broken links:
-   - CONFIGURACAO_PORTAS.md
    - DEVELOPMENT_SETUP.md
    - docs/_archive/BACKEND_API_TEST_PLAN.md
-   - docs/_deprecated/ENHANCED_INTEGRATION_TEST_IMPLEMENTATION.md
-   - docs/_deprecated/QUICKSTART_GUIDE.md
-   - docs/TOC.md
 
 2. **Agent Briefs** - Start using the brief templates for focused tasks:
    - Create briefs in `docs/agent/briefs/` for upcoming work
@@ -205,8 +242,9 @@ The infrastructure is complete and ready for use. No immediate action required.
 
 1. **Regular Reviews** - Schedule quarterly documentation reviews
 2. **Manifest Updates** - Regenerate manifest when docs change significantly
-3. **Link Checking** - Set up automated link checking in CI
+3. **Link Checking** - Set up automated link checking in CI (with proper support for relative links)
 4. **Glossary Updates** - Keep glossary current as new terms emerge
+5. **Tag Taxonomy** - Review and refine tags as documentation evolves
 
 ---
 
@@ -216,13 +254,14 @@ The infrastructure is complete and ready for use. No immediate action required.
 - [x] No project paths interrupted
 - [x] All documentation accessible
 - [x] Directory structure created
-- [x] Manifest generated with accurate statistics
-- [x] TOC generated with categorized docs
+- [x] Manifest generated with accurate statistics and tag taxonomy
+- [x] TOC generated with categorized docs using relative links
 - [x] Glossary created with domain terms
 - [x] Agent scaffolding complete (briefs, playbooks, templates)
 - [x] Context cards created for key components
 - [x] README placeholders added for new directories
 - [x] Broken links identified and documented
+- [x] TOC.md marked as active (canonical navigation document)
 
 ---
 
@@ -235,8 +274,8 @@ The repository now has:
 - Comprehensive glossary of domain terms
 - Agent scaffolding for briefs, playbooks, and context cards
 - Context cards for key components
-- Complete documentation inventory (manifest)
-- Organized table of contents
+- Complete documentation inventory (manifest) with documented tag taxonomy
+- Organized table of contents using relative links for better compatibility
 - Infrastructure for runbooks, interfaces, and configuration schemas
 
 All existing documentation remains intact and accessible. The new infrastructure is ready for immediate use.
