@@ -19,8 +19,9 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "test": "npm run test:schemas",
+    "test": "npm run test:schemas && npm run test:contracts",
     "test:schemas": "cd schemas && npm run validate",
+    "test:contracts": "node scripts/validate-contracts.mjs",
     "smoke:stream": "node scripts/smoke-stream-test.mjs"
   },
   "keywords": [
