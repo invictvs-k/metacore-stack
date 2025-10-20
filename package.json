@@ -32,7 +32,9 @@
     "prepare": "husky",
     "commit": "cz",
     "security:audit": "node scripts/security-audit.mjs",
-    "agent:update": "node scripts/agent-update.mjs"
+    "agent:update": "node scripts/agent-update.mjs",
+    "report:test": "node scripts/generate-test-report.mjs",
+    "report:quality": "node scripts/generate-quality-report.mjs"
   },
   "keywords": [
     "dashboard",

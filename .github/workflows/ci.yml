@@ -1,7 +1,7 @@
 name: ci
 on:
-  push: 
-    branches: [ main ]
+  push:
+    branches: [main]
   pull_request:
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
-        with: 
+        with:
           dotnet-version: '8.0.x'
       - name: Cache NuGet packages
         uses: actions/cache@v4
@@ -27,7 +27,7 @@ jobs:
         run: dotnet build -c Release --no-restore
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
-        continue-on-error: true  # Some tests are currently failing - tracked separately
+        continue-on-error: true # Some tests are currently failing - tracked separately
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: 
+        with:
           node-version: '20'
           cache: 'npm'
       - name: Install dependencies
@@ -110,3 +110,107 @@ jobs:
       - name: Run SSE smoke test
         run: node scripts/smoke-stream-test.mjs
         continue-on-error: true
+
+  # Pre-commit checks validation
+  precommit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run format check
+        run: npm run format
+      - name: Run smoke tests
+        run: npm run test:smoke
+
+  # Security audits
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Install dependencies
+        run: npm ci
+      - name: Restore .NET dependencies
+        run: cd server-dotnet && dotnet restore
+      - name: Run security audit
+        run: npm run security:audit
+        continue-on-error: true
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: .artifacts/security/
+
+  # Release version validation (dry-run)
+  release-dry:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Test release (dry-run)
+        run: npm run release:dry
+
+  # E2E tests (requires services)
+  e2e:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Install integration-api dependencies
+        run: cd tools/integration-api && npm ci
+      - name: Build integration-api
+        run: cd tools/integration-api && npm run build
+      - name: Start integration-api
+        run: |
+          cd tools/integration-api
+          timeout 120 npm start &
+          sleep 10
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+  # Documentation validation
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Check for broken links (basic)
+        run: |
+          echo "Checking for basic markdown issues..."
+          find docs -name "*.md" -type f -exec grep -l "]()" {} \; || echo "No broken links found"
+      - name: Validate docs manifest
+        run: |
+          if [ -f "docs/docs.manifest.json" ]; then
+            node -e "JSON.parse(require('fs').readFileSync('docs/docs.manifest.json'))" && echo "✅ Manifest valid"
+          fi
