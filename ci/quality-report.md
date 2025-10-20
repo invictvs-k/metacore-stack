@@ -1,6 +1,6 @@
 # Quality Report
 
-**Generated**: 2025-10-20T16:30:02.498Z
+**Generated**: 2025-10-20T16:36:44.696Z
 
 ## Test Results
 
@@ -8,7 +8,15 @@
 
 ## Security Audit
 
-⚠️ No security report available
+**NPM Vulnerabilities**:
+
+- Total: 5
+- Critical: 0
+- High: 0
+- Moderate: 0
+- Low: 5
+
+See [detailed report](.artifacts/security/security-report.md)
 
 ## Build Status
 

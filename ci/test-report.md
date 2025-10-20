@@ -1,6 +1,6 @@
 # Test Report
 
-**Generated**: 2025-10-20T16:29:53.644Z
+**Generated**: 2025-10-20T16:36:44.512Z
 
 ## Summary
 
@@ -9,14 +9,14 @@
 - **Failed**: 0
 - **Success Rate**: 100.0%
 
-- **Total Duration**: 3.13s
+- **Total Duration**: 3.12s
 
 ## Test Results
 
 ### ✅ Schema Validation
 
 - **Status**: passed
-- **Duration**: 0.52s
+- **Duration**: 0.51s
 
 <details>
 <summary>Output</summary>
@@ -73,7 +73,7 @@ All schema validations passed.
 ### ✅ Smoke Tests
 
 - **Status**: passed
-- **Duration**: 2.36s
+- **Duration**: 2.35s
 
 <details>
 <summary>Output</summary>
