@@ -1,24 +1,27 @@
-# Schemas – Metaplataforma (Sala Viva)
+# Schemas – Meta-Platform (Living Room)
 
-Este diretório contém os 4 contratos canônicos do runtime:
-- `room.schema.json` — ciclo de vida e configuração da Sala
-- `entity.schema.json` — modelo de Entidade (humano/IA/NPC/orquestrador)
-- `message.schema.json` — protocolo de mensagens (chat/command/event/artifact)
-- `artifact-manifest.schema.json` — manifestos de artefatos (mesa da Sala/Entidade)
+This directory contains the 4 canonical runtime contracts:
 
-## Convenções
+- `room.schema.json` — Room lifecycle and configuration
+- `entity.schema.json` — Entity model (human/AI/NPC/orchestrator)
+- `message.schema.json` — Message protocol (chat/command/event/artifact)
+- `artifact-manifest.schema.json` — Artifact manifests (Room/Entity desk)
+
+## Conventions
+
 - Draft 2020-12
-- `$id` estável e `$metadata.semver` para versionamento
-- Reúso via `common.defs.json` (RoomId, EntityId, PortId, Origin etc.)
+- Stable `$id` and `$metadata.semver` for versioning
+- Reuse via `common.defs.json` (RoomId, EntityId, PortId, Origin, etc.)
 
-## Validação
+## Validation
+
 ```bash
 pnpm i
 pnpm validate
 ```
 
-## Evolução (por sprint)
+## Evolution (per sprint)
 
-Os schemas são imutáveis durante um sprint.
+Schemas are immutable during a sprint.
 
-Extensões devem ir em x-extensions até a próxima versão.
+Extensions must go in x-extensions until the next version.
