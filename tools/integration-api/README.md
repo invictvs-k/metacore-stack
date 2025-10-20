@@ -16,6 +16,17 @@ Backend service for the Operator Dashboard. Provides a unified API for managing 
 npm install
 ```
 
+### Test Client Dependencies
+
+The test execution feature requires the test-client dependencies to be installed:
+
+```bash
+cd ../../server-dotnet/operator/test-client
+npm install
+```
+
+This installs the `axios` HTTP client required by test scenarios. See `TEST_SETUP.md` in the repository root for complete test setup instructions.
+
 ## Development
 
 ```bash

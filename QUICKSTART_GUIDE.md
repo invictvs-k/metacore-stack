@@ -49,7 +49,13 @@ npm install
 # Dashboard
 cd apps/operator-dashboard
 npm install
+
+# Test Client (REQUIRED for test execution)
+cd server-dotnet/operator/test-client
+npm install
 ```
+
+**Note:** The test-client dependencies must be installed for test execution to work. Without them, you'll see "Cannot find package 'axios'" errors.
 
 ### 2. Start Services
 
