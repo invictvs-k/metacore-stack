@@ -48,6 +48,8 @@ jobs:
         run: npm ci
       - name: Install integration-api dependencies
         run: cd tools/integration-api && npm ci
+      - name: Install dashboard dependencies
+        run: cd apps/operator-dashboard && npm ci
       - name: Build integration-api
         run: npm run build:api
       - name: Type check
