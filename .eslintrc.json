@@ -29,8 +29,8 @@
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
         "project": [
-          "./tools/integration-api/tsconfig.json",
-          "./apps/operator-dashboard/tsconfig.json",
+          "./tools/*/tsconfig.json",
+          "./apps/*/tsconfig.json",
           "./ui/tsconfig.json",
           "./mcp-ts/servers/*/tsconfig.json"
         ]
