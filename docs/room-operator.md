@@ -1,3 +1,12 @@
+---
+title: RoomOperator Documentation
+status: active
+owners: []
+tags: [architecture, ops, spec]
+last_review: 2025-10-20
+links: []
+---
+
 # RoomOperator Documentation
 
 ## Overview

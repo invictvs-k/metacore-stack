@@ -1,3 +1,12 @@
+---
+title: RoomOperator-RoomServer Integration - Implementation Summary
+status: active
+owners: []
+tags: [implementation, architecture, integration]
+last_review: 2025-10-20
+links: []
+---
+
 # RoomOperator-RoomServer Integration - Implementation Summary
 
 ## Overview

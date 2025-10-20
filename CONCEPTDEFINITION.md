@@ -1,95 +1,80 @@
-# 🧠 Metacore Stack — Especificação Funcional
+# 🧠 Metacore Stack — Functional Specification
 
-### (Versão 1.0)
-
----
-
-## 1. Visão Geral
-
-A Metacore Stack é um ambiente de execução colaborativo que permite que **humanos e agentes de IA** coexistam, interajam e trabalhem sobre **artefatos compartilhados**, de forma coordenada e persistente.
-
-A ideia central é simples:
-
-> “Uma Sala é um espaço vivo onde entidades (humanas ou artificiais) entram, interagem, produzem e transformam artefatos, usando recursos conectados, com governança e rastreabilidade total.”
-
-O sistema é **agnóstico de linguagem e tecnologia de IA**.  
-Um agente Python, um humano no navegador, e um orquestrador em .NET podem coexistir na mesma Sala — todos agindo por meio de interfaces e protocolos padronizados.
+### (Version 1.0)
 
 ---
 
-## 2. Conceito de Sala (Room)
+## 1. Overview
 
-### O que é
+The Metacore Stack is a collaborative execution environment that allows **humans and AI agents** to coexist, interact, and work on **shared artifacts** in a coordinated and persistent manner.
 
-Uma **Sala** é o ambiente lógico e de execução onde o trabalho acontece.  
-Pense nela como um **“servidor de jogo colaborativo”**:
+The core idea is simple:
 
-- tem um **ciclo de vida** (`init → active → paused → ended`),
-    
-- mantém **recursos, entidades, artefatos e políticas**,
-    
-- e permanece viva até ser encerrada.
-    
+> "A Room is a living space where entities (human or artificial) enter, interact, produce and transform artifacts, using connected resources, with full governance and traceability."
 
-### Função
-
-A Sala:
-
-- gerencia o **estado global** (quem está presente, que recursos estão ativos, que artefatos existem);
-    
-- propaga **mensagens e eventos em tempo real** entre os membros;
-    
-- armazena e versiona **artefatos produzidos**;
-    
-- aplica **políticas de segurança e governança**;
-    
-- registra **telemetria e histórico** de tudo o que ocorreu.
-    
-
-### Exemplo
-
-Imagine uma Sala chamada `room-ai-workflow`.  
-Nela estão:
-
-- Marcelo (humano),
-    
-- o Agente `TextRefiner`,
-    
-- e o Orquestrador `StageManager`.
-    
-
-Marcelo envia um arquivo Markdown.  
-O `TextRefiner` o lê, melhora a clareza, e grava uma nova versão.  
-O `StageManager` detecta o evento `ARTIFACT.ADDED` e dispara a próxima tarefa.  
-Tudo isso ocorre **dentro da Sala**, com logs e versionamento automático.
+The system is **language and AI technology agnostic**.  
+A Python agent, a human in a browser, and a .NET orchestrator can coexist in the same Room — all acting through standardized interfaces and protocols.
 
 ---
 
-## 3. Entidades (Entities)
+## 2. Room Concept
 
-### O que são
+### What it is
 
-**Entidades** são os membros da Sala.  
-Elas representam tanto **pessoas humanas** quanto **agentes de IA**, **processos automatizados** ou **NPCs (entidades reativas)**.
+A **Room** is the logical and execution environment where work happens.  
+Think of it as a **"collaborative game server"**:
 
-Cada entidade:
+- has a **lifecycle** (`init → active → paused → ended`),
+- maintains **resources, entities, artifacts, and policies**,
+- and remains alive until terminated.
 
-- tem um **ID**, um **tipo** (`human`, `agent`, `npc`, `orchestrator`),
-    
-- possui **capacidades** (ports/funções que sabe executar),
-    
-- obedece a **políticas** (quem pode comandá-la, o que pode acessar),
-    
-- e pode ter um **workspace próprio** (sua “mesa de trabalho”).
-    
+### Function
 
-### Função
+The Room:
 
-As Entidades são **os atores**.  
-Tudo o que acontece na Sala parte de uma Entidade —  
-toda mensagem, artefato ou ação tem um `from` e, opcionalmente, um `to`.
+- manages the **global state** (who is present, which resources are active, which artifacts exist);
+- propagates **messages and events in real time** among members;
+- stores and versions **produced artifacts**;
+- applies **security and governance policies**;
+- records **telemetry and history** of everything that occurred.
 
-### Exemplo
+### Example
+
+Imagine a Room called `room-ai-workflow`.  
+In it are:
+
+- Marcelo (human),
+- the Agent `TextRefiner`,
+- and the Orchestrator `StageManager`.
+
+Marcelo sends a Markdown file.  
+The `TextRefiner` reads it, improves clarity, and saves a new version.  
+The `StageManager` detects the `ARTIFACT.ADDED` event and triggers the next task.  
+All of this occurs **within the Room**, with automatic logs and versioning.
+
+---
+
+## 3. Entities
+
+### What they are
+
+**Entities** are Room members.  
+They represent both **human persons** and **AI agents**, **automated processes**, or **NPCs (reactive entities)**.
+
+Each entity:
+
+- has an **ID**, a **type** (`human`, `agent`, `npc`, `orchestrator`),
+- possesses **capabilities** (ports/functions it can execute),
+- obeys **policies** (who can command it, what it can access),
+- and may have its **own workspace** (its "work desk").
+
+### Function
+
+Entities are **the actors**.  
+Everything that happens in the Room originates from an Entity —  
+every message, artifact, or action has a `from` and, optionally, a `to`.
+
+### Example
 
 ```json
 {
@@ -102,81 +87,64 @@ toda mensagem, artefato ou ação tem um `from` e, opcionalmente, um `to`.
 }
 ```
 
-Este agente aceita comandos para gerar e revisar textos, e só o orquestrador pode dar instruções diretas a ele.
+This agent accepts commands to generate and review texts, and only the orchestrator can give direct instructions to it.
 
 ---
 
-## 4. Workspaces e Artefatos
+## 4. Workspaces and Artifacts
 
-### O que são
+### What they are
 
-Os **Workspaces** são as “mesas” de trabalho.  
-Há dois níveis:
+**Workspaces** are the "work desks".  
+There are two levels:
 
-- **Workspace da Sala**: espaço compartilhado, visível a todos.
-    
-- **Workspace da Entidade**: espaço privado, visível só a quem o possui (salvo se promovido).
-    
+- **Room Workspace**: shared space, visible to all.
+- **Entity Workspace**: private space, visible only to its owner (unless promoted).
 
-**Artefatos** são os arquivos, textos, dados ou outputs criados pelas entidades.  
-Cada artefato possui um **manifesto** (`artifact-manifest.json`) com:
+**Artifacts** are files, texts, data, or outputs created by entities.  
+Each artifact has a **manifest** (`artifact-manifest.json`) with:
 
-- nome, tipo (ex: `doc/markdown`, `app/json`);
-    
-- origem (sala, entidade, port);
-    
-- hash SHA256 e versionamento;
-    
-- metadados e timestamp.
-    
+- name, type (e.g., `doc/markdown`, `app/json`);
+- origin (room, entity, port);
+- SHA256 hash and versioning;
+- metadata and timestamp.
 
-### Função
+### Function
 
-Os Workspaces permitem:
+Workspaces enable:
 
-- isolamento controlado;
-    
-- versionamento transparente;
-    
-- reconstrução e auditoria de resultados.
-    
+- controlled isolation;
+- transparent versioning;
+- reconstruction and audit of results.
 
-### Exemplo de fluxo
+### Flow example
 
-1. Marcelo (E-H1) faz upload de `input.txt`.
-    
-2. O Agente `TextRefiner` gera `output_refined.txt`.
-    
-3. O Orquestrador lê o evento e envia o resultado para revisão.
-    
-4. Todos os arquivos ficam na “mesa” da Sala, versionados e rastreáveis.
-    
+1. Marcelo (E-H1) uploads `input.txt`.
+2. The Agent `TextRefiner` generates `output_refined.txt`.
+3. The Orchestrator reads the event and sends the result for review.
+4. All files remain on the Room's "desk", versioned and traceable.
 
 ---
 
-## 5. Mensageria e Comunicação
+## 5. Messaging and Communication
 
-### O que é
+### What it is
 
-O **Bus da Sala** é o sistema de mensagens em tempo real.  
-Baseado em **SignalR (WebSocket)**, ele conecta todas as entidades e propaga mensagens do tipo:
+The **Room Bus** is the real-time messaging system.  
+Based on **SignalR (WebSocket)**, it connects all entities and propagates messages of type:
 
-- `chat` — comunicação livre/humana;
-    
-- `command` — instrução formal de execução;
-    
-- `event` — evento do sistema ou da entidade;
-    
-- `artifact` — notificação sobre novo ou alterado artefato.
-    
+- `chat` — free/human communication;
+- `command` — formal execution instruction;
+- `event` — system or entity event;
+- `artifact` — notification about new or changed artifact.
 
-### Função
+### Function
 
-É o **coração da Sala**.  
-Tudo o que acontece é comunicado via mensagens —  
-isso permite que humanos, agentes e orquestradores compartilhem o mesmo canal.
+It's the **heart of the Room**.  
+Everything that happens is communicated via messages —  
+this allows humans, agents, and orchestrators to share the same channel.
 
-### Exemplo (mensagem `command`)
+### Example (`command` message)
 
 ```json
 {
@@ -188,174 +156,156 @@ isso permite que humanos, agentes e orquestradores compartilhem o mesmo canal.
   "payload": {
     "target": "E-AGENT-1",
     "port": "text.generate",
-    "inputs": { "text": "Otimize este texto." }
+    "inputs": { "text": "Optimize this text." }
   }
 }
 ```
 
-O agente `E-AGENT-1` recebe a mensagem e executa o port `text.generate`.
+The agent `E-AGENT-1` receives the message and executes the `text.generate` port.
 
 ---
 
-## 6. Ports e Capabilities
+## 6. Ports and Capabilities
 
-### O que são
+### What they are
 
-**Ports** são contratos de função padronizados — definem o que uma entidade _sabe fazer_.
+**Ports** are standardized function contracts — they define what an entity _can do_.
 
-Exemplo:
+Example:
 
-- `text.generate` — recebe texto e parâmetros, retorna nova versão.
-    
-- `review` — analisa e dá feedback.
-    
-- `plan` — elabora plano de tarefas.
-    
-- `search.web` — executa pesquisa via recurso MCP.
-    
+- `text.generate` — receives text and parameters, returns new version.
+- `review` — analyzes and provides feedback.
+- `plan` — creates task plan.
+- `search.web` — performs search via MCP resource.
 
-### Função
+### Function
 
-Os Ports transformam agentes e humanos em **módulos intercambiáveis**.  
-Qualquer entidade pode anunciar seus ports e ser chamada por outro componente.
+Ports transform agents and humans into **interchangeable modules**.  
+Any entity can announce its ports and be called by another component.
 
-### Exemplo (adapter)
+### Example (adapter)
 
-Um `text.generate` pode ser implementado por:
+A `text.generate` can be implemented by:
 
-- um agente local via API OpenAI,
-    
-- um humano revisando texto manualmente,
-    
-- um serviço externo plugado via MCP.
-    
+- a local agent via OpenAI API,
+- a human manually reviewing text,
+- an external service plugged in via MCP.
 
-Todos seguem o mesmo contrato de entrada/saída.
+All follow the same input/output contract.
 
 ---
 
-## 7. Recursos (Resources) e MCP
+## 7. Resources and MCP
 
-### O que são
+### What they are
 
-**Recursos** são as ferramentas externas disponíveis na Sala.  
-Eles podem ser:
+**Resources** are external tools available in the Room.  
+They can be:
 
-- repositórios Git,
-    
-- APIs HTTP,
-    
-- mecanismos de busca,
-    
-- bancos de dados,
-    
-- ferramentas de conversão, etc.
-    
+- Git repositories,
+- HTTP APIs,
+- search engines,
+- databases,
+- conversion tools, etc.
 
-São expostos via **MCP (Model Context Protocol)** —  
-um padrão aberto que permite conectar ferramentas por WebSocket/JSON-RPC.
+They are exposed via **MCP (Model Context Protocol)** —  
+an open standard that allows connecting tools via WebSocket/JSON-RPC.
 
-### Função
+### Function
 
-Os Recursos expandem o “alcance” da Sala —  
-as Entidades podem consultar dados, enviar requisições e buscar conhecimento fora do ambiente, com segurança e controle.
+Resources expand the Room's "reach" —  
+Entities can query data, send requests, and seek knowledge outside the environment, with security and control.
 
-### Exemplo
+### Example
 
-Um MCP Server `web.search` (em TypeScript) expõe:
+An MCP Server `web.search` (in TypeScript) exposes:
 
 ```json
 {
-  "tools": [{
-    "id": "web.search",
-    "title": "Search the Web",
-    "inputSchema": { "q": "string", "limit": "number" },
-    "outputSchema": { "items": "array" }
-  }]
-}
-```
-
-A Entidade na Sala chama:
-
-```json
-{ "toolId": "web.search", "args": { "q": "agentes cognitivos", "limit": 3 } }
-```
-
-E recebe uma lista de resultados.  
-Tudo registrado, versionado e auditado.
-
----
-
-## 8. Orquestradores e Tasks
-
-### O que são
-
-Os **Orquestradores** são Entidades especiais que possuem “scripts” de coordenação — chamados **Tasks**.  
-Esses scripts definem:
-
-- **comandos sequenciais ou condicionais**;
-    
-- **dependências entre tarefas**;
-    
-- **checkpoints de validação humana**;
-    
-- **resultados esperados**.
-    
-
-### Função
-
-Eles transformam a Sala em um **ambiente de execução programável**.  
-Ao invés de escrever um fluxo rígido de código, você escreve um JSON que descreve o trabalho — e o Orquestrador executa.
-
-### Exemplo (Task Script simplificado)
-
-```json
-{
-  "name": "Refinar Documento",
-  "steps": [
+  "tools": [
     {
-      "task": "gerar_texto",
-      "target": "E-AGENT-1",
-      "port": "text.generate",
-      "inputs": { "text": "draft.md", "guidance": "clareza e fluidez" },
-      "output": "refined.md"
-    },
-    {
-      "task": "revisar",
-      "target": "E-HUMAN-1",
-      "port": "review",
-      "inputs": { "artifact": "refined.md" },
-      "checkpoint": "aguardar_aprovação"
+      "id": "web.search",
+      "title": "Search the Web",
+      "inputSchema": { "q": "string", "limit": "number" },
+      "outputSchema": { "items": "array" }
     }
   ]
 }
 ```
 
-O Orquestrador executa passo a passo, aguardando confirmações e publicando eventos (`TASK.START`, `TASK.END`, `CHECKPOINT.REACHED`).
+The Entity in the Room calls:
+
+```json
+{ "toolId": "web.search", "args": { "q": "cognitive agents", "limit": 3 } }
+```
+
+And receives a list of results.  
+Everything recorded, versioned, and audited.
 
 ---
 
-## 9. Policies e Governança
+## 8. Orchestrators and Tasks
 
-### O que são
+### What they are
 
-**Policies** são regras de segurança e governança aplicadas em tempo real:
+**Orchestrators** are special Entities that possess coordination "scripts" — called **Tasks**.  
+These scripts define:
 
-- quem pode enviar comandos a quem,
-    
-- quais recursos cada entidade pode acessar,
-    
-- quantas vezes pode usar um tool (rate-limit),
-    
-- o que pode ser logado ou mascarado (PII).
-    
+- **sequential or conditional commands**;
+- **dependencies between tasks**;
+- **human validation checkpoints**;
+- **expected results**.
 
-### Função
+### Function
 
-Garantem **controle e conformidade**, sem bloquear a fluidez do trabalho.  
-São aplicadas pelo Host da Sala, e registradas nos manifests e logs de telemetria.
+They transform the Room into a **programmable execution environment**.  
+Instead of writing a rigid code flow, you write JSON that describes the work — and the Orchestrator executes it.
 
-### Exemplo
+### Example (simplified Task Script)
+
+```json
+{
+  "name": "Refine Document",
+  "steps": [
+    {
+      "task": "generate_text",
+      "target": "E-AGENT-1",
+      "port": "text.generate",
+      "inputs": { "text": "draft.md", "guidance": "clarity and fluency" },
+      "output": "refined.md"
+    },
+    {
+      "task": "review",
+      "target": "E-HUMAN-1",
+      "port": "review",
+      "inputs": { "artifact": "refined.md" },
+      "checkpoint": "await_approval"
+    }
+  ]
+}
+```
+
+The Orchestrator executes step by step, awaiting confirmations and publishing events (`TASK.START`, `TASK.END`, `CHECKPOINT.REACHED`).
+
+---
+
+## 9. Policies and Governance
+
+### What they are
+
+**Policies** are security and governance rules applied in real time:
+
+- who can send commands to whom,
+- which resources each entity can access,
+- how many times it can use a tool (rate-limit),
+- what can be logged or masked (PII).
+
+### Function
+
+They ensure **control and compliance**, without blocking work fluidity.  
+They are enforced by the Room Host, and recorded in manifests and telemetry logs.
+
+### Example
 
 ```json
 "policy": {
@@ -367,125 +317,105 @@ São aplicadas pelo Host da Sala, e registradas nos manifests e logs de telemetr
 
 ---
 
-## 10. Telemetria e Histórico
+## 10. Telemetry and History
 
-### O que é
+### What it is
 
-Todo evento gerado na Sala é gravado em:
+Every event generated in the Room is recorded in:
 
-- `events.jsonl` — log contínuo de eventos;
-    
-- `room-run.json` — resumo consolidado (entidades, artefatos, duração);
-    
-- e opcionalmente enviado via **OpenTelemetry** para observabilidade em tempo real.
-    
+- `events.jsonl` — continuous event log;
+- `room-run.json` — consolidated summary (entities, artifacts, duration);
+- and optionally sent via **OpenTelemetry** for real-time observability.
 
-### Função
+### Function
 
-Permite:
+Enables:
 
-- rastreabilidade completa (quem fez o quê, quando e com o quê);
-    
-- auditoria e replay de execuções passadas;
-    
-- aprendizado e ajuste de fluxos.
-    
+- complete traceability (who did what, when, and with what);
+- audit and replay of past executions;
+- learning and flow adjustment.
 
-### Exemplo (linha de log)
+### Example (log line)
 
 ```json
-{"ts":"2025-10-17T12:10:03Z","event":"RESOURCE.CALLED","room":"room-ai-workflow","entity":"E-AGENT-1","tool":"web.search","args":{"q":"Azure AI"}}
+{
+  "ts": "2025-10-17T12:10:03Z",
+  "event": "RESOURCE.CALLED",
+  "room": "room-ai-workflow",
+  "entity": "E-AGENT-1",
+  "tool": "web.search",
+  "args": { "q": "Azure AI" }
+}
 ```
 
 ---
 
-## 11. Potenciais e Extensões
+## 11. Potential and Extensions
 
-### a) Metaplataforma universal
+### a) Universal meta-platform
 
-Por ser baseada em **protocolos**, a Sala pode integrar:
+Being based on **protocols**, the Room can integrate:
 
-- Agentes Python (LangGraph, Agno, AutoGen);
-    
-- Orquestradores .NET (Orleans);
-    
-- UI/Apps web (Next.js);
-    
-- Recursos MCP escritos em qualquer linguagem.
-    
+- Python agents (LangGraph, Agno, AutoGen);
+- .NET orchestrators (Orleans);
+- UI/Web apps (Next.js);
+- MCP resources written in any language.
 
-### b) Ambientes híbridos
+### b) Hybrid environments
 
-Uma Sala pode ser aberta para múltiplos humanos e agentes simultaneamente, tornando-se um **espaço de trabalho cognitivo colaborativo** — híbrido humano+IA.
+A Room can be open to multiple humans and agents simultaneously, becoming a **collaborative cognitive workspace** — hybrid human+AI.
 
-### c) Reaproveitamento
+### c) Reusability
 
-Cada **Stage** de um projeto maior é apenas uma **Sala encapsulada**, com entrada e saída definidas, permitindo reuso como módulos em pipelines mais amplos.
+Each **Stage** of a larger project is just an **encapsulated Room**, with defined input and output, allowing reuse as modules in broader pipelines.
 
-### d) Aplicações futuras
+### d) Future applications
 
-- **Reuniões cognitivas persistentes**: times humanos + IAs trabalhando com contexto contínuo.
-    
-- **Ambientes de desenvolvimento orientados a IA**: agentes refatorando, testando e versionando código em tempo real.
-    
-- **Assistentes multiagente em domínios específicos**: jurídico, médico, educacional, criativo.
-    
-- **Governança autônoma**: políticas dinâmicas adaptando-se ao contexto e performance das entidades.
-    
+- **Persistent cognitive meetings**: human teams + AIs working with continuous context.
+- **AI-oriented development environments**: agents refactoring, testing, and versioning code in real time.
+- **Multi-agent assistants in specific domains**: legal, medical, educational, creative.
+- **Autonomous governance**: dynamic policies adapting to context and entity performance.
 
 ---
 
-## 12. Exemplo funcional completo
+## 12. Complete functional example
 
-1. **Sala criada**  
-    `POST /rooms → {"id":"room-abc123","state":"active"}`
-    
-2. **Entidades entram**
-    
-    - Humano (E-H1) via UI.
-        
-    - Agente de IA (E-A1) via WS.
-        
-    - Orquestrador (E-ORC) via script.
-        
-3. **Artefato enviado**  
-    Marcelo envia `texto_original.md`.
-    
-4. **Orquestrador envia comando**  
-    `E-ORC` → `E-A1` (`port=text.generate`, input: `texto_original.md`).
-    
-5. **Agente produz saída**  
-    `E-A1` grava `texto_refinado.md`.
-    
-6. **Orquestrador pede revisão**  
-    `E-ORC` → `E-H1` (`port=review`, input: `texto_refinado.md`).
-    
-7. **Marcelo aprova**  
-    Artefato é marcado como final.
-    
-8. **Sala finaliza**  
-    Todos os artefatos, eventos e manifests são salvos.  
-    `room-run.json` resume o histórico da sessão.
-    
+1. **Room created**  
+   `POST /rooms → {"id":"room-abc123","state":"active"}`
+2. **Entities enter**
+   - Human (E-H1) via UI.
+   - AI Agent (E-A1) via WS.
+   - Orchestrator (E-ORC) via script.
+
+3. **Artifact sent**  
+   Marcelo sends `original_text.md`.
+4. **Orchestrator sends command**  
+   `E-ORC` → `E-A1` (`port=text.generate`, input: `original_text.md`).
+5. **Agent produces output**  
+   `E-A1` saves `refined_text.md`.
+6. **Orchestrator requests review**  
+   `E-ORC` → `E-H1` (`port=review`, input: `refined_text.md`).
+7. **Marcelo approves**  
+   Artifact is marked as final.
+8. **Room finalizes**  
+   All artifacts, events, and manifests are saved.  
+   `room-run.json` summarizes the session history.
 
 ---
 
-## 13. Potencial Estratégico
+## 13. Strategic Potential
 
-A Metaplataforma é um **framework universal de colaboração cognitiva**.
+The Meta-platform is a **universal framework for cognitive collaboration**.
 
-Ela não é “mais um sistema de chat com IA”.  
-É uma **infraestrutura de trabalho vivo**, onde:
+It's not "just another AI chat system".  
+It's a **living work infrastructure**, where:
 
-- cada projeto pode se tornar uma rede de salas e stages;
-    
-- cada sala pode ser reaberta, auditada e reutilizada;
-    
-- e cada entidade (humana ou IA) é interoperável via contratos.
-    
+- each project can become a network of rooms and stages;
+- each room can be reopened, audited, and reused;
+- and each entity (human or AI) is interoperable via contracts.
 
-Em outras palavras:
+In other words:
 
-> A Sala Viva é o que transforma o trabalho com IA de algo episódico (prompts e respostas) em algo contínuo, governado e evolutivo.
+> The Living Room is what transforms AI work from something episodic (prompts and responses) into something continuous, governed, and evolutionary.
 
 ---

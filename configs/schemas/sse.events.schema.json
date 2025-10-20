@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://metacore-stack.local/schemas/sse.events.schema.json",
+  "title": "SSE Event Schema",
+  "description": "Schema para eventos Server-Sent Events (SSE) transmitidos via Integration API",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "string",
+      "enum": [
+        "log",
+        "message", 
+        "done",
+        "error",
+        "heartbeat",
+        "room.created",
+        "room.updated",
+        "room.deleted",
+        "entity.joined",
+        "entity.left",
+        "entity.updated",
+        "command.executed",
+        "test.started",
+        "test.completed"
+      ],
+      "description": "Tipo do evento SSE"
+    },
+    "data": {
+      "oneOf": [
+        { "type": "object" },
+        { "type": "string" }
+      ],
+      "description": "Payload do evento - pode ser objeto ou string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 do evento"
+    },
+    "traceId": {
+      "type": "string",
+      "description": "ID de rastreamento opcional para correlação de eventos"
+    },
+    "runId": {
+      "type": "string",
+      "description": "ID da execução relacionada ao evento"
+    }
+  },
+  "required": ["event", "data", "timestamp"]
+}

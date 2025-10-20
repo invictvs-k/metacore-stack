@@ -1,0 +1,6 @@
+extends: [[spectral:oas, all]]
+rules:
+  info-contact: off
+  info-description: warn
+  operation-description: warn
+  operation-tags: off

@@ -30,21 +30,18 @@ export default function RoomDetailPage() {
 
         if (response.ok) {
           const data = await response.json();
-          setRoomName(data.name || `Sala ${roomId}`);
+          setRoomName(data.name || `Room ${roomId}`);
         } else {
-          setRoomName(`Sala ${roomId}`);
+          setRoomName(`Room ${roomId}`);
         }
 
         // Try to fetch artifacts
-        const artifactsResponse = await fetch(
-          `http://localhost:5000/rooms/${roomId}/artifacts`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Entity-Id': 'demo-entity',
-            },
-          }
-        );
+        const artifactsResponse = await fetch(`http://localhost:5000/rooms/${roomId}/artifacts`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Entity-Id': 'demo-entity',
+          },
+        });
 
         if (artifactsResponse.ok) {
           const data = await artifactsResponse.json();
@@ -70,7 +67,7 @@ export default function RoomDetailPage() {
         }
       } catch (err) {
         console.log('Error fetching room details:', err);
-        setRoomName(`Sala ${roomId}`);
+        setRoomName(`Room ${roomId}`);
         // Use mock data
         setArtifacts([
           {
@@ -110,47 +107,51 @@ export default function RoomDetailPage() {
     <div className="container">
       <div style={{ marginBottom: '2rem' }}>
         <Link href="/rooms" className="btn btn-secondary">
-          ← Voltar para Salas
+          ← Back to Rooms
         </Link>
       </div>
 
       <h1>{roomName}</h1>
       <p style={{ color: '#666', marginBottom: '2rem' }}>ID: {roomId}</p>
 
-      {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-error">{error}</div>}
 
       <div className="alert alert-info" style={{ marginBottom: '2rem' }}>
-        <strong>Integração Backend:</strong> Esta página busca artefatos do endpoint{' '}
+        <strong>Backend Integration:</strong> This page fetches artifacts from the endpoint{' '}
         <code>GET /rooms/{'{roomId}'}/artifacts</code>
       </div>
 
-      <h2 style={{ marginBottom: '1rem' }}>Artefatos</h2>
+      <h2 style={{ marginBottom: '1rem' }}>Artifacts</h2>
 
       {artifacts.length === 0 ? (
         <div className="card">
-          <p>Nenhum artefato encontrado nesta sala.</p>
+          <p>No artifacts found in this room.</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gap: '1rem' }}>
           {artifacts.map((artifact, index) => (
             <div key={index} className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+              <div
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}
+              >
                 <div>
                   <h3 className="card-header">{artifact.name}</h3>
                   <div className="card-content">
-                    <p><strong>Tipo:</strong> {artifact.type}</p>
-                    <p><strong>Versão:</strong> {artifact.version}</p>
-                    <p><strong>SHA256:</strong> {artifact.sha256.substring(0, 16)}...</p>
-                    <p><strong>Criado:</strong> {new Date(artifact.created).toLocaleString('pt-BR')}</p>
+                    <p>
+                      <strong>Type:</strong> {artifact.type}
+                    </p>
+                    <p>
+                      <strong>Version:</strong> {artifact.version}
+                    </p>
+                    <p>
+                      <strong>SHA256:</strong> {artifact.sha256.substring(0, 16)}...
+                    </p>
+                    <p>
+                      <strong>Created:</strong> {new Date(artifact.created).toLocaleString('en-US')}
+                    </p>
                   </div>
                 </div>
-                <button className="btn btn-primary">
-                  Download
-                </button>
+                <button className="btn btn-primary">Download</button>
               </div>
             </div>
           ))}

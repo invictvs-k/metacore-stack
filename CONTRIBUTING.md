@@ -1,11 +1,12 @@
-# Contribuição
+# Contributing
 
-- Siga **Conventional Commits** (`feat:`, `fix:`, `chore:` ...).
-- Todo PR deve passar: build, testes, lint, validação de schemas.
-- Evite breaking changes nos `schemas/` sem versionar.
+- Follow **Conventional Commits** (`feat:`, `fix:`, `chore:` ...).
+- Every PR must pass: build, tests, lint, schema validation.
+- Avoid breaking changes in `schemas/` without versioning.
 
-## Scripts úteis
-- `make bootstrap` — instala dependências globais e locais
-- `make run-server` — roda o Room Host
-- `make mcp-up` — sobe servers MCP de exemplo
-- `make schemas-validate` — valida JSON Schemas + exemplos
+## Useful Scripts
+
+- `make bootstrap` — install global and local dependencies
+- `make run-server` — run the Room Host
+- `make mcp-up` — start example MCP servers
+- `make schemas-validate` — validate JSON Schemas + examples

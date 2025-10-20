@@ -1,3 +1,12 @@
+---
+title: Integration Testing Guide
+status: active
+owners: []
+tags: [testing, howto, integration]
+last_review: 2025-10-20
+links: []
+---
+
 # Integration Testing Guide
 
 Complete guide for testing RoomOperator-RoomServer integration.

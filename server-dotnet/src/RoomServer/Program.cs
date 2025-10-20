@@ -41,6 +41,7 @@ builder.Services.AddSingleton<RoomContextStore>();
 builder.Services.AddSingleton<PermissionService>();
 builder.Services.AddSingleton<PolicyEngine>();
 builder.Services.AddSingleton<McpRegistry>();
+builder.Services.AddSingleton<McpConnectionManager>();
 builder.Services.AddHostedService<McpRegistryHostedService>();
 builder.Logging.AddConsole();
 
@@ -51,6 +52,9 @@ app.MapGet("/", () => Results.Text("RoomServer alive"));
 app.MapHealthChecks("/health");
 app.MapHub<RoomHub>("/room");
 app.MapArtifactEndpoints();
+app.MapMcpStatusEndpoints();
+app.MapMcpAdminEndpoints();
+app.MapEventsEndpoints();
 
 app.Run();
 

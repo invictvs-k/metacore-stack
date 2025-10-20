@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-roomserver",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/server-dotnet/src/RoomServer/RoomServer.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build-roomoperator",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/server-dotnet/operator/RoomOperator.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "type": "npm",
+      "script": "install",
+      "path": "tools/integration-api",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: install - tools/integration-api",
+      "detail": "install dependencies from package"
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "path": "apps/operator-dashboard",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: dev - apps/operator-dashboard",
+      "detail": "vite",
+      "isBackground": true
+    }
+  ]
+}

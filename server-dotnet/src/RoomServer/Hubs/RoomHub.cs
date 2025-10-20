@@ -19,6 +19,7 @@ public partial class RoomHub : Hub
   private readonly RoomEventPublisher _events;
   private readonly ILogger<RoomHub> _logger;
   private readonly McpRegistry _mcpRegistry;
+  private readonly McpConnectionManager _connectionManager;
   private readonly PolicyEngine _policyEngine;
   private readonly RoomContextStore _roomContexts;
   private readonly RoomObservabilityService _observability;
@@ -29,6 +30,7 @@ public partial class RoomHub : Hub
       RoomEventPublisher events,
       ILogger<RoomHub> logger,
       McpRegistry mcpRegistry,
+      McpConnectionManager connectionManager,
       PolicyEngine policyEngine,
       RoomContextStore roomContexts,
       RoomObservabilityService observability)
@@ -38,6 +40,7 @@ public partial class RoomHub : Hub
     _events = events;
     _logger = logger;
     _mcpRegistry = mcpRegistry;
+    _connectionManager = connectionManager;
     _policyEngine = policyEngine;
     _roomContexts = roomContexts;
     _observability = observability;

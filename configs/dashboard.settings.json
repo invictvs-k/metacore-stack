@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "roomServer": {
+    "baseUrl": "http://127.0.0.1:40801",
+    "events": {
+      "type": "sse",
+      "path": "/events"
+    }
+  },
+  "roomOperator": {
+    "baseUrl": "http://127.0.0.1:40802",
+    "events": {
+      "type": "sse",
+      "path": "/events"
+    }
+  },
+  "testClient": {
+    "runner": "scripts/run-test-client.sh",
+    "scenariosPath": "server-dotnet/operator/test-client/scenarios",
+    "artifactsDir": ".artifacts/integration"
+  },
+  "integrationApi": {
+    "port": 40901,
+    "logLevel": "info"
+  },
+  "ui": {
+    "theme": "system",
+    "refreshInterval": 5000,
+    "sseReconnectInterval": 5000,
+    "sseMaxReconnectInterval": 30000,
+    "sseReconnectBackoffMultiplier": 1.5
+  }
+}

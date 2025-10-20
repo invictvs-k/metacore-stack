@@ -5,13 +5,13 @@
 export default {
   // RoomOperator configuration
   operator: {
-    baseUrl: process.env.OPERATOR_URL || 'http://localhost:8080',
+    baseUrl: process.env.OPERATOR_URL || 'http://localhost:40802',
     timeout: 30000,
   },
 
   // RoomServer configuration (for validation)
   roomServer: {
-    baseUrl: process.env.ROOMSERVER_URL || 'http://localhost:5000',
+    baseUrl: process.env.ROOMSERVER_URL || 'http://localhost:40801',
     timeout: 10000,
   },
 

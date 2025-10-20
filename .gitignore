@@ -8,7 +8,9 @@ obj/
 # node
 node_modules/
 pnpm-lock.yaml
+package-lock.json
 .next/
+dist/
 
 # env
 .env
@@ -20,9 +22,11 @@ pnpm-lock.yaml
 **/.ai-flow/
 dist/
 coverage/
-*.egg-info/
-__pycache__/
-*.pyc
+.artifacts/
+.repo_fixup_backup/
+*.log
+*.trx
+TestResults/
 
 # verification reports
 environment-validation-report-*.md

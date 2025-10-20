@@ -1,0 +1,99 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "RoomServer (Development)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-roomserver",
+      "program": "${workspaceFolder}/server-dotnet/src/RoomServer/bin/Debug/net8.0/RoomServer.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/server-dotnet/src/RoomServer",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://127.0.0.1:40801"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "RoomOperator (Development)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-roomoperator",
+      "program": "${workspaceFolder}/server-dotnet/operator/bin/Debug/net8.0/RoomOperator.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/server-dotnet/operator",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "http://127.0.0.1:40802"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "Integration API (Development)",
+      "type": "node",
+      "request": "launch",
+      "name": "Integration API",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/tools/integration-api/src/index.ts",
+      "preLaunchTask": "npm: install - tools/integration-api",
+      "runtimeArgs": ["--loader", "ts-node/esm"],
+      "cwd": "${workspaceFolder}/tools/integration-api",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "40901"
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Operator Dashboard (Development)",
+      "type": "chrome",
+      "request": "launch",
+      "name": "Dashboard",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/apps/operator-dashboard",
+      "preLaunchTask": "npm: dev - apps/operator-dashboard",
+      "serverReadyAction": {
+        "pattern": "Local:\\s+(https?://\\S+)",
+        "uriFormat": "%s",
+        "action": "openExternally"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (Development)",
+      "configurations": [
+        "RoomServer (Development)",
+        "RoomOperator (Development)",
+        "Integration API (Development)",
+        "Operator Dashboard (Development)"
+      ],
+      "stopAll": true
+    },
+    {
+      "name": "Backend Only (Development)",
+      "configurations": [
+        "RoomServer (Development)",
+        "RoomOperator (Development)",
+        "Integration API (Development)"
+      ],
+      "stopAll": true
+    }
+  ]
+}

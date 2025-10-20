@@ -1,0 +1,91 @@
+name: agent-run
+
+on:
+  workflow_dispatch:
+    inputs:
+      brief:
+        description: 'Brief file path (relative to docs/agent/briefs/)'
+        required: false
+        type: string
+  push:
+    paths:
+      - 'docs/agent/briefs/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  detect-brief:
+    runs-on: ubuntu-latest
+    outputs:
+      brief: ${{ steps.detect.outputs.brief }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed brief
+        id: detect
+        run: |
+          if [ -n "${{ inputs.brief }}" ]; then
+            echo "brief=docs/agent/briefs/${{ inputs.brief }}" >> $GITHUB_OUTPUT
+          else
+            # Find changed brief in the last commit
+            BRIEF=$(git diff --name-only HEAD~1 HEAD | grep "docs/agent/briefs/.*\.md" | grep -v README | head -1)
+            if [ -n "$BRIEF" ]; then
+              echo "brief=$BRIEF" >> $GITHUB_OUTPUT
+              echo "Detected changed brief: $BRIEF"
+            else
+              echo "No brief detected"
+            fi
+          fi
+
+  execute-brief:
+    needs: detect-brief
+    if: needs.detect-brief.outputs.brief != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Display brief
+        run: |
+          echo "📋 Executing brief: ${{ needs.detect-brief.outputs.brief }}"
+          echo "---"
+          cat "${{ needs.detect-brief.outputs.brief }}"
+          echo "---"
+
+      - name: Notify execution
+        run: |
+          echo "🤖 This workflow detects and tracks agent briefs."
+          echo "To execute a brief, use a GitHub Copilot agent or manual workflow."
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the brief above"
+          echo "2. Create a feature branch"
+          echo "3. Execute the task manually or via agent"
+          echo "4. Generate report in agent/reports/"
+          echo "5. Run 'npm run agent:update' to update backlog"
+          echo "6. Create PR with changes"
+
+      - name: Update backlog
+        run: npm run agent:update
+
+      - name: Commit backlog changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -f "agent/backlog.md" ]; then
+            git add agent/backlog.md
+            git diff --staged --quiet || git commit -m "chore: update agent backlog [skip ci]"
+            git push
+          fi

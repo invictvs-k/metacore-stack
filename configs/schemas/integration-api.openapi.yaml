@@ -1,0 +1,182 @@
+openapi: 3.1.0
+info:
+  title: Integration API
+  version: 0.1.0
+  description: |
+    API de integração para o Operator Dashboard.
+    
+    Fornece endpoints para configuração, streaming de eventos SSE, 
+    gerenciamento de comandos e execução de testes.
+    
+servers:
+  - url: http://localhost:40901
+    description: Development server
+
+paths:
+  /api/events/roomserver:
+    get:
+      summary: Server-Sent Events stream do RoomServer
+      description: Retorna um stream SSE com eventos do RoomServer em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+
+  /api/events/roomoperator:
+    get:
+      summary: Server-Sent Events stream do RoomOperator
+      description: Retorna um stream SSE com eventos do RoomOperator em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+
+  /api/events/combined:
+    get:
+      summary: Server-Sent Events stream combinado
+      description: Retorna um stream SSE com eventos agregados do RoomServer e RoomOperator em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+
+  /api/events/heartbeat:
+    get:
+      summary: SSE heartbeat endpoint
+      description: Retorna pings periódicos para teste de conectividade SSE
+      parameters:
+        - name: intervalMs
+          in: query
+          schema:
+            type: integer
+            default: 1000
+          description: Intervalo entre heartbeats em milissegundos
+        - name: max
+          in: query
+          schema:
+            type: integer
+            default: 3
+          description: Número máximo de heartbeats antes de finalizar
+      responses:
+        '200':
+          description: Stream de heartbeat
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+                
+  /api/commands/execute:
+    post:
+      summary: Executa um comando
+      description: Envia um comando para execução no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandRequest'
+      responses:
+        '200':
+          description: Comando aceito e em execução
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '400':
+          description: Requisição inválida
+        '500':
+          description: Erro interno do servidor
+
+  /api/config:
+    get:
+      summary: Retorna configuração do sistema
+      responses:
+        '200':
+          description: Configuração atual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+
+components:
+  schemas:
+    SSEEvent:
+      type: object
+      description: Evento Server-Sent Events
+      required:
+        - event
+        - data
+        - timestamp
+      properties:
+        event:
+          type: string
+          enum: [log, message, done, error, heartbeat]
+          description: Tipo do evento
+        data:
+          oneOf:
+            - type: object
+            - type: string
+          description: Payload do evento
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp ISO 8601 do evento
+        traceId:
+          type: string
+          description: ID de rastreamento opcional
+          
+    CommandRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Nome do comando a executar
+        params:
+          type: object
+          description: Parâmetros do comando
+        runId:
+          type: string
+          description: ID único da execução
+          
+    CommandResponse:
+      type: object
+      required:
+        - success
+        - runId
+      properties:
+        success:
+          type: boolean
+          description: Indica se o comando foi aceito
+        runId:
+          type: string
+          description: ID único da execução
+        message:
+          type: string
+          description: Mensagem de resposta
+        data:
+          type: object
+          description: Dados adicionais da resposta
+          
+    Config:
+      type: object
+      properties:
+        version:
+          type: string
+          description: Versão da API
+        environment:
+          type: string
+          description: Ambiente de execução
+        features:
+          type: object
+          description: Features habilitadas

@@ -1,0 +1,1352 @@
+{
+  "generatedAt": "2025-10-20T03:38:58.099Z",
+  "tagTaxonomy": {
+    "core": [
+      "architecture",
+      "api",
+      "howto",
+      "adr",
+      "ops",
+      "design"
+    ],
+    "extended": [
+      "testing",
+      "implementation",
+      "runbook",
+      "agent",
+      "spec",
+      "archive",
+      "deprecated"
+    ]
+  },
+  "files": [
+    {
+      "path": "apps/operator-dashboard/CONTEXT.md",
+      "title": "Context Card: Operator Dashboard",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [
+        "./README.md",
+        "../../tools/integration-api/README.md"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "apps/operator-dashboard/README.md",
+      "title": "Operator Dashboard",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "DASHBOARD_README.md",
+        "QUICKSTART.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "ci/analysis-report.md",
+      "title": "CI Analysis Report",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "ci/SUMMARY.md",
+      "title": "CI Fix Summary - Make CI Green",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "CODE_OF_CONDUCT.md",
+      "title": "Código de Conduta",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "CONCEPTDEFINITION.md",
+      "title": "🧠 Metacore Stack — Especificação Funcional",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md",
+        "docs/glossary.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/README.md",
+      "title": "Configuration Schemas",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "CONFIGURACAO_PORTAS.md",
+      "title": "Resumo das Configurações de Portas - Metacore Stack",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "/PORT_CONFIGURATION.md",
+        "PORT_CONFIGURATION.md",
+        "QUICKSTART.md",
+        "DASHBOARD_README.md"
+      ],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "title": "Contribuição",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "DASHBOARD_README.md",
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "DASHBOARD_README.md",
+      "title": "Dashboard React for Control and Observability",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "tools/integration-api/README.md",
+        "apps/operator-dashboard/README.md",
+        "CONTRIBUTING.md"
+      ],
+      "linksIn": [
+        "CONFIGURACAO_PORTAS.md",
+        "QUICKSTART.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "DEVELOPMENT_SETUP.md",
+      "title": "Development Setup Guide",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "./TEST_SETUP.md",
+        "./QUICKSTART_GUIDE.md",
+        "./VALIDATION_CHECKLIST.md"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": [
+        "broken-links:3"
+      ]
+    },
+    {
+      "path": "docs/_adr/000-template.md",
+      "title": "ADR-000: [Short Title of Decision]",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "README.md"
+      ],
+      "tags": [
+        "adr",
+        "architecture",
+        "implementation",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_archive/BACKEND_API_TEST_PLAN.md",
+      "title": "Plano de Testes Detalhado - Backend/APIs do Metacore Stack",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "server-dotnet/src/RoomServer/Startup.cs"
+      ],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "broken-links:1"
+      ]
+    },
+    {
+      "path": "docs/_archive/ENVIRONMENT_VERIFICATION.md",
+      "title": "Verificação do Ambiente e Dependências",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_archive/ROOM_HOST_IMPLEMENTATION.md",
+      "title": "Room Host Functionality - Implementation Status",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_archive/ROOMOPERATOR_IMPLEMENTATION.md",
+      "title": "RoomOperator Implementation Summary",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "implementation",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_archive/TEST_SETUP.md",
+      "title": "Test Client Setup and Execution",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_archive/VALIDATION_CHECKLIST.md",
+      "title": "Implementation Validation Checklist",
+      "status": "archived",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "archive",
+        "api",
+        "spec",
+        "testing",
+        "implementation",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/_deprecated/CONNECTION_TEST_FIX.md",
+      "title": "Connection Test Fix - Technical Details",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/CONNECTION_TEST_VISUAL.md",
+      "title": "Connection Test - Before vs After",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/CORS_FIX_EXPLAINED.md",
+      "title": "CORS Fix - RoomOperator Connection Issue",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "implementation",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/CRITICAL_FIXES_EXPLAINED.md",
+      "title": "Critical Fixes - Event Streaming, Service Independence, and Test Execution",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/ENHANCED_INTEGRATION_TEST_IMPLEMENTATION.md",
+      "title": "Implementation Summary: Enhanced Integration Test System",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "/docs/TESTING.md"
+      ],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/IMPLEMENTATION_SUMMARY_FIX.md",
+      "title": "Implementation Summary - Fix Pack Observabilidade & Execução",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/IMPLEMENTATION_SUMMARY_MCP.md",
+      "title": "MCP Integration Test Implementation Summary",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/IMPLEMENTATION_SUMMARY.md",
+      "title": "Schema Compliance Implementation Summary",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md",
+      "title": "Layer 3 Flow Validation - Summary",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation",
+        "design"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/_deprecated/QUICKSTART_GUIDE.md",
+      "title": "Quick Start Guide - Observability & Execution Fix",
+      "status": "deprecated",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "/QUICKSTART.md"
+      ],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "deprecated",
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": [
+        "marked-deprecated"
+      ]
+    },
+    {
+      "path": "docs/agent/briefs/README.md",
+      "title": "Agent Briefs",
+      "status": "active",
+      "lastModified": "2025-10-20T00:17:25-03:00",
+      "linksOut": [],
+      "linksIn": [],
+      "tags": [
+        "agent",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/agent/playbooks/README.md",
+      "title": "Agent Playbooks",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [],
+      "tags": [
+        "agent",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/agent/templates/brief-template.md",
+      "title": "Brief: [Title]",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [],
+      "tags": [
+        "agent",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/agent/templates/context-card-template.md",
+      "title": "Context Card: [Component Name]",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [],
+      "tags": [
+        "agent",
+        "architecture",
+        "adr",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/agent/templates/playbook-template.md",
+      "title": "Playbook: [Title]",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [],
+      "tags": [
+        "agent",
+        "architecture",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/curation-report.md",
+      "title": "Documentation Curation Report",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "implementation",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/glossary.md",
+      "title": "Glossary",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [
+        "../PORT_CONFIGURATION.md",
+        "../CONCEPTDEFINITION.md",
+        "./ROOMOPERATOR_ROOMSERVER_INTEGRATION.md",
+        "./TESTING.md",
+        "./TOC.md"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "adr",
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/INTEGRATION_IMPLEMENTATION_SUMMARY.md",
+      "title": "RoomOperator-RoomServer Integration - Implementation Summary",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "implementation",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/interfaces/README.md",
+      "title": "Interfaces",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/MCP_CONNECTION_BEHAVIOR.md",
+      "title": "MCP Connection Behavior in RoomServer",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/room-operator.md",
+      "title": "RoomOperator Documentation",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md",
+      "title": "RoomOperator-RoomServer Integration Guide",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/runbooks/README.md",
+      "title": "Runbooks",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "ops",
+        "runbook",
+        "howto"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/TESTING.md",
+      "title": "Integration Testing Guide",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md",
+        "docs/_deprecated/ENHANCED_INTEGRATION_TEST_IMPLEMENTATION.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "docs/TOC.md",
+      "title": "Documentation Table of Contents",
+      "status": "active",
+      "lastModified": "2025-10-20T00:16:56-03:00",
+      "linksOut": [
+        "/README.md",
+        "/docs/curation-report.md",
+        "/docs/glossary.md",
+        "/reports/schema-roomserver-alignment.md",
+        "/schemas/README.md",
+        "/docs/interfaces/README.md",
+        "/server-dotnet/operator/seeds/project-plan.md",
+        "/docs/runbooks/README.md",
+        "/configs/schemas/README.md",
+        "/PORT_CONFIGURATION.md",
+        "/QUICKSTART.md",
+        "/apps/operator-dashboard/README.md",
+        "/CONCEPTDEFINITION.md",
+        "/DASHBOARD_README.md",
+        "/docs/TESTING.md",
+        "/tools/integration-api/README.md",
+        "/DEVELOPMENT_SETUP.md",
+        "/docs/MCP_CONNECTION_BEHAVIOR.md",
+        "/docs/room-operator.md",
+        "/docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md",
+        "/reports/LAYER3_FLOW_VALIDATION.md",
+        "/server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md",
+        "/server-dotnet/operator/test-client/README.md",
+        "/CONFIGURACAO_PORTAS.md",
+        "/CONTRIBUTING.md",
+        "/docs/INTEGRATION_IMPLEMENTATION_SUMMARY.md",
+        "/SECURITY.md",
+        "/server-dotnet/operator/README.md",
+        "/server-dotnet/operator/scripts/README.md",
+        "/server-dotnet/src/RoomServer/Services/Mcp/README.md",
+        "/tools/integration-api/CONTEXT.md",
+        "/apps/operator-dashboard/CONTEXT.md",
+        "/ci/analysis-report.md",
+        "/ci/SUMMARY.md",
+        "/docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md",
+        "/docs/_deprecated/CONNECTION_TEST_FIX.md",
+        "/docs/_deprecated/CONNECTION_TEST_VISUAL.md",
+        "/docs/_deprecated/CORS_FIX_EXPLAINED.md",
+        "/docs/_deprecated/CRITICAL_FIXES_EXPLAINED.md",
+        "/docs/_deprecated/ENHANCED_INTEGRATION_TEST_IMPLEMENTATION.md",
+        "/docs/_deprecated/IMPLEMENTATION_SUMMARY_FIX.md",
+        "/docs/_deprecated/IMPLEMENTATION_SUMMARY_MCP.md",
+        "/docs/_deprecated/IMPLEMENTATION_SUMMARY.md",
+        "/docs/_deprecated/QUICKSTART_GUIDE.md",
+        "/docs/_archive/BACKEND_API_TEST_PLAN.md",
+        "/docs/_archive/ENVIRONMENT_VERIFICATION.md",
+        "/docs/_archive/ROOM_HOST_IMPLEMENTATION.md",
+        "/docs/_archive/ROOMOPERATOR_IMPLEMENTATION.md",
+        "/docs/_archive/TEST_SETUP.md",
+        "/docs/_archive/VALIDATION_CHECKLIST.md",
+        "/CODE_OF_CONDUCT.md",
+        "./docs.manifest.json",
+        "./glossary.md"
+      ],
+      "linksIn": [
+        "README.md"
+      ],
+      "tags": [
+        "architecture",
+        "adr",
+        "api",
+        "spec",
+        "testing",
+        "implementation",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "PORT_CONFIGURATION.md",
+      "title": "Port Configuration Guide",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "CONFIGURACAO_PORTAS.md",
+        "README.md",
+        "docs/TOC.md",
+        "docs/glossary.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "QUICKSTART.md",
+      "title": "Quick Start Guide - Operator Dashboard",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "apps/operator-dashboard/README.md",
+        "tools/integration-api/README.md",
+        "DASHBOARD_README.md"
+      ],
+      "linksIn": [
+        "CONFIGURACAO_PORTAS.md",
+        "README.md",
+        "docs/TOC.md",
+        "docs/_deprecated/QUICKSTART_GUIDE.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "README.md",
+      "title": "Metacore Stack — Metaplataforma (MVP)",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [
+        "docs/TOC.md",
+        "PORT_CONFIGURATION.md",
+        "server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md",
+        "docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md",
+        "docs/TESTING.md",
+        "docs/room-operator.md",
+        "server-dotnet/operator/test-client/README.md",
+        "docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md",
+        "docs/glossary.md",
+        "QUICKSTART.md",
+        "DEVELOPMENT_SETUP.md",
+        "docs/_adr/",
+        "docs/_adr/000-template.md",
+        "CONCEPTDEFINITION.md",
+        "docs/MCP_CONNECTION_BEHAVIOR.md",
+        "docs/agent/briefs/",
+        "docs/agent/playbooks/",
+        "docs/agent/templates/",
+        "apps/operator-dashboard/CONTEXT.md",
+        "tools/integration-api/CONTEXT.md",
+        "docs/runbooks/",
+        "docs/interfaces/",
+        "reports/LAYER3_FLOW_VALIDATION.md",
+        "reports/schema-roomserver-alignment.md",
+        "docs/curation-report.md",
+        "CONTRIBUTING.md"
+      ],
+      "linksIn": [
+        "docs/TOC.md",
+        "apps/operator-dashboard/CONTEXT.md",
+        "tools/integration-api/CONTEXT.md"
+      ],
+      "tags": [
+        "architecture",
+        "adr",
+        "api",
+        "spec",
+        "testing",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "reports/LAYER3_FLOW_VALIDATION.md",
+      "title": "Relatório de Validação: Fluxos de Ponta a Ponta da Camada 3",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "reports/schema-roomserver-alignment.md",
+      "title": "RoomServer vs. Schemas Canônicos — Relatório de Alinhamento",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "schemas/README.md",
+      "title": "Schemas – Metaplataforma (Sala Viva)",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "SECURITY.md",
+      "title": "Security Policy",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "howto",
+        "testing",
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md",
+      "title": "Enhanced Integration Test System",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "../test-client/README.md",
+        "../scripts/run-integration-test.sh"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/operator/README.md",
+      "title": "RoomOperator",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/operator/scripts/README.md",
+      "title": "Integration Test Scripts",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "../docs/ENHANCED_INTEGRATION_TESTING.md",
+        "../test-client/README.md",
+        "../../../docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md"
+      ],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/operator/seeds/project-plan.md",
+      "title": "AI Lab Project Plan",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "ops"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/operator/test-client/README.md",
+      "title": "RoomOperator Test Client",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [
+        "../../../docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "server-dotnet/src/RoomServer/Services/Mcp/README.md",
+      "title": "MCP Bridge - Model Context Protocol Integration",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "testing",
+        "implementation"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "tools/integration-api/CONTEXT.md",
+      "title": "Context Card: Integration API",
+      "status": "active",
+      "lastModified": "2025-10-20T03:07:20Z",
+      "linksOut": [
+        "./README.md",
+        "../../apps/operator-dashboard/README.md",
+        "../../server-dotnet/operator/test-client/README.md"
+      ],
+      "linksIn": [
+        "README.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing",
+        "ops",
+        "design"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "tools/integration-api/README.md",
+      "title": "Integration API",
+      "status": "active",
+      "lastModified": "2025-10-19T23:53:39-03:00",
+      "linksOut": [],
+      "linksIn": [
+        "DASHBOARD_README.md",
+        "QUICKSTART.md",
+        "docs/TOC.md"
+      ],
+      "tags": [
+        "architecture",
+        "api",
+        "spec",
+        "howto",
+        "testing"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/integration-api.openapi.yaml",
+      "title": "Integration API OpenAPI Specification",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/sse.events.schema.json",
+      "title": "SSE Events JSON Schema",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/commands.catalog.schema.json",
+      "title": "Commands Catalog JSON Schema",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
+    }
+  ],
+  "summary": {
+    "total": 61,
+    "active": 45,
+    "deprecated": 10,
+    "archived": 6,
+    "duplicates": 0,
+    "brokenLinks": 2,
+    "staleOver180d": 0
+  }
+}
