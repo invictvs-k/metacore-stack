@@ -36,9 +36,7 @@ async function testBuild() {
   try {
     // Test Node/TS build
     console.log('  - Building integration-api...');
-    await execAsync('cd tools/integration-api && npm run build', {
-      cwd: process.cwd()
-    });
+    await execAsync('cd tools/integration-api && npm run build');
     console.log('    ✅ integration-api builds successfully');
     
     // Test schema validation
