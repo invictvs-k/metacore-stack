@@ -39,6 +39,8 @@ def room_server() -> Iterator[Dict[str, object]]:
     # Create temporary files to capture stdout and stderr
     stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stdout.log')
     stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stderr.log')
+    stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
+    stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
     
     try:
         process = subprocess.Popen(
@@ -71,6 +73,18 @@ def room_server() -> Iterator[Dict[str, object]]:
                         return ''.join(tail_lines)
                 except Exception as e:
                     return f"Error reading file: {e}"
+            # Read the tail of stdout and stderr for debugging
+            stdout_file.flush()
+            stderr_file.flush()
+            
+            def read_tail(filepath: str, lines: int = 50) -> str:
+                try:
+                    with open(filepath, 'r') as f:
+                        content = f.readlines()
+                        tail = content[-lines:] if len(content) > lines else content
+                        return ''.join(tail)
+                except Exception:
+                    return "(unable to read output)"
             
             stdout_tail = read_tail(stdout_file.name)
             stderr_tail = read_tail(stderr_file.name)
@@ -80,6 +94,11 @@ def room_server() -> Iterator[Dict[str, object]]:
                 error_msg += f"\n--- Last 50 lines of stdout ---\n{stdout_tail}"
             if stderr_tail:
                 error_msg += f"\n--- Last 50 lines of stderr ---\n{stderr_tail}"
+            error_msg = "RoomServer failed to start (healthcheck failed)."
+            if stdout_tail.strip():
+                error_msg += f"\n\nLast 50 lines of stdout:\n{stdout_tail}"
+            if stderr_tail.strip():
+                error_msg += f"\n\nLast 50 lines of stderr:\n{stderr_tail}"
             
             raise RuntimeError(error_msg) from None
 
