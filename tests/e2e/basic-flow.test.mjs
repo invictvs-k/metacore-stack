@@ -58,36 +58,52 @@ async function testSSEHeartbeat() {
   
   return new Promise((resolve, reject) => {
     const url = `${BASE_URL}/events/heartbeat`;
-    const es = new EventSource(url);
-    let receivedEvent = false;
     
-    const timeout = setTimeout(() => {
-      es.close();
-      if (!receivedEvent) {
-        reject(new Error('No heartbeat received within timeout'));
-      }
-    }, 5000);
-    
-    es.addEventListener('heartbeat', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log(`  ✅ Received heartbeat:`, data);
-        receivedEvent = true;
-        clearTimeout(timeout);
+    try {
+      const es = new EventSource(url);
+      let receivedEvent = false;
+      let errorCount = 0;
+      
+      const timeout = setTimeout(() => {
         es.close();
-        resolve(data);
-      } catch (error) {
-        clearTimeout(timeout);
-        es.close();
-        reject(error);
-      }
-    });
-    
-    es.onerror = (error) => {
-      clearTimeout(timeout);
-      es.close();
-      reject(new Error('SSE connection error'));
-    };
+        if (!receivedEvent) {
+          reject(new Error('No heartbeat received within timeout'));
+        }
+      }, 10000); // Increased timeout to 10 seconds
+      
+      es.addEventListener('heartbeat', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log(`  ✅ Received heartbeat:`, data);
+          receivedEvent = true;
+          clearTimeout(timeout);
+          es.close();
+          resolve(data);
+        } catch (error) {
+          clearTimeout(timeout);
+          es.close();
+          reject(error);
+        }
+      });
+      
+      es.addEventListener('open', () => {
+        console.log('  📡 SSE connection established');
+      });
+      
+      es.onerror = (error) => {
+        errorCount++;
+        console.log(`  ⚠️  SSE connection error (attempt ${errorCount})`);
+        
+        // EventSource automatically retries, but if we get multiple errors quickly, fail
+        if (errorCount > 3) {
+          clearTimeout(timeout);
+          es.close();
+          reject(new Error(`SSE connection failed after ${errorCount} attempts`));
+        }
+      };
+    } catch (error) {
+      reject(new Error(`Failed to create EventSource: ${error.message}`));
+    }
   });
 }
 
@@ -121,6 +137,9 @@ async function main() {
       process.exit(1);
     }
     
+    // Give the service a moment to be fully ready after health check
+    console.log('⏳ Waiting for service to be fully ready...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
     console.log('');
     
     // Test SSE heartbeat

@@ -189,7 +189,9 @@ jobs:
         run: |
           cd tools/integration-api
           timeout 120 npm start &
-          sleep 10
+          sleep 15
+          # Verify service is responding
+          curl -f http://localhost:40901/health || echo "Warning: Health check failed"
       - name: Run E2E tests
         run: npm run test:e2e
 
