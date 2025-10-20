@@ -35,7 +35,6 @@ def test_ssl_verification_passed_to_hub_connection(mock_builder_class: MagicMock
     mock_builder.configure_logging.return_value = mock_builder
     mock_builder.with_automatic_reconnect.return_value = mock_builder
     mock_builder.build.return_value = MagicMock()
-    
     # Test with HTTPS (should default to True)
     client_https = RoomClient("https://example.com/room")
     client_https.connect()
