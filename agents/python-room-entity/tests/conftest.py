@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+import tempfile
 import time
 from pathlib import Path
 from typing import Dict, Iterator
@@ -34,33 +35,72 @@ def _wait_for_health(timeout: float = 45.0) -> None:
 def room_server() -> Iterator[Dict[str, object]]:
     env = os.environ.copy()
     env.setdefault("ASPNETCORE_URLS", f"{SERVER_URL}")
-    process = subprocess.Popen(
-        [
-            "dotnet",
-            "run",
-            "--project",
-            str(SERVER_PROJECT),
-        ],
-        cwd=str(ROOT),
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    
+    # Create temporary files to capture stdout and stderr
+    stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
+    stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
+    
     try:
-        _wait_for_health()
-    except Exception:
+        process = subprocess.Popen(
+            [
+                "dotnet",
+                "run",
+                "--project",
+                str(SERVER_PROJECT),
+            ],
+            cwd=str(ROOT),
+            env=env,
+            stdout=stdout_file,
+            stderr=stderr_file,
+        )
+        try:
+            _wait_for_health()
+        except Exception:
+            process.terminate()
+            
+            # Read the tail of stdout and stderr for debugging
+            stdout_file.flush()
+            stderr_file.flush()
+            
+            def read_tail(filepath: str, lines: int = 50) -> str:
+                try:
+                    with open(filepath, 'r') as f:
+                        content = f.readlines()
+                        tail = content[-lines:] if len(content) > lines else content
+                        return ''.join(tail)
+                except Exception:
+                    return "(unable to read output)"
+            
+            stdout_tail = read_tail(stdout_file.name)
+            stderr_tail = read_tail(stderr_file.name)
+            
+            error_msg = "RoomServer failed to start (healthcheck failed)."
+            if stdout_tail.strip():
+                error_msg += f"\n\nLast 50 lines of stdout:\n{stdout_tail}"
+            if stderr_tail.strip():
+                error_msg += f"\n\nLast 50 lines of stderr:\n{stderr_tail}"
+            
+            raise RuntimeError(error_msg) from None
+
+        yield {"base_url": SERVER_URL, "process": process}
+
         process.terminate()
-        raise RuntimeError(
-            "RoomServer failed to start (healthcheck failed). Output is unavailable because stdout/stderr were redirected to DEVNULL."
-        ) from None
-
-    yield {"base_url": SERVER_URL, "process": process}
-
-    process.terminate()
-    try:
-        process.wait(timeout=10)
-    except subprocess.TimeoutExpired:
-        process.kill()
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+    finally:
+        # Clean up temporary files
+        stdout_file.close()
+        stderr_file.close()
+        try:
+            os.unlink(stdout_file.name)
+        except Exception:
+            pass
+        try:
+            os.unlink(stderr_file.name)
+        except Exception:
+            pass
 
 
 @pytest.fixture(scope="session", autouse=True)
