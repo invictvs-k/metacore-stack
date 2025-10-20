@@ -311,6 +311,8 @@ All commands are used as PR comments:
 
 ---
 
-**Last Updated**: October 20, 2025  
+**Last Updated**: 2025-10-20T21:05:00Z  
 **Configuration Version**: 2.0 (with grouping)  
 **Maintained by**: @invictvs-k
+
+> **Note**: For automated updates to this timestamp, consider adding a pre-commit hook or CI/CD step that updates this value on each commit to the documentation.

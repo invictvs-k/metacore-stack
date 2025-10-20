@@ -146,7 +146,7 @@ groups:
       - '@types/react*'
 ```
 
-**Total Groups Created**: 24 groups across 6 ecosystems
+**Total Groups Created**: 20 groups across 6 ecosystems
 
 #### 2. Predictable Scheduling
 
