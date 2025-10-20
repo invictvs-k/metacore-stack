@@ -1,5 +1,7 @@
 # Implementation Validation Checklist
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 ## Backend (Integration API)
 
 ### Configuration Management

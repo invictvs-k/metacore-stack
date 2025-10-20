@@ -1,3 +1,12 @@
+---
+title: MCP Connection Behavior in RoomServer
+status: active
+owners: []
+tags: [architecture, implementation, mcp]
+last_review: 2025-10-20
+links: []
+---
+
 # MCP Connection Behavior in RoomServer
 
 ## Overview

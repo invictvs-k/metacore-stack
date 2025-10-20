@@ -38,6 +38,19 @@ Define and validate configuration file formats used throughout the system:
 See the `/schemas` directory at the repository root for domain object schemas (Room, Entity, Message, etc.).
 This directory is specifically for **configuration file** schemas.
 
+## Available Schemas
+
+### API Contracts & Events
+
+- **[integration-api.openapi.yaml](integration-api.openapi.yaml)** - OpenAPI specification for the Integration API (placeholder, to be filled in Prompt 3)
+- **[sse.events.schema.json](sse.events.schema.json)** - JSON Schema for Server-Sent Events (SSE) payload structure (placeholder, to be filled in Prompt 3)
+- **[commands.catalog.schema.json](commands.catalog.schema.json)** - JSON Schema for the commands catalog (placeholder, to be filled in Prompt 3)
+
 ## Status
 
-Currently a placeholder. Add schema definitions as configuration formats are formalized.
+Schema placeholders created. These will be fully populated in Prompt 3 with:
+- Complete endpoint definitions
+- Request/response models
+- Event type specifications
+- Command parameter schemas
+- Validation rules

@@ -343,9 +343,9 @@ npm run preview
 
 ## Next Steps
 
-- Read [TEST_SETUP.md](./TEST_SETUP.md) for testing documentation
-- Read [QUICKSTART_GUIDE.md](./QUICKSTART_GUIDE.md) for usage guide
-- Read [VALIDATION_CHECKLIST.md](./VALIDATION_CHECKLIST.md) for feature validation
+- Read [TEST_SETUP.md](docs/_archive/TEST_SETUP.md) for testing documentation (archived)
+- Read [QUICKSTART.md](QUICKSTART.md) for usage guide
+- Read [VALIDATION_CHECKLIST.md](docs/_archive/VALIDATION_CHECKLIST.md) for feature validation (archived)
 
 ## Support
 

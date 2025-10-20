@@ -248,6 +248,91 @@ The infrastructure is complete and ready for use. No immediate action required.
 
 ---
 
+## Changes Applied (Prompt 2)
+
+**Date:** 2025-10-20
+
+This section documents the active curation and consolidation work performed in Prompt 2, following the recommendations in this report.
+
+### Broken Links Fixed
+
+| File | Links Fixed | Details |
+|------|-------------|---------|
+| `DEVELOPMENT_SETUP.md` | 3 | Updated links to archived files (TEST_SETUP.md, VALIDATION_CHECKLIST.md), fixed link to QUICKSTART.md |
+| `docs/_archive/BACKEND_API_TEST_PLAN.md` | 1 | Removed broken reference to deleted Startup.cs file |
+
+### Archive Banners Added
+
+All archived files now have standardized archive banners:
+
+| File | Status | Banner Added |
+|------|--------|--------------|
+| `docs/_archive/BACKEND_API_TEST_PLAN.md` | archived | ✅ |
+| `docs/_archive/ENVIRONMENT_VERIFICATION.md` | archived | ✅ |
+| `docs/_archive/TEST_SETUP.md` | archived | ✅ |
+| `docs/_archive/ROOM_HOST_IMPLEMENTATION.md` | archived | ✅ |
+| `docs/_archive/ROOMOPERATOR_IMPLEMENTATION.md` | archived | ✅ |
+| `docs/_archive/VALIDATION_CHECKLIST.md` | archived | ✅ |
+
+### Front-Matter Added
+
+Standardized YAML front-matter added to key active documentation files:
+
+| File | Status | Tags |
+|------|--------|------|
+| `docs/TESTING.md` | active | testing, howto, integration |
+| `docs/glossary.md` | active | architecture, api, spec |
+| `docs/room-operator.md` | active | architecture, ops, spec |
+| `docs/INTEGRATION_IMPLEMENTATION_SUMMARY.md` | active | implementation, architecture, integration |
+| `docs/MCP_CONNECTION_BEHAVIOR.md` | active | architecture, implementation, mcp |
+| `docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md` | active | architecture, integration, howto |
+
+### Schema Placeholders Created
+
+Machine-readable contract schemas created in `configs/schemas/`:
+
+| Schema | Type | Purpose | Status |
+|--------|------|---------|--------|
+| `integration-api.openapi.yaml` | OpenAPI 3.0 | Integration API specification | Placeholder - to be filled in Prompt 3 |
+| `sse.events.schema.json` | JSON Schema | SSE event payload structure | Placeholder - to be filled in Prompt 3 |
+| `commands.catalog.schema.json` | JSON Schema | Command catalog definition | Placeholder - to be filled in Prompt 3 |
+
+### Documentation Updates
+
+| File | Update |
+|------|--------|
+| `configs/schemas/README.md` | Added references to new schema files |
+| `docs/interfaces/README.md` | Added links to schema placeholders |
+
+### Duplicates Verified
+
+| File | Status | Action |
+|------|--------|--------|
+| `CONFIGURACAO_PORTAS.md` | duplicate | Already has redirection banner to PORT_CONFIGURATION.md - no action needed |
+
+### Manual Follow-Ups
+
+None identified at this stage. All actions completed successfully.
+
+### Next Steps (for Prompt 3)
+
+1. **Populate Schemas**: Fill in the placeholder schemas with actual:
+   - API endpoints and models (integration-api.openapi.yaml)
+   - Event types and payloads (sse.events.schema.json)
+   - Command definitions and parameters (commands.catalog.schema.json)
+
+2. **Build/CI Alignment**: Update build and CI configurations to:
+   - Validate schemas during build
+   - Run contract tests against schemas
+   - Use path filters to trigger appropriate builds
+
+3. **Contract Tests**: Create tests that validate:
+   - API responses match OpenAPI spec
+   - SSE events match JSON schema
+   - Commands match catalog schema
+
+---
+
 ## Validation Checklist
 
 - [x] No build broken

@@ -1,5 +1,7 @@
 # Test Client Setup and Execution
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 ## Prerequisites
 
 The test client requires Node.js dependencies to be installed before tests can run.

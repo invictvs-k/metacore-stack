@@ -1,3 +1,12 @@
+---
+title: RoomOperator-RoomServer Integration Guide
+status: active
+owners: []
+tags: [architecture, integration, howto]
+last_review: 2025-10-20
+links: []
+---
+
 # RoomOperator-RoomServer Integration Guide
 
 ## Overview

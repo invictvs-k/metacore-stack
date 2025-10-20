@@ -1,3 +1,12 @@
+---
+title: Glossary
+status: active
+owners: []
+tags: [architecture, api, spec]
+last_review: 2025-10-20
+links: []
+---
+
 # Glossary
 
 **Last Updated:** 2025-10-20

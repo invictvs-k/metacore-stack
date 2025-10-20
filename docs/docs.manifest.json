@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-10-20T03:23:40.042Z",
+  "generatedAt": "2025-10-20T03:38:58.099Z",
   "tagTaxonomy": {
     "core": [
       "architecture",
@@ -727,7 +727,7 @@
       "path": "docs/glossary.md",
       "title": "Glossary",
       "status": "active",
-      "lastModified": "2025-10-20T03:07:20Z",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [
         "../PORT_CONFIGURATION.md",
         "../CONCEPTDEFINITION.md",
@@ -753,7 +753,7 @@
       "path": "docs/INTEGRATION_IMPLEMENTATION_SUMMARY.md",
       "title": "RoomOperator-RoomServer Integration - Implementation Summary",
       "status": "active",
-      "lastModified": "2025-10-19T23:53:39-03:00",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [],
       "linksIn": [
         "docs/TOC.md"
@@ -791,7 +791,7 @@
       "path": "docs/MCP_CONNECTION_BEHAVIOR.md",
       "title": "MCP Connection Behavior in RoomServer",
       "status": "active",
-      "lastModified": "2025-10-19T23:53:39-03:00",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [],
       "linksIn": [
         "README.md",
@@ -810,7 +810,7 @@
       "path": "docs/room-operator.md",
       "title": "RoomOperator Documentation",
       "status": "active",
-      "lastModified": "2025-10-19T23:53:39-03:00",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [],
       "linksIn": [
         "README.md",
@@ -830,7 +830,7 @@
       "path": "docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md",
       "title": "RoomOperator-RoomServer Integration Guide",
       "status": "active",
-      "lastModified": "2025-10-19T23:53:39-03:00",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [],
       "linksIn": [
         "README.md",
@@ -867,7 +867,7 @@
       "path": "docs/TESTING.md",
       "title": "Integration Testing Guide",
       "status": "active",
-      "lastModified": "2025-10-19T23:53:39-03:00",
+      "lastModified": "2025-10-20T03:38:58.099Z",
       "linksOut": [],
       "linksIn": [
         "README.md",
@@ -1284,11 +1284,65 @@
       ],
       "owners": [],
       "reasons": []
+    },
+    {
+      "path": "configs/schemas/integration-api.openapi.yaml",
+      "title": "Integration API OpenAPI Specification",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/sse.events.schema.json",
+      "title": "SSE Events JSON Schema",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
+    },
+    {
+      "path": "configs/schemas/commands.catalog.schema.json",
+      "title": "Commands Catalog JSON Schema",
+      "status": "active",
+      "lastModified": "2025-10-20T03:38:58.099Z",
+      "linksOut": [],
+      "linksIn": [
+        "configs/schemas/README.md",
+        "docs/interfaces/README.md"
+      ],
+      "tags": [
+        "api",
+        "spec",
+        "contract"
+      ],
+      "owners": [],
+      "reasons": []
     }
   ],
   "summary": {
-    "total": 58,
-    "active": 42,
+    "total": 61,
+    "active": 45,
     "deprecated": 10,
     "archived": 6,
     "duplicates": 0,

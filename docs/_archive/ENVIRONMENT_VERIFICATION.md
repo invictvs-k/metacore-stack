@@ -1,5 +1,7 @@
 # Verificação do Ambiente e Dependências
 
+> 🗄️ **ARQUIVADO** — conteúdo histórico. Não seguir como referência atual.
+
 Este documento descreve o processo de verificação completa do ambiente de desenvolvimento do Metacore Stack.
 
 ## Visão Geral

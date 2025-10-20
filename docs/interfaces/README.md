@@ -22,6 +22,14 @@ Files should be named descriptively:
 - `{component-name}.proto` for protocol buffers
 - `{component-name}-contract.ts` for TypeScript contracts
 
+## Available Specifications
+
+Machine-readable API contracts are being consolidated. Current schema placeholders:
+
+- **Integration API** - See [configs/schemas/integration-api.openapi.yaml](../../configs/schemas/integration-api.openapi.yaml) (OpenAPI specification, to be completed in Prompt 3)
+- **SSE Events** - See [configs/schemas/sse.events.schema.json](../../configs/schemas/sse.events.schema.json) (JSON Schema for event payloads, to be completed in Prompt 3)
+- **Commands Catalog** - See [configs/schemas/commands.catalog.schema.json](../../configs/schemas/commands.catalog.schema.json) (JSON Schema for command definitions, to be completed in Prompt 3)
+
 ## Status
 
-This directory is currently a placeholder. Interface specifications will be added as the system architecture solidifies.
+Schema placeholders created. Will be populated in Prompt 3 with complete specifications.
