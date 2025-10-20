@@ -81,7 +81,7 @@ The Integration API needs a health check endpoint for monitoring and load balanc
 
 ## Outputs
 - New file: `src/routes/health.ts`
-- Updated: `src/app.ts` (register route)
+- Updated: `src/index.ts` (register route)
 - Updated: `README.md` (document endpoint)
 - New file: `src/routes/__tests__/health.test.ts`
 
