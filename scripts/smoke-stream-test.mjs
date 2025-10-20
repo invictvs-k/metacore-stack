@@ -42,7 +42,7 @@ function testSSEHeartbeat() {
       }
     }, (res) => {
       // Validate SSE headers
-      if (res.headers['content-type'] !== 'text/event-stream') {
+      if (!res.headers['content-type'] || !res.headers['content-type'].startsWith('text/event-stream')) {
         clearTimeout(timeout);
         reject(new Error(`Wrong content-type: ${res.headers['content-type']}`));
         return;
