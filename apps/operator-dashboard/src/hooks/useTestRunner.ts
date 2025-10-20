@@ -8,18 +8,13 @@ export function useTestRunner() {
   const [running, setRunning] = useState(false);
   const [currentRunId, setCurrentRunId] = useState<string | null>(null);
 
-  const { data: scenariosData } = useSWR<{ scenarios: TestScenario[] }>(
-    '/api/tests',
-    fetcher
-  );
+  const { data: scenariosData } = useSWR<{ scenarios: TestScenario[] }>('/api/tests', fetcher);
 
   const runTest = useCallback(async (scenarioId: string = 'all') => {
     setRunning(true);
     try {
-      const body = scenarioId === 'all' 
-        ? { all: true }
-        : { scenarioId };
-        
+      const body = scenarioId === 'all' ? { all: true } : { scenarioId };
+
       const response = await fetch('/api/tests/run', {
         method: 'POST',
         headers: {

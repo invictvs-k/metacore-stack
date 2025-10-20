@@ -22,7 +22,7 @@ function App() {
                 Control & Observability
               </p>
             </div>
-            
+
             <nav className="mt-6">
               <NavLink to="/" icon={<Home size={20} />}>
                 Overview

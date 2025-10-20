@@ -4,21 +4,12 @@
     "es2022": true,
     "node": true
   },
-  "extends": [
-    "eslint:recommended"
-  ],
+  "extends": ["eslint:recommended"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "ignorePatterns": [
-    "dist/",
-    "node_modules/",
-    ".artifacts/",
-    "build/",
-    "coverage/",
-    "*.d.ts"
-  ],
+  "ignorePatterns": ["dist/", "node_modules/", ".artifacts/", "build/", "coverage/", "*.d.ts"],
   "rules": {
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "no-console": "off"
@@ -35,10 +26,7 @@
           "./mcp-ts/servers/*/tsconfig.json"
         ]
       },
-      "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-      ],
+      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
       "plugins": ["@typescript-eslint"]
     }
   ]
