@@ -17,7 +17,7 @@ The curation was performed following the principle of **non-destructive organiza
 | **Total Documents** | 43 | 100% |
 | Active | 31 | 72% |
 | Deprecated | 9 | 21% |
-| Archived | 0 | 0% |
+| Archived | 6 | 14% |
 | Duplicates | 3 | 7% |
 | Files with Broken Links | 3 | 7% |
 | Stale (>180 days) | 0 | 0% |
