@@ -232,38 +232,69 @@ eventsRouter.get('/heartbeat', (req: Request, res: Response) => {
   setupSSE(res);
 
   let count = 0;
-  const traceId = `hb-${Date.now()}`;
+  const traceId = req.traceId || `hb-${Date.now()}`;
+  const runId = req.runId;
+
+  // Get configurable parameters from query string
+  const intervalMs = parseInt(req.query.intervalMs as string) || 1000; // Default 1 second for fast testing
+  const maxCount = parseInt(req.query.max as string) || 3; // Default 3 heartbeats
 
   // Send initial message
   sendSSEMessage(res, {
     event: 'log',
     data: 'Heartbeat stream started',
     timestamp: new Date().toISOString(),
-    traceId
+    traceId,
+    runId
   });
 
-  // Send heartbeat every 30 seconds
+  // Send first heartbeat immediately
+  count++;
+  sendSSEMessage(res, {
+    event: 'heartbeat',
+    data: { count, message: 'ping' },
+    timestamp: new Date().toISOString(),
+    traceId,
+    runId
+  });
+
+  // Check if we're already done after first heartbeat
+  if (count >= maxCount) {
+    sendSSEMessage(res, {
+      event: 'done',
+      data: 'Heartbeat test completed',
+      timestamp: new Date().toISOString(),
+      traceId,
+      runId
+    });
+    res.end();
+    return;
+  }
+
+  // Send subsequent heartbeats at interval
   const heartbeat = setInterval(() => {
     count++;
     sendSSEMessage(res, {
       event: 'heartbeat',
       data: { count, message: 'ping' },
       timestamp: new Date().toISOString(),
-      traceId
+      traceId,
+      runId
     });
 
-    // Send a done message after 3 heartbeats for testing
-    if (count >= 3) {
+    // Send a done message after max heartbeats
+    if (count >= maxCount) {
       sendSSEMessage(res, {
         event: 'done',
         data: 'Heartbeat test completed',
         timestamp: new Date().toISOString(),
-        traceId
+        traceId,
+        runId
       });
       clearInterval(heartbeat);
       res.end();
     }
-  }, 30000);
+  }, intervalMs);
 
   req.on('close', () => {
     clearInterval(heartbeat);

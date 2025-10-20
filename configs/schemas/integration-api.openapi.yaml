@@ -13,6 +13,30 @@ servers:
     description: Development server
 
 paths:
+  /api/events/roomserver:
+    get:
+      summary: Server-Sent Events stream do RoomServer
+      description: Retorna um stream SSE com eventos do RoomServer em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+
+  /api/events/roomoperator:
+    get:
+      summary: Server-Sent Events stream do RoomOperator
+      description: Retorna um stream SSE com eventos do RoomOperator em tempo real
+      responses:
+        '200':
+          description: Stream de eventos SSE
+          content:
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/SSEEvent'
+
   /api/events/combined:
     get:
       summary: Server-Sent Events stream combinado
@@ -29,6 +53,19 @@ paths:
     get:
       summary: SSE heartbeat endpoint
       description: Retorna pings periódicos para teste de conectividade SSE
+      parameters:
+        - name: intervalMs
+          in: query
+          schema:
+            type: integer
+            default: 1000
+          description: Intervalo entre heartbeats em milissegundos
+        - name: max
+          in: query
+          schema:
+            type: integer
+            default: 3
+          description: Número máximo de heartbeats antes de finalizar
       responses:
         '200':
           description: Stream de heartbeat
