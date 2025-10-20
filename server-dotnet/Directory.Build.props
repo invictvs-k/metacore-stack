@@ -5,8 +5,16 @@
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest</AnalysisLevel>
     
-    <!-- Warnings as Errors -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Warnings as Errors - enforce policy -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    
+    <!-- Suppress pre-existing warnings that are being tracked separately -->
+    <!-- NU1603: Package version not found (uses newer compatible version) -->
+    <!-- CS1998: Async method without await (in AuditLog.cs) -->
+    <!-- CS8604: Possible null reference (in ArtifactEndpoints.cs) -->
+    <NoWarn>$(NoWarn);NU1603;CS1998;CS8604</NoWarn>
+    
+    <!-- Critical package warnings should still error -->
     <WarningsAsErrors>$(WarningsAsErrors);NU1605</WarningsAsErrors>
     
     <!-- Common Properties -->

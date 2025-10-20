@@ -72,7 +72,7 @@ paths:
           content:
             text/event-stream:
               schema:
-                type: object
+                $ref: '#/components/schemas/SSEEvent'
                 
   /api/commands/execute:
     post:

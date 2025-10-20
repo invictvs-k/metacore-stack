@@ -91,9 +91,11 @@
 | integration-api.openapi.yaml | ✅ Valid | Spectral | 8 warnings (non-critical) |
 
 **Endpoints Documented:**
-- `/events/stream` - SSE event stream
-- `/events/heartbeat` - SSE heartbeat test endpoint
-- `/commands/run` - Command execution
+- `/api/events/roomserver` - SSE event stream from RoomServer
+- `/api/events/roomoperator` - SSE event stream from RoomOperator
+- `/api/events/combined` - SSE combined event stream
+- `/api/events/heartbeat` - SSE heartbeat test endpoint
+- `/api/commands/execute` - Command execution
 - `/api/config` - System configuration
 
 **Spectral Warnings:**
