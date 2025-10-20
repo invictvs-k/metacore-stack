@@ -13,6 +13,7 @@ export default function Tests() {
   const [exitCode, setExitCode] = useState<number | null>(null);
   const [artifactsDir, setArtifactsDir] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [streamActive, setStreamActive] = useState<boolean>(false);
 
   const handleLogMessage = useCallback((data: any) => {
     if (data.runId && data.chunk) {
@@ -21,14 +22,17 @@ export default function Tests() {
     } else if (data.runId && data.artifactsDir !== undefined) {
       // Handle 'started' event
       setArtifactsDir(data.artifactsDir);
+      setStreamActive(true);
     } else if (data.runId && data.exitCode !== undefined) {
       // Handle 'done' event
       setExitCode(data.exitCode);
       setTestStatus(data.exitCode === 0 ? 'completed' : 'failed');
+      setStreamActive(false); // Mark stream as inactive to prevent reconnection
     } else if (data.message) {
       // Handle 'error' event
       setLogs(prev => [...prev, `Error: ${data.message}`]);
       setTestStatus('failed');
+      setStreamActive(false);
     }
   }, []);
 
@@ -39,9 +43,9 @@ export default function Tests() {
   };
 
   useSSE(
-    currentRunId ? `/api/tests/stream/${currentRunId}` : '',
+    currentRunId && streamActive ? `/api/tests/stream/${currentRunId}` : '',
     handleLogMessage,
-    !!currentRunId,
+    !!currentRunId && streamActive,
     sseOptions
   );
 
@@ -51,12 +55,14 @@ export default function Tests() {
     setExitCode(null);
     setArtifactsDir(null);
     setError(null);
+    setStreamActive(true); // Enable streaming
     try {
       await runTest(selectedScenario);
     } catch (error: any) {
       console.error('Failed to run test:', error);
       setError(error.message || 'Failed to start test execution');
       setTestStatus('failed');
+      setStreamActive(false);
     }
   };
 

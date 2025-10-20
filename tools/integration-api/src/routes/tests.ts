@@ -103,6 +103,36 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
   };
 
   const pollForUpdates = async () => {
+    // Check if run is still active
+    const currentRun = getRun(runId);
+    
+    // If run is no longer active, check metadata for final state
+    if (!currentRun) {
+      try {
+        const metadata = await getRunMetadata(runId);
+        if (metadata) {
+          // Send any remaining logs
+          const currentLogs = getRunLogs(runId);
+          if (currentLogs.length > lastLogCount) {
+            const newLogs = currentLogs.slice(lastLogCount);
+            for (const log of newLogs) {
+              res.write(`event: log\n`);
+              res.write(`data: ${JSON.stringify({ runId, chunk: log })}\n\n`);
+            }
+          }
+          
+          // Finalize with exit code from metadata
+          finalizeRun(metadata.exitCode ?? -1);
+          return;
+        }
+      } catch (error) {
+        // If we can't find metadata and run is not active, something went wrong
+        finalizeRun(-1);
+        return;
+      }
+    }
+    
+    // Stream new logs
     const currentLogs = getRunLogs(runId);
     if (currentLogs.length > lastLogCount) {
       const newLogs = currentLogs.slice(lastLogCount);
@@ -113,28 +143,17 @@ testsRouter.get('/stream/:runId', async (req: Request, res: Response) => {
       lastLogCount = currentLogs.length;
     }
 
-    // Check if run is complete
-    const currentRun = getRun(runId);
-    if (!currentRun || currentRun.status !== 'running') {
-      let exitCode: number;
-
-      if (currentRun?.exitCode !== undefined) {
-        exitCode = currentRun.exitCode;
-      } else {
-        try {
-          const metadata = await getRunMetadata(runId);
-          exitCode = metadata?.exitCode ?? -1;
-        } catch (error) {
-          exitCode = -1;
-        }
-      }
-
+    // Check if run status has changed to completed/failed
+    if (currentRun && currentRun.status !== 'running') {
+      const exitCode = currentRun.exitCode ?? -1;
       finalizeRun(exitCode);
     }
   };
 
+  let isPolling = false;
+
   pollInterval = setInterval(() => {
-    if (completed || isPolling) {
+    if (state === 'completed' || isPolling) {
       return;
     }
 
