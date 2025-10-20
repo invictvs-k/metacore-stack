@@ -1,4 +1,9 @@
 # Schema Compliance Implementation Summary
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: Schema compliance implementation summary - completed work  
+> Data: 2025-10-20
+
+
 
 This document summarizes the changes made to align the RoomServer C# implementation with the JSON schemas.
 

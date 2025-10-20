@@ -1,4 +1,9 @@
 # Connection Test - Before vs After
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: Connection test visual guide - superseded by current testing docs  
+> Data: 2025-10-20
+
+
 
 ## Visual Comparison
 

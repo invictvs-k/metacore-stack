@@ -1,4 +1,9 @@
 # Critical Fixes - Event Streaming, Service Independence, and Test Execution
+> ⚠️ **DEPRECADO** — mantido para referência histórica.  
+> Motivo: Event streaming fixes explanation - completed work  
+> Data: 2025-10-20
+
+
 
 ## Issues Fixed
 
