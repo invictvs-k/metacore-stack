@@ -33,3 +33,5 @@ environment-validation-report-*.md
 
 .venv/
 venv/
+__pycache__/
+*.pyc
