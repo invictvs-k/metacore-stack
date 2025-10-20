@@ -21,7 +21,14 @@ class ChatMessage(TypedDict):
 class OpenAIResponder(Protocol):
     """Protocol describing the interface required by :class:`RoomAgent`."""
 
-    def respond(self, messages: Iterable[ChatMessage], **kwargs: object) -> str:
+    def respond(
+        self,
+        messages: Iterable[ChatMessage],
+        *,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+    ) -> str:
         """Return the model response for the given chat transcript."""
 
 
@@ -40,27 +47,28 @@ class OpenAIChatClient(OpenAIResponder):
                 raise RuntimeError("openai package is not available")
             self.client = OpenAI()
 
-    def respond(self, messages: Iterable[ChatMessage], **kwargs: object) -> str:
+    def respond(
+        self,
+        messages: Iterable[ChatMessage],
+        *,
+        model: Optional[str] = None,
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+    ) -> str:
         if self.client is None:  # pragma: no cover - defensive guard
             raise RuntimeError("OpenAI client not initialised")
-        # Normalize overrides: if None is passed, use the default
-        model = kwargs.get("model", self.model)
-        if model is None:
-            model = self.model
-        temperature = kwargs.get("temperature", self.temperature)
-        if temperature is None:
-            temperature = self.temperature
-        temperature = float(temperature)
-        max_tokens = kwargs.get("max_tokens", self.max_tokens)
-        if max_tokens is None:
-            max_tokens = self.max_tokens
+        # Use provided overrides or fall back to instance defaults
+        final_model = model if model is not None else self.model
+        final_temperature = temperature if temperature is not None else self.temperature
+        final_max_tokens = max_tokens if max_tokens is not None else self.max_tokens
+        
         params = {
-            "model": model,
-            "temperature": temperature,
+            "model": final_model,
+            "temperature": float(final_temperature),
             "messages": list(messages),
         }
-        if max_tokens is not None:
-            params["max_tokens"] = int(max_tokens)
+        if final_max_tokens is not None:
+            params["max_tokens"] = int(final_max_tokens)
         response = self.client.chat.completions.create(**params)
         choice = response.choices[0]
         message = choice.message
