@@ -10,8 +10,11 @@
     
     <!-- Suppress pre-existing warnings that are being tracked separately -->
     <!-- NU1603: Package version not found (uses newer compatible version) -->
+    <!--   TODO: Update package references to resolve NU1603. See issue #123. -->
     <!-- CS1998: Async method without await (in AuditLog.cs) -->
+    <!--   TODO: Refactor AuditLog.cs to use await or remove async. See issue #124. -->
     <!-- CS8604: Possible null reference (in ArtifactEndpoints.cs) -->
+    <!--   TODO: Add null checks in ArtifactEndpoints.cs. See issue #125. -->
     <NoWarn>$(NoWarn);NU1603;CS1998;CS8604</NoWarn>
     
     <!-- Critical package warnings should still error -->
