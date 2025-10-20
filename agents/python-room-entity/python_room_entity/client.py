@@ -212,7 +212,7 @@ class RoomClient:
         return None
 
     def _ensure_connected(self) -> None:
-        if self._hub is None:
+        if not self.is_connected:
             raise RuntimeError("room client is not connected")
 
     def _ensure_joined(self) -> None:
