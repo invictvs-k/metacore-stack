@@ -131,12 +131,18 @@ async function generateReport() {
   report += `## Dependencies\n\n`;
   report += `- ✅ Dependabot configured (weekly updates)\n`;
   report += `- ✅ Security audits automated\n`;
-  report += `- ⚠️  5 low severity vulnerabilities (see security report)\n\n`;
+  
+  const secAudit = await readJsonIfExists(join(process.cwd(), '.artifacts', 'security', 'npm-audit.json'));
+  const low = secAudit?.metadata?.vulnerabilities?.low || 0;
+  if (low > 0) {
+    report += `- ⚠️  ${low} low severity vulnerabilit${low === 1 ? 'y' : 'ies'} (see security report)\n\n`;
+  } else {
+    report += `- ✅ No low severity vulnerabilities\n\n`;
+  }
   
   // Overall Status
   report += `## Overall Status\n\n`;
   
-  const secAudit = await readJsonIfExists(join(process.cwd(), '.artifacts', 'security', 'npm-audit.json'));
   const critical = secAudit?.metadata?.vulnerabilities?.critical || 0;
   const high = secAudit?.metadata?.vulnerabilities?.high || 0;
   
