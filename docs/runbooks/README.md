@@ -2,9 +2,16 @@
 
 This directory contains operational runbooks for common tasks and troubleshooting procedures.
 
+## Available Runbooks
+
+- **[Development Runbook](./development.md)** - Complete guide for local development setup, workflows, and best practices
+- **[Agent Execution Runbook](./agent-execution.md)** - Guide for AI agents working with this repository
+
 ## Purpose
 
 Runbooks are step-by-step guides for:
+
+- Development workflows and setup
 - Deployment procedures
 - Incident response
 - Common maintenance tasks
@@ -25,11 +32,18 @@ A good runbook should include:
 ## Naming Convention
 
 Use descriptive names that indicate the task:
-- `deploy-{component}.md`
-- `troubleshoot-{issue}.md`
-- `recover-{scenario}.md`
-- `upgrade-{component}.md`
+
+- `development.md` - Development workflow and setup
+- `agent-execution.md` - Agent automation guide
+- `deploy-{component}.md` - Deployment procedures
+- `troubleshoot-{issue}.md` - Troubleshooting guides
+- `recover-{scenario}.md` - Recovery procedures
+- `upgrade-{component}.md` - Upgrade procedures
 
 ## Status
 
-This directory is ready for runbook documentation. Add runbooks as operational procedures are established.
+Active runbooks:
+
+- ✅ Development runbook with complete setup and workflow guide
+- ✅ Agent execution runbook with brief/playbook system
+- 🔄 Additional operational runbooks to be added as needed

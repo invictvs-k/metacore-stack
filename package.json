@@ -22,7 +22,19 @@
     "test": "npm run test:schemas && npm run test:contracts",
     "test:schemas": "cd schemas && npm run validate",
     "test:contracts": "node scripts/validate-contracts.mjs",
-    "smoke:stream": "node scripts/smoke-stream-test.mjs"
+    "test:smoke": "node tests/smoke/smoke.test.mjs",
+    "test:contract": "node tests/contract/contract.test.mjs",
+    "test:e2e": "node tests/e2e/basic-flow.test.mjs",
+    "test:all": "npm run test:smoke && npm run test:contract && npm test",
+    "smoke:stream": "node scripts/smoke-stream-test.mjs",
+    "release": "standard-version",
+    "release:dry": "standard-version --dry-run",
+    "prepare": "husky",
+    "commit": "cz",
+    "security:audit": "node scripts/security-audit.mjs",
+    "agent:update": "node scripts/agent-update.mjs",
+    "report:test": "node scripts/generate-test-report.mjs",
+    "report:quality": "node scripts/generate-quality-report.mjs"
   },
   "keywords": [
     "dashboard",
@@ -32,11 +44,24 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^20.1.0",
+    "@commitlint/config-conventional": "^20.0.0",
+    "@eslint/js": "^9.38.0",
     "@stoplight/spectral-cli": "^6.15.0",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
+    "ajv": "^8.17.1",
+    "ajv-draft-04": "^1.0.0",
+    "ajv-formats": "^3.0.1",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.38.0",
+    "eventsource": "^4.0.0",
+    "globals": "^16.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
     "npm-run-all": "^4.1.5",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "standard-version": "^9.5.0"
   }
 }

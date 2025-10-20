@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: 'npm'
+    directory: '/tools/integration-api'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: 'npm'
+    directory: '/apps/operator-dashboard'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: 'npm'
+    directory: '/schemas'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: 'nuget'
+    directory: '/server-dotnet'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
