@@ -37,6 +37,8 @@ def room_server() -> Iterator[Dict[str, object]]:
     env.setdefault("ASPNETCORE_URLS", f"{SERVER_URL}")
     
     # Create temporary files to capture stdout and stderr
+    stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stdout.log')
+    stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stderr.log')
     stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
     stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
     
@@ -58,6 +60,19 @@ def room_server() -> Iterator[Dict[str, object]]:
         except Exception:
             process.terminate()
             
+            # Read the tail of the output files for debugging
+            stdout_file.flush()
+            stderr_file.flush()
+            
+            def read_tail(file_path: str, lines: int = 50) -> str:
+                """Read the last N lines from a file."""
+                try:
+                    with open(file_path, 'r') as f:
+                        all_lines = f.readlines()
+                        tail_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
+                        return ''.join(tail_lines)
+                except Exception as e:
+                    return f"Error reading file: {e}"
             # Read the tail of stdout and stderr for debugging
             stdout_file.flush()
             stderr_file.flush()
@@ -74,6 +89,11 @@ def room_server() -> Iterator[Dict[str, object]]:
             stdout_tail = read_tail(stdout_file.name)
             stderr_tail = read_tail(stderr_file.name)
             
+            error_msg = "RoomServer failed to start (healthcheck failed).\n"
+            if stdout_tail:
+                error_msg += f"\n--- Last 50 lines of stdout ---\n{stdout_tail}"
+            if stderr_tail:
+                error_msg += f"\n--- Last 50 lines of stderr ---\n{stderr_tail}"
             error_msg = "RoomServer failed to start (healthcheck failed)."
             if stdout_tail.strip():
                 error_msg += f"\n\nLast 50 lines of stdout:\n{stdout_tail}"
