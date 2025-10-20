@@ -179,7 +179,7 @@ This script:
 - Checks `agent/reports/` for completed runs
 - Updates `agent/backlog.md` with current status
 
-## Versionamento Automático
+## Automated Versioning
 
 ### Conventional Commits → Releases
 

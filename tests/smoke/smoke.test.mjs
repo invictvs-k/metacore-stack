@@ -7,6 +7,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import http from 'http';
+import { join } from 'path';
 
 const execAsync = promisify(exec);
 
@@ -36,7 +37,9 @@ async function testBuild() {
   try {
     // Test Node/TS build
     console.log('  - Building integration-api...');
-    await execAsync('cd tools/integration-api && npm run build');
+    await execAsync('npm run build', {
+      cwd: join(process.cwd(), 'tools', 'integration-api')
+    });
     console.log('    ✅ integration-api builds successfully');
     
     // Test schema validation
