@@ -80,8 +80,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: 'mcp-ts/pnpm-lock.yaml'
       - name: Install dependencies
         run: cd mcp-ts && pnpm i
       - name: Build all MCP servers
@@ -119,6 +117,10 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
+      - name: Install integration-api dependencies
+        run: cd tools/integration-api && npm install
+      - name: Install schemas dependencies
+        run: cd schemas && npm install
       - name: Run format check
         run: npm run format
         continue-on-error: true # Pre-existing format issues in ui/ directory
@@ -179,6 +181,8 @@ jobs:
         run: npm install
       - name: Install integration-api dependencies
         run: cd tools/integration-api && npm install
+      - name: Install schemas dependencies
+        run: cd schemas && npm install
       - name: Build integration-api
         run: cd tools/integration-api && npm run build
       - name: Start integration-api
