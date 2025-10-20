@@ -107,7 +107,7 @@ npm run test:all
 
 ## Validação de Fluxos
 
-* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](LAYER3_VALIDATION_SUMMARY.md))
+* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md))
   - Fluxo 3.1: Criação de Sala (5 testes)
   - Fluxo 3.2: Entrada de Entidade (8 testes)
   - Cenários adicionais: 2 testes
