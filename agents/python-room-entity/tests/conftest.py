@@ -37,8 +37,6 @@ def room_server() -> Iterator[Dict[str, object]]:
     env.setdefault("ASPNETCORE_URLS", f"{SERVER_URL}")
     
     # Create temporary files to capture stdout and stderr
-    stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stdout.log')
-    stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='_stderr.log')
     stdout_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
     stderr_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.log')
     
