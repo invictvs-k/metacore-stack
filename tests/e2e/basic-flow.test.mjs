@@ -9,7 +9,7 @@
  */
 
 import http from 'http';
-import EventSource from 'eventsource';
+import { EventSource } from 'eventsource';
 
 const BASE_URL = 'http://localhost:40901';
 
