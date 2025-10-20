@@ -151,9 +151,6 @@
 - **[Quick Start Guide - Observability & Execution Fix](/docs/_deprecated/QUICKSTART_GUIDE.md)** [DEPRECATED] (1 refs)  
   _Last updated: 2025-10-20_ | Tags: deprecated, architecture, api, spec, howto, testing, implementation
 
-- **[Documentation Table of Contents](/docs/TOC.md)** [DEPRECATED] (1 refs)  
-  _Last updated: 2025-10-20_ | Tags: architecture, adr, api, spec, testing, implementation, design
-
 ## Archived Documentation
 
 - **[Plano de Testes Detalhado - Backend/APIs do Metacore Stack](/docs/_archive/BACKEND_API_TEST_PLAN.md)** [ARCHIVED] (1 refs)  
