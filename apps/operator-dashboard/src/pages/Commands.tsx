@@ -11,8 +11,8 @@ export default function Commands() {
 
   useEffect(() => {
     fetch('/api/commands')
-      .then(res => res.json())
-      .then(data => setCatalog(data))
+      .then((res) => res.json())
+      .then((data) => setCatalog(data))
       .catch(console.error);
   }, []);
 
@@ -44,13 +44,11 @@ export default function Commands() {
     }
   };
 
-  const selectedCommandInfo = catalog?.commands.find(c => c.id === selectedCommand);
+  const selectedCommandInfo = catalog?.commands.find((c) => c.id === selectedCommand);
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-        Command Execution
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Command Execution</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Command Selection & Execution */}
@@ -117,9 +115,10 @@ export default function Commands() {
             disabled={!selectedCommand || executing}
             className={`
               w-full px-6 py-3 rounded flex items-center justify-center gap-2 transition-colors
-              ${!selectedCommand || executing
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
+              ${
+                !selectedCommand || executing
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
               }
               text-white font-medium
             `}
@@ -160,19 +159,16 @@ export default function Commands() {
                 key={cmd.id}
                 className={`
                   p-4 border rounded cursor-pointer transition-colors
-                  ${selectedCommand === cmd.id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  ${
+                    selectedCommand === cmd.id
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }
                 `}
                 onClick={() => setSelectedCommand(cmd.id)}
               >
-                <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                  {cmd.title}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  {cmd.description}
-                </p>
+                <h3 className="font-medium text-gray-900 dark:text-white mb-1">{cmd.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{cmd.description}</p>
                 <code className="text-xs bg-gray-100 dark:bg-gray-900 px-2 py-1 rounded">
                   {cmd.id}
                 </code>
@@ -180,9 +176,7 @@ export default function Commands() {
             ))}
           </div>
 
-          {!catalog && (
-            <p className="text-gray-600 dark:text-gray-400">Loading commands...</p>
-          )}
+          {!catalog && <p className="text-gray-600 dark:text-gray-400">Loading commands...</p>}
         </div>
       </div>
     </div>

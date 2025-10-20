@@ -8,7 +8,7 @@
 
 ## Architecture & ADRs
 
-- **[Metacore Stack — Metaplataforma (MVP)](../README.md)** (3 refs)  
+- **[Metacore Stack — Meta-Platform (MVP)](../README.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, adr, api, spec, testing, ops
 
 - **[Glossary](./glossary.md)** (2 refs)  
@@ -22,13 +22,13 @@
 
 ## API & Specifications
 
-- **[RoomServer vs. Schemas Canônicos — Relatório de Alinhamento](../reports/schema-roomserver-alignment.md)** (2 refs)  
+- **[RoomServer vs. Canonical Schemas — Alignment Report](../reports/schema-roomserver-alignment.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec
 
 - **[Interfaces](./interfaces/README.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec
 
-- **[Schemas – Metaplataforma (Sala Viva)](../schemas/README.md)** (1 refs)  
+- **[Schemas – Meta-Platform (Living Room)](../schemas/README.md)** (1 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec
 
 - **[Integration API OpenAPI Specification](../configs/schemas/integration-api.openapi.yaml)** (2 refs)  
@@ -62,10 +62,10 @@
 - **[Operator Dashboard](../apps/operator-dashboard/README.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec, howto, testing
 
-- **[🧠 Metacore Stack — Especificação Funcional](../CONCEPTDEFINITION.md)** (3 refs)  
+- **[🧠 Metacore Stack — Functional Specification](../CONCEPTDEFINITION.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec, testing
 
-- **[Contribuição](../CONTRIBUTING.md)** (3 refs)  
+- **[Contributing](../CONTRIBUTING.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec, testing
 
 - **[Dashboard React for Control and Observability](../DASHBOARD_README.md)** (3 refs)  
@@ -98,7 +98,7 @@
 - **[RoomOperator-RoomServer Integration Guide](./ROOMOPERATOR_ROOMSERVER_INTEGRATION.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec, testing, design
 
-- **[Relatório de Validação: Fluxos de Ponta a Ponta da Camada 3](../reports/LAYER3_FLOW_VALIDATION.md)** (2 refs)  
+- **[Validation Report: Layer 3 End-to-End Flows](../reports/LAYER3_FLOW_VALIDATION.md)** (2 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec, testing
 
 - **[Enhanced Integration Test System](../server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md)** (2 refs)  
@@ -113,7 +113,7 @@
 - **[CI Fix Summary - Make CI Green](../ci/SUMMARY.md)** (1 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec, howto, testing
 
-- **[Resumo das Configurações de Portas - Metacore Stack](../CONFIGURACAO_PORTAS.md)** (1 refs)  
+- **[Port Configuration Summary - Metacore Stack](../CONFIGURACAO_PORTAS.md)** (1 refs)  
   _Last updated: 2025-10-20_ | Tags: api, spec, testing
 
 - **[RoomOperator-RoomServer Integration - Implementation Summary](./INTEGRATION_IMPLEMENTATION_SUMMARY.md)** (1 refs)  

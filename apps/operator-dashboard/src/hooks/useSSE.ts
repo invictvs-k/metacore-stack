@@ -7,15 +7,15 @@ interface UseSSEOptions {
 }
 
 export function useSSE(
-  url: string, 
-  onMessage: (data: any) => void, 
+  url: string,
+  onMessage: (data: any) => void,
   enabled: boolean = true,
   options: UseSSEOptions = {}
 ) {
-  const { 
+  const {
     reconnectInterval = 5000,
     maxReconnectInterval = 30000,
-    reconnectBackoffMultiplier = 1.5
+    reconnectBackoffMultiplier = 1.5,
   } = options;
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -52,19 +52,21 @@ export function useSSE(
         console.error('SSE connection error, reconnecting...');
         eventSource.close();
         eventSourceRef.current = null;
-        
+
         // Increment reconnection attempts
         reconnectAttemptsRef.current += 1;
-        
+
         // Calculate next delay with exponential backoff
         const nextDelay = Math.min(
           currentReconnectDelayRef.current * reconnectBackoffMultiplier,
           maxReconnectInterval
         );
         currentReconnectDelayRef.current = nextDelay;
-        
-        console.log(`Reconnecting in ${Math.round(nextDelay / 1000)}s (attempt ${reconnectAttemptsRef.current})...`);
-        
+
+        console.log(
+          `Reconnecting in ${Math.round(nextDelay / 1000)}s (attempt ${reconnectAttemptsRef.current})...`
+        );
+
         // Reconnect after calculated delay
         reconnectTimeoutRef.current = setTimeout(() => {
           connect();
@@ -80,7 +82,14 @@ export function useSSE(
     } catch (error) {
       console.error('Error creating EventSource:', error);
     }
-  }, [url, onMessage, enabled, reconnectInterval, maxReconnectInterval, reconnectBackoffMultiplier]);
+  }, [
+    url,
+    onMessage,
+    enabled,
+    reconnectInterval,
+    maxReconnectInterval,
+    reconnectBackoffMultiplier,
+  ]);
 
   useEffect(() => {
     connect();
@@ -100,6 +109,6 @@ export function useSSE(
   }, [connect, reconnectInterval]);
 
   return {
-    reconnect: connect
+    reconnect: connect,
   };
 }

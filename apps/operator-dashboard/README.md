@@ -75,20 +75,26 @@ src/
 ### Hooks
 
 #### `useSSE(url, onMessage, enabled, options)`
+
 Manages Server-Sent Events connections with:
+
 - Automatic reconnection with exponential backoff
 - Support for multiple event types (started, log, done, error, etc.)
 - Heartbeat monitoring
 - Configurable retry intervals and backoff multipliers
 
 #### `useConfig()`
+
 Provides access to dashboard configuration with:
+
 - Automatic refresh every 10 seconds
 - Update capabilities with validation
 - Mutation tracking
 
 #### `useTestRunner()`
+
 Manages test scenario execution and result streaming with:
+
 - Scenario listing via SWR
 - Test execution with runId tracking
 - Run metadata retrieval
@@ -96,6 +102,7 @@ Manages test scenario execution and result streaming with:
 ### State Management
 
 Uses Zustand for lightweight global state:
+
 - Theme preference (light/dark/system)
 - Current run ID for test execution tracking
 - Event history with windowing (keeps last 2000 events)
@@ -163,6 +170,7 @@ server: {
 ## Browser Support
 
 Modern browsers with EventSource (SSE) support:
+
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+
@@ -170,32 +178,40 @@ Modern browsers with EventSource (SSE) support:
 ## Development Tips
 
 ### SSE Resilience
+
 The dashboard implements robust SSE handling:
+
 - Exponential backoff reconnection (1.5x multiplier, max 30s)
 - Multiple event type support
 - Automatic cleanup on unmount
 - Heartbeat detection
 
 ### Hot Reload Detection
+
 Configuration changes are detected via checksum polling every 5 seconds. When a change is detected, a notification appears prompting the user to reload.
 
 ### Test Execution
+
 - Tests run with unique runId for isolation
 - Logs stream in real-time via SSE with typed events
 - Exit codes and artifact directories are displayed on completion
 - Multiple tests can run sequentially without page reload
 
 ### Event Management
+
 - **Pause/Resume**: Stop receiving events without closing SSE connection
 - **Auto-scroll**: Toggle automatic scrolling to latest events
 - **Windowing**: Keeps only last 2000 events in memory to prevent performance issues
 - **Filtering**: Filter by source (all/roomserver/roomoperator)
 
 ### Command Validation
+
 Commands use JSON Schema for parameter validation before execution. Validation errors show which parameters are missing or invalid with actionable feedback.
 
 ### Connection Testing
+
 The Settings page includes a "Test Connections" button that:
+
 - Pings RoomServer and RoomOperator baseUrls
 - Checks MCP status endpoint availability
 - Displays detailed results with error messages
@@ -203,17 +219,22 @@ The Settings page includes a "Test Connections" button that:
 ## Troubleshooting
 
 ### API Connection Failed
+
 Ensure the Integration API is running on port 40901:
+
 ```bash
 cd tools/integration-api
 npm run dev
 ```
 
 ### SSE Connection Errors
+
 Check that RoomServer and RoomOperator are accessible at configured URLs.
 
 ### Build Errors
+
 Clear cache and reinstall:
+
 ```bash
 rm -rf node_modules dist
 npm install

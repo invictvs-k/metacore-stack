@@ -19,7 +19,7 @@ export default function RoomsPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Try to fetch from backend API
       const response = await fetch('http://localhost:5000/api/rooms', {
         method: 'GET',
@@ -37,13 +37,13 @@ export default function RoomsPage() {
         setRooms([
           {
             id: 'room-001',
-            name: 'Sala de Desenvolvimento',
+            name: 'Development Room',
             created: new Date().toISOString(),
             artifactCount: 5,
           },
           {
             id: 'room-002',
-            name: 'Sala de Testes',
+            name: 'Test Room',
             created: new Date().toISOString(),
             artifactCount: 3,
           },
@@ -55,13 +55,13 @@ export default function RoomsPage() {
       setRooms([
         {
           id: 'room-001',
-          name: 'Sala de Desenvolvimento',
+          name: 'Development Room',
           created: new Date().toISOString(),
           artifactCount: 5,
         },
         {
           id: 'room-002',
-          name: 'Sala de Testes',
+          name: 'Test Room',
           created: new Date().toISOString(),
           artifactCount: 3,
         },
@@ -118,7 +118,7 @@ export default function RoomsPage() {
   if (loading) {
     return (
       <div className="container">
-        <h1>Salas</h1>
+        <h1>Rooms</h1>
         <div className="loading">
           <div className="spinner"></div>
         </div>
@@ -128,47 +128,47 @@ export default function RoomsPage() {
 
   return (
     <div className="container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1>Salas Disponíveis</h1>
-        <button 
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="btn btn-primary"
-        >
-          {showCreateForm ? 'Cancelar' : 'Nova Sala'}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2rem',
+        }}
+      >
+        <h1>Available Rooms</h1>
+        <button onClick={() => setShowCreateForm(!showCreateForm)} className="btn btn-primary">
+          {showCreateForm ? 'Cancel' : 'New Room'}
         </button>
       </div>
 
-      {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-error">{error}</div>}
 
       {showCreateForm && (
         <div className="card" style={{ marginBottom: '2rem' }}>
-          <h2 className="card-header">Criar Nova Sala</h2>
+          <h2 className="card-header">Create New Room</h2>
           <form onSubmit={handleCreateRoom} className="form">
             <div className="form-group">
-              <label className="form-label">Nome da Sala</label>
+              <label className="form-label">Room Name</label>
               <input
                 type="text"
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
                 className="form-input"
-                placeholder="Digite o nome da sala"
+                placeholder="Enter room name"
                 required
               />
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
               <button type="submit" className="btn btn-success">
-                Criar Sala
+                Create Room
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setShowCreateForm(false)}
                 className="btn btn-secondary"
               >
-                Cancelar
+                Cancel
               </button>
             </div>
           </form>
@@ -176,14 +176,14 @@ export default function RoomsPage() {
       )}
 
       <div className="alert alert-info" style={{ marginBottom: '1rem' }}>
-        <strong>Integração Backend:</strong> Esta página tenta se conectar ao backend em{' '}
-        <code>http://localhost:5000/api/rooms</code>. Quando o backend não está disponível, 
-        dados de exemplo são exibidos.
+        <strong>Backend Integration:</strong> This page attempts to connect to the backend at{' '}
+        <code>http://localhost:5000/api/rooms</code>. When the backend is not available, sample data
+        is displayed.
       </div>
 
       {rooms.length === 0 ? (
         <div className="card">
-          <p>Nenhuma sala encontrada. Crie uma nova sala para começar!</p>
+          <p>No rooms found. Create a new room to get started!</p>
         </div>
       ) : (
         <div className="room-list">
@@ -192,14 +192,12 @@ export default function RoomsPage() {
               <div className="room-name">{room.name}</div>
               <div className="room-meta">
                 ID: {room.id}
-                {room.artifactCount !== undefined && (
-                  <> • Artefatos: {room.artifactCount}</>
-                )}
-                <> • Criado: {new Date(room.created).toLocaleDateString('pt-BR')}</>
+                {room.artifactCount !== undefined && <> • Artifacts: {room.artifactCount}</>}
+                <> • Created: {new Date(room.created).toLocaleDateString('en-US')}</>
               </div>
               <div style={{ marginTop: '1rem' }}>
                 <Link href={`/rooms/${room.id}`} className="btn btn-primary">
-                  Acessar Sala
+                  Access Room
                 </Link>
               </div>
             </div>

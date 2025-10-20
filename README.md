@@ -1,4 +1,4 @@
-# Metacore Stack — Metaplataforma (MVP)
+# Metacore Stack — Meta-Platform (MVP)
 
 [![CI](https://github.com/invictvs-k/metacore-stack/workflows/ci/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/ci.yml)
 [![PR Validation](https://github.com/invictvs-k/metacore-stack/workflows/pr-validation/badge.svg)](https://github.com/invictvs-k/metacore-stack/actions/workflows/pr-validation.yml)
@@ -8,19 +8,21 @@
 
 > **Technical Report**: See [ci/tech-report.md](ci/tech-report.md) for detailed build status, test results, and pipeline observability.
 
-Mono-repo com:
+Mono-repo with:
+
 - `server-dotnet/` — Room Host (.NET 8 + SignalR) + RoomOperator
-- `mcp-ts/` — MCP servers em TypeScript
+- `mcp-ts/` — MCP servers in TypeScript
 - `apps/operator-dashboard/` — Operator Dashboard (Vite/React)
 - `tools/integration-api/` — Integration API (Express/TypeScript)
-- `ui/` — UI mínima (Next.js) [opcional neste ciclo]
-- `schemas/` — JSON Schemas base + exemplos + validação AJV
-- `infra/` — docker-compose para ambiente local
+- `ui/` — Minimal UI (Next.js) [optional in this cycle]
+- `schemas/` — Base JSON Schemas + examples + AJV validation
+- `infra/` — docker-compose for local environment
 - `docs/` — Documentation (see [Table of Contents](docs/TOC.md))
 
 ## Port Configuration
 
 All components use standardized ports for easy integration:
+
 - **RoomServer**: 40801
 - **RoomOperator**: 40802
 - **Integration API**: 40901
@@ -29,20 +31,21 @@ All components use standardized ports for easy integration:
 See [PORT_CONFIGURATION.md](PORT_CONFIGURATION.md) for detailed setup and configuration.
 
 ## Quickstart
+
 ```bash
 # 0) verify environment (optional but recommended)
 make verify-environment
 
-# 1) preparar ferramentas
+# 1) prepare tools
 make bootstrap
 
-# 2) subir MCP servers de exemplo
+# 2) start example MCP servers
 make mcp-up
 
-# 3) rodar Room Host
+# 3) run Room Host
 make run-server
 
-# 4) validar schemas
+# 4) validate schemas
 make schemas-validate
 ```
 
@@ -84,6 +87,7 @@ npm run dev
 ```
 
 **Key Features:**
+
 - ✅ Structured JSON logging with traceId/runId
 - ✅ SSE endpoints with heartbeat monitoring
 - ✅ OpenAPI 3.1 specification with validation
@@ -106,6 +110,7 @@ cd server-dotnet/operator/scripts
 ```
 
 Features:
+
 - Automated service orchestration with readiness checks
 - Artifact collection in `.artifacts/integration/{timestamp}/`
 - Performance metrics (P50/P95 latency, success rates)
@@ -141,33 +146,35 @@ npm run test:all
 ```
 
 **Available test scenarios:**
+
 - `npm run test:basic` - Complete happy path (entities → artifacts → policies)
 - `npm run test:basic-enhanced` - Enhanced basic flow with trace logging
 - `npm run test:error` - Error handling and validation
 - `npm run test:stress` - Performance and load testing
 
 **Documentation:**
+
 - [Enhanced Integration Testing](server-dotnet/operator/docs/ENHANCED_INTEGRATION_TESTING.md) - Comprehensive test system with artifacts and metrics
 - [Integration Guide](docs/ROOMOPERATOR_ROOMSERVER_INTEGRATION.md) - Complete API reference, communication flows, and error handling
 - [Testing Guide](docs/TESTING.md) - Detailed testing instructions and troubleshooting
 - [RoomOperator Docs](docs/room-operator.md) - Operator architecture and usage
 - [Test Client README](server-dotnet/operator/test-client/README.md) - Test client usage and customization
 
-## Estrutura e Convenções
+## Structure and Conventions
 
-* .NET 8, Node 20, pnpm 9
-* Conventional Commits
-* CI: build + lint + teste + validação de schemas
+- .NET 8, Node 20, pnpm 9
+- Conventional Commits
+- CI: build + lint + test + schema validation
 
-## Validação de Fluxos
+## Flow Validation
 
-* **Layer 3 Flows:** ✅ Validados e testados ([ver relatório](docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md))
-  - Fluxo 3.1: Criação de Sala (5 testes)
-  - Fluxo 3.2: Entrada de Entidade (8 testes)
-  - Cenários adicionais: 2 testes
-  - 15 testes automatizados, 100% aprovação
+- **Layer 3 Flows:** ✅ Validated and tested ([see report](docs/_deprecated/LAYER3_VALIDATION_SUMMARY.md))
+  - Flow 3.1: Room Creation (5 tests)
+  - Flow 3.2: Entity Entry (8 tests)
+  - Additional scenarios: 2 tests
+  - 15 automated tests, 100% passing
 
-## Documentação
+## Documentation
 
 ### 📚 Quick Navigation
 
@@ -250,11 +257,12 @@ metacore-stack/
 ### 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for:
+
 - Commit conventions (Conventional Commits)
 - Pull request requirements
 - Build and test expectations
 - Schema versioning guidelines
 
-## Licença
+## License
 
-MIT (ajuste conforme necessidade)
+MIT (adjust as needed)
