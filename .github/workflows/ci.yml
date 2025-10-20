@@ -16,8 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with: 
           node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: schemas/pnpm-lock.yaml
       - run: pnpm i
       - run: pnpm validate
 
@@ -55,8 +53,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
-          cache-dependency-path: mcp-ts/pnpm-lock.yaml
       - name: Install dependencies
         run: cd mcp-ts && pnpm i
       - name: Build all MCP servers
