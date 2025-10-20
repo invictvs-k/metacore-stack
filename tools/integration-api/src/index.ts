@@ -11,6 +11,7 @@ import { commandsRouter } from './routes/commands.js';
 import { mcpRouter } from './routes/mcp.js';
 import { healthRouter } from './routes/health.js';
 import { loadConfig } from './services/config.js';
+import { tracingMiddleware, structuredLogger } from './middleware/tracing.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +26,7 @@ async function main() {
     crossOriginResourcePolicy: { policy: "cross-origin" }
   }));
   app.use(cors());
+  app.use(tracingMiddleware);
   app.use(morgan(config.integrationApi.logLevel === 'debug' ? 'dev' : 'combined'));
   app.use(express.json());
 
@@ -48,9 +50,20 @@ async function main() {
   });
 
   app.listen(port, () => {
-    console.log(`Integration API listening on port ${port}`);
-    console.log(`Health check: http://localhost:${port}/health`);
+    structuredLogger('Integration API started', 'info', {
+      port,
+      environment: process.env.NODE_ENV || 'development',
+      endpoints: {
+        health: `/health`,
+        config: `/api/config`,
+        events: `/api/events/*`,
+        heartbeat: `/api/events/heartbeat`
+      }
+    });
   });
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  structuredLogger('Failed to start Integration API', 'error', { error: error.message, stack: error.stack });
+  process.exit(1);
+});

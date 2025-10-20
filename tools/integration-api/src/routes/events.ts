@@ -226,3 +226,46 @@ eventsRouter.get('/combined', async (req: Request, res: Response) => {
     cleanupRoomOperator?.();
   });
 });
+
+// GET /api/events/heartbeat - Simple heartbeat endpoint for testing SSE
+eventsRouter.get('/heartbeat', (req: Request, res: Response) => {
+  setupSSE(res);
+
+  let count = 0;
+  const traceId = `hb-${Date.now()}`;
+
+  // Send initial message
+  sendSSEMessage(res, {
+    event: 'log',
+    data: 'Heartbeat stream started',
+    timestamp: new Date().toISOString(),
+    traceId
+  });
+
+  // Send heartbeat every 30 seconds
+  const heartbeat = setInterval(() => {
+    count++;
+    sendSSEMessage(res, {
+      event: 'heartbeat',
+      data: { count, message: 'ping' },
+      timestamp: new Date().toISOString(),
+      traceId
+    });
+
+    // Send a done message after 3 heartbeats for testing
+    if (count >= 3) {
+      sendSSEMessage(res, {
+        event: 'done',
+        data: 'Heartbeat test completed',
+        timestamp: new Date().toISOString(),
+        traceId
+      });
+      clearInterval(heartbeat);
+      res.end();
+    }
+  }, 30000);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+  });
+});
