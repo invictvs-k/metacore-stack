@@ -40,8 +40,8 @@ cleanup() {
     # Kill RoomServer if running
     if [ -n "$ROOMSERVER_PID" ]; then
         echo "Stopping RoomServer (PID: $ROOMSERVER_PID)..."
-        kill $ROOMSERVER_PID 2>/dev/null || true
-        wait $ROOMSERVER_PID 2>/dev/null || true
+        kill "$ROOMSERVER_PID" 2>/dev/null || true
+        wait "$ROOMSERVER_PID" 2>/dev/null || true
     fi
     
     # Clean up any processes on port 40801
@@ -129,7 +129,7 @@ start_server() {
         fi
         
         # Check if process is still running
-        if ! kill -0 $ROOMSERVER_PID 2>/dev/null; then
+        if ! kill -0 "$ROOMSERVER_PID" 2>/dev/null; then
             echo -e "${RED}❌ RoomServer process died${NC}"
             echo "Check server log: $ARTIFACTS_DIR/server.log"
             tail -20 "$ARTIFACTS_DIR/server.log"
