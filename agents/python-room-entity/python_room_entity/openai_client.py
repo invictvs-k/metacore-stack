@@ -68,7 +68,7 @@ class OpenAIChatClient(OpenAIResponder):
             "messages": list(messages),
         }
         if final_max_tokens is not None:
-            params["max_tokens"] = int(final_max_tokens)
+            params["max_tokens"] = final_max_tokens
         response = self.client.chat.completions.create(**params)
         choice = response.choices[0]
         message = choice.message
