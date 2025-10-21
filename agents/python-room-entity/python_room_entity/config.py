@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Mapping, Optional
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Union
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -56,7 +56,7 @@ class MessagePayload:
 
     channel: str = "room"
     type: str = "chat"
-    payload: Mapping[str, Any] | BaseModel = field(default_factory=dict)
+    payload: Union[Mapping[str, Any], BaseModel] = field(default_factory=dict)
     correlation_id: Optional[str] = None
 
     def as_dict(self) -> Dict[str, Any]:
