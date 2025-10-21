@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Union
 
@@ -45,7 +46,7 @@ class EventPayload(BaseModel):
     @field_validator("kind")
     @classmethod
     def _validate_kind(cls, value: str) -> str:
-        if not value or value.upper() != value:
+        if not value or not re.match(r'^[A-Z0-9_.]+$', value):
             raise ValueError("event kind must be SCREAMING_CASE (e.g. ROOM.STATE)")
         return value
 
