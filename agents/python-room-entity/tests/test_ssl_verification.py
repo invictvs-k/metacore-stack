@@ -38,7 +38,6 @@ def test_ssl_verification_passed_to_hub_connection(mock_builder_class: MagicMock
     # Test with HTTPS (should default to True)
     client_https = RoomClient("https://example.com/room")
     client_https.connect()
-    
     # Verify the with_url was called with verify_ssl=True
     call_args = mock_builder.with_url.call_args
     assert call_args[0][0] == "https://example.com/room"
