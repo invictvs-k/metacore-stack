@@ -38,7 +38,7 @@ cleanup() {
     echo -e "${YELLOW}Cleaning up...${NC}"
     
     # Kill RoomServer if running
-    if [ ! -z "$ROOMSERVER_PID" ]; then
+    if [ -n "$ROOMSERVER_PID" ]; then
         echo "Stopping RoomServer (PID: $ROOMSERVER_PID)..."
         kill $ROOMSERVER_PID 2>/dev/null || true
         wait $ROOMSERVER_PID 2>/dev/null || true
