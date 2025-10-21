@@ -50,6 +50,8 @@ updates:
           - 'major'
       # Security patches - separate group for visibility
       security:
+        patterns:
+          - '*'
         applies-to: security-updates
 
   # Integration API (backend tooling)
@@ -95,6 +97,8 @@ updates:
           - 'major'
       # Security patches
       security:
+        patterns:
+          - '*'
         applies-to: security-updates
 
   # Operator Dashboard (React frontend)
@@ -148,6 +152,8 @@ updates:
           - 'major'
       # Security patches
       security:
+        patterns:
+          - '*'
         applies-to: security-updates
 
   # JSON Schemas
@@ -184,6 +190,8 @@ updates:
           - 'major'
       # Security patches
       security:
+        patterns:
+          - '*'
         applies-to: security-updates
 
   # .NET Server (RoomServer)
