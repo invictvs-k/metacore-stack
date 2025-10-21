@@ -52,7 +52,7 @@ cleanup() {
         sleep 1
         # Force kill if needed
         REMAINING=$(lsof -ti:40801 2>/dev/null || true)
-        if [ ! -z "$REMAINING" ]; then
+        if [ -n "$REMAINING" ]; then
             echo "$REMAINING" | xargs kill -9 2>/dev/null || true
         fi
     fi
