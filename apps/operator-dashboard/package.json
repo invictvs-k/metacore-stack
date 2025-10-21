@@ -12,9 +12,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",
-    "zustand": "^4.4.7",
+    "zustand": "^5.0.8",
     "swr": "^2.2.4",
-    "zod": "^3.22.4",
+    "zod": "^4.1.12",
     "lucide-react": "^0.303.0",
     "clsx": "^2.0.0"
   },
