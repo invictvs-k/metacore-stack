@@ -1,37 +1,244 @@
 version: 2
 updates:
+  # Root workspace (shared dependencies, build tools, monorepo config)
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # Consolidate TypeScript/build tooling updates
+      typescript-stack:
+        patterns:
+          - 'typescript'
+          - '@types/*'
+          - 'ts-node'
+          - 'tsx'
+          - 'tsup'
+          - 'esbuild'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Consolidate linting/formatting tools
+      code-quality:
+        patterns:
+          - 'eslint*'
+          - '@typescript-eslint/*'
+          - 'prettier'
+          - 'lint-staged'
+          - 'husky'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Consolidate testing frameworks
+      testing:
+        patterns:
+          - 'vitest'
+          - 'jest'
+          - '@vitest/*'
+          - '@jest/*'
+          - 'mocha'
+          - 'chai'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Security patches - separate group for visibility
+      security:
+        patterns:
+          - '*'
+        applies-to: security-updates
 
+  # Integration API (backend tooling)
   - package-ecosystem: 'npm'
     directory: '/tools/integration-api'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # Express and server dependencies
+      express-stack:
+        patterns:
+          - 'express'
+          - 'helmet'
+          - 'cors'
+          - 'body-parser'
+          - 'compression'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # File system and utilities
+      utilities:
+        patterns:
+          - 'chokidar'
+          - 'globby'
+          - 'fs-extra'
+          - 'rimraf'
+          - 'uuid'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Development dependencies
+      dev-dependencies:
+        dependency-type: 'development'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Security patches
+      security:
+        patterns:
+          - '*'
+        applies-to: security-updates
 
+  # Operator Dashboard (React frontend)
   - package-ecosystem: 'npm'
     directory: '/apps/operator-dashboard'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # React ecosystem
+      react-stack:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - 'react-router*'
+          - '@types/react*'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # State management and data fetching
+      state-management:
+        patterns:
+          - 'zustand'
+          - 'zod'
+          - '@tanstack/*'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Build and dev tools
+      build-tools:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+          - 'rollup'
+          - 'webpack'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Development dependencies
+      dev-dependencies:
+        dependency-type: 'development'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Security patches
+      security:
+        patterns:
+          - '*'
+        applies-to: security-updates
 
+  # JSON Schemas
   - package-ecosystem: 'npm'
     directory: '/schemas'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # Schema validation tools
+      schema-tools:
+        patterns:
+          - 'ajv'
+          - 'json-schema*'
+          - '@apidevtools/*'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # All other dependencies
+      all-dependencies:
+        patterns:
+          - '*'
+        exclude-patterns:
+          - 'ajv'
+          - 'json-schema*'
+          - '@apidevtools/*'
+        update-types:
+          - 'patch'
+          - 'minor'
+          - 'major'
+      # Security patches
+      security:
+        patterns:
+          - '*'
+        applies-to: security-updates
 
+  # .NET Server (RoomServer)
   - package-ecosystem: 'nuget'
     directory: '/server-dotnet'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # Testing frameworks
+      testing:
+        patterns:
+          - 'xunit*'
+          - 'FluentAssertions*'
+          - 'Moq*'
+          - 'coverlet*'
+          - 'Microsoft.NET.Test.Sdk'
+      # ASP.NET Core
+      aspnet-core:
+        patterns:
+          - 'Microsoft.AspNetCore.*'
+          - 'Microsoft.Extensions.*'
+      # All other dependencies
+      production-dependencies:
+        patterns:
+          - '*'
+        exclude-patterns:
+          - 'xunit*'
+          - 'FluentAssertions*'
+          - 'Moq*'
+          - 'coverlet*'
+          - 'Microsoft.NET.Test.Sdk'
 
+  # GitHub Actions
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
       interval: 'weekly'
-    open-pull-requests-limit: 5
+      day: 'monday'
+      time: '09:00'
+      timezone: 'America/Sao_Paulo'
+    open-pull-requests-limit: 3
+    groups:
+      # Group all GitHub Actions together
+      github-actions:
+        patterns:
+          - '*'
