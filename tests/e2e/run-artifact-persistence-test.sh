@@ -46,7 +46,7 @@ cleanup() {
     
     # Clean up any processes on port 40801
     PIDS=$(lsof -ti:40801 2>/dev/null || true)
-    if [ ! -z "$PIDS" ]; then
+    if [ -n "$PIDS" ]; then
         echo "Cleaning up processes on port 40801..."
         echo "$PIDS" | xargs kill 2>/dev/null || true
         sleep 1
