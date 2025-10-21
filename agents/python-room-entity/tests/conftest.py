@@ -63,8 +63,6 @@ def room_server() -> Iterator[Dict[str, object]]:
             stderr_file.flush()
             
             # Read the tail of stdout and stderr for debugging
-            stdout_file.flush()
-            stderr_file.flush()
             
             def read_tail(filepath: str, lines: int = 50) -> str:
                 try:
