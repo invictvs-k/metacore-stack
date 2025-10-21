@@ -74,6 +74,9 @@
 - **[Integration Testing Guide](./TESTING.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec, howto, testing
 
+- **[Artifact Persistence E2E Testing Guide](./ARTIFACT_PERSISTENCE_TESTING.md)**  
+  _Last updated: 2025-10-21_ | Tags: testing, api, spec, howto
+
 - **[Integration API](../tools/integration-api/README.md)** (3 refs)  
   _Last updated: 2025-10-20_ | Tags: architecture, api, spec, howto, testing
 
