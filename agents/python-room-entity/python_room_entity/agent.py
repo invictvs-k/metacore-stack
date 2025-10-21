@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+from collections import deque
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List
+from typing import Any, Deque, Dict, Iterable, List
 
 from .client import RoomClient
 from .config import EntitySpec
@@ -36,8 +37,12 @@ class RoomAgent:
     responder: OpenAIResponder
     system_prompt: str = DEFAULT_SYSTEM_PROMPT
     max_history: int = 20
-    _history: List[ChatMessage] = field(default_factory=list, init=False)
+    _history: Deque[ChatMessage] = field(init=False)
     _running: bool = field(default=False, init=False)
+
+    def __post_init__(self) -> None:
+        """Initialize the history deque with the configured max_history."""
+        self._history = deque(maxlen=self.max_history)
 
     def start(self) -> List[Dict[str, Any]]:
         """Connect to the room and begin processing incoming messages."""
@@ -155,5 +160,3 @@ class RoomAgent:
 
     def _append_history(self, entry: ChatMessage) -> None:
         self._history.append(entry)
-        if len(self._history) > self.max_history:
-            self._history[:] = self._history[-self.max_history :]
