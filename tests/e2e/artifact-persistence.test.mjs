@@ -224,7 +224,7 @@ async function listArtifacts(workspace, entityId = null) {
       const items = response.body.items || [];
       console.log(`   ✅ Found ${items.length} artifact(s)`);
       items.forEach(item => {
-        console.log(`      - ${item.name} (v${item.version}, ${item.sha256.substring(0, 8)}...)`);
+        console.log(`      - ${item.name} (v${item.version}, ${(item.sha256 ? item.sha256.substring(0, 8) : 'N/A')}...)`);
       });
       logEvidence('list_artifacts', 'SUCCESS', {
         workspace,
