@@ -58,7 +58,8 @@ class RoomClient:
 
     @property
     def is_connected(self) -> bool:
-        return self._hub is not None and not self._disconnected.is_set()
+        with self._lock:
+            return self._hub is not None and not self._disconnected.is_set()
 
     @property
     def verify_ssl(self) -> bool:
@@ -68,8 +69,9 @@ class RoomClient:
     def connect(self) -> None:
         """Initialise the SignalR hub connection."""
 
-        if self._hub is not None:
-            raise RuntimeError("room client is already connected")
+        with self._lock:
+            if self._hub is not None:
+                raise RuntimeError("room client is already connected")
 
         # Build hub in a local variable first
         hub = (
@@ -94,7 +96,8 @@ class RoomClient:
         # Only clear disconnected flag and assign to self._hub after successful start
         try:
             hub.start()
-            self._hub = hub
+            with self._lock:
+                self._hub = hub
             self._disconnected.clear()
             self._logger.info("Connected to hub %s", self._hub_url)
         except Exception:
@@ -105,13 +108,15 @@ class RoomClient:
     def disconnect(self) -> None:
         """Gracefully close the SignalR connection."""
 
-        if self._hub is None:
-            return
+        with self._lock:
+            if self._hub is None:
+                return
+            hub = self._hub
+            self._hub = None
 
         try:
-            self._hub.stop()
+            hub.stop()
         finally:
-            self._hub = None
             self._disconnected.set()
             self._logger.info("Disconnected from hub")
 
