@@ -17,6 +17,25 @@ SERVER_PROJECT = ROOT / "server-dotnet" / "src" / "RoomServer" / "RoomServer.csp
 SERVER_URL = "http://127.0.0.1:5010"
 
 
+def _read_tail(filepath: str, lines: int = 50) -> str:
+    """Read the last N lines from a file for debugging purposes.
+    
+    Args:
+        filepath: Path to the file to read
+        lines: Number of lines to read from the end (default: 50)
+        
+    Returns:
+        String containing the last N lines of the file, or an error message
+    """
+    try:
+        with open(filepath, 'r') as f:
+            content = f.readlines()
+            tail = content[-lines:] if len(content) > lines else content
+            return ''.join(tail)
+    except Exception:
+        return "(unable to read output)"
+
+
 def _wait_for_health(timeout: float = 45.0) -> None:
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -62,18 +81,8 @@ def room_server() -> Iterator[Dict[str, object]]:
             stdout_file.flush()
             stderr_file.flush()
             
-            
-            def read_tail(filepath: str, lines: int = 50) -> str:
-                try:
-                    with open(filepath, 'r') as f:
-                        content = f.readlines()
-                        tail = content[-lines:] if len(content) > lines else content
-                        return ''.join(tail)
-                except Exception:
-                    return "(unable to read output)"
-            
-            stdout_tail = read_tail(stdout_file.name)
-            stderr_tail = read_tail(stderr_file.name)
+            stdout_tail = _read_tail(stdout_file.name)
+            stderr_tail = _read_tail(stderr_file.name)
             
             error_msg = "RoomServer failed to start (healthcheck failed)."
             if stdout_tail.strip():
