@@ -324,7 +324,7 @@ nuget/server-dotnet/tests/coverlet.collector-6.0.4
 
 ### B. YAML Configuration Diff
 
-See Git commit `e18d78d` for full diff:
+See the current changes for the full diff:
 - Added 24 dependency groups
 - Set timezone: `America/Sao_Paulo`
 - Set day: `monday`
