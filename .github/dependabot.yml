@@ -19,6 +19,10 @@ updates:
           - 'tsx'
           - 'tsup'
           - 'esbuild'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Consolidate linting/formatting tools
       code-quality:
         patterns:
@@ -27,6 +31,10 @@ updates:
           - 'prettier'
           - 'lint-staged'
           - 'husky'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Consolidate testing frameworks
       testing:
         patterns:
@@ -36,6 +44,10 @@ updates:
           - '@jest/*'
           - 'mocha'
           - 'chai'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Security patches - separate group for visibility
       security:
         update-types:
@@ -59,6 +71,10 @@ updates:
           - 'cors'
           - 'body-parser'
           - 'compression'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # File system and utilities
       utilities:
         patterns:
@@ -67,9 +83,17 @@ updates:
           - 'fs-extra'
           - 'rimraf'
           - 'uuid'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Development dependencies
       dev-dependencies:
         dependency-type: 'development'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Security patches
       security:
         update-types:
@@ -92,12 +116,20 @@ updates:
           - 'react-dom'
           - 'react-router*'
           - '@types/react*'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # State management and data fetching
       state-management:
         patterns:
           - 'zustand'
           - 'zod'
           - '@tanstack/*'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Build and dev tools
       build-tools:
         patterns:
@@ -105,9 +137,17 @@ updates:
           - '@vitejs/*'
           - 'rollup'
           - 'webpack'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Development dependencies
       dev-dependencies:
         dependency-type: 'development'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Security patches
       security:
         update-types:
@@ -129,10 +169,22 @@ updates:
           - 'ajv'
           - 'json-schema*'
           - '@apidevtools/*'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # All other dependencies
       all-dependencies:
         patterns:
           - '*'
+        exclude-patterns:
+          - 'ajv'
+          - 'json-schema*'
+          - '@apidevtools/*'
+        update-types:
+          - 'version-update:semver-major'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
       # Security patches
       security:
         update-types:
