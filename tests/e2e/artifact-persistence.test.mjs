@@ -283,7 +283,7 @@ function verifyArtifactContent(downloaded, expected, name) {
   const expectedHash = sha256(expected);
   
   if (downloadedHash === expectedHash) {
-    console.log(`   ✅ Content verified (SHA256: ${downloadedHash?.substring(0, 16)}...)`);
+    console.log(`   ✅ Content verified (SHA256: ${downloadedHash.substring(0, 16)}...)`);
     logEvidence('verify_content', 'SUCCESS', {
       name,
       expectedHash,
