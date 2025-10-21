@@ -20,9 +20,9 @@ updates:
           - 'tsup'
           - 'esbuild'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Consolidate linting/formatting tools
       code-quality:
         patterns:
@@ -32,9 +32,9 @@ updates:
           - 'lint-staged'
           - 'husky'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Consolidate testing frameworks
       testing:
         patterns:
@@ -45,13 +45,12 @@ updates:
           - 'mocha'
           - 'chai'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Security patches - separate group for visibility
       security:
-        update-types:
-          - 'security'
+        applies-to: security-updates
 
   # Integration API (backend tooling)
   - package-ecosystem: 'npm'
@@ -72,9 +71,9 @@ updates:
           - 'body-parser'
           - 'compression'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # File system and utilities
       utilities:
         patterns:
@@ -84,20 +83,19 @@ updates:
           - 'rimraf'
           - 'uuid'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Development dependencies
       dev-dependencies:
         dependency-type: 'development'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Security patches
       security:
-        update-types:
-          - 'security'
+        applies-to: security-updates
 
   # Operator Dashboard (React frontend)
   - package-ecosystem: 'npm'
@@ -117,9 +115,9 @@ updates:
           - 'react-router*'
           - '@types/react*'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # State management and data fetching
       state-management:
         patterns:
@@ -127,9 +125,9 @@ updates:
           - 'zod'
           - '@tanstack/*'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Build and dev tools
       build-tools:
         patterns:
@@ -138,20 +136,19 @@ updates:
           - 'rollup'
           - 'webpack'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Development dependencies
       dev-dependencies:
         dependency-type: 'development'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Security patches
       security:
-        update-types:
-          - 'security'
+        applies-to: security-updates
 
   # JSON Schemas
   - package-ecosystem: 'npm'
@@ -170,9 +167,9 @@ updates:
           - 'json-schema*'
           - '@apidevtools/*'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # All other dependencies
       all-dependencies:
         patterns:
@@ -182,13 +179,12 @@ updates:
           - 'json-schema*'
           - '@apidevtools/*'
         update-types:
-          - 'version-update:semver-major'
-          - 'version-update:semver-minor'
-          - 'version-update:semver-patch'
+          - 'patch'
+          - 'minor'
+          - 'major'
       # Security patches
       security:
-        update-types:
-          - 'security'
+        applies-to: security-updates
 
   # .NET Server (RoomServer)
   - package-ecosystem: 'nuget'
