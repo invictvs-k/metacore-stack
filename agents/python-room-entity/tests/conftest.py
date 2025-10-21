@@ -76,11 +76,6 @@ def room_server() -> Iterator[Dict[str, object]]:
             stdout_tail = read_tail(stdout_file.name)
             stderr_tail = read_tail(stderr_file.name)
             
-            error_msg = "RoomServer failed to start (healthcheck failed).\n"
-            if stdout_tail:
-                error_msg += f"\n--- Last 50 lines of stdout ---\n{stdout_tail}"
-            if stderr_tail:
-                error_msg += f"\n--- Last 50 lines of stderr ---\n{stderr_tail}"
             error_msg = "RoomServer failed to start (healthcheck failed)."
             if stdout_tail.strip():
                 error_msg += f"\n\nLast 50 lines of stdout:\n{stdout_tail}"
